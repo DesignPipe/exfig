@@ -1,0 +1,1 @@
+amends "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@0.8.0#/GeneratorSettings.pkl"

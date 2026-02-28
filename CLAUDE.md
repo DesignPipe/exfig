@@ -127,7 +127,7 @@ Fourteen modules in `Sources/`:
 | --------------- | --------------------------------------------------------- |
 | `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI              |
 | `ExFigCore`     | Domain models (Color, Image, TextStyle), processors       |
-| `ExFigConfig`   | PKL config parsing, evaluation, locator                   |
+| `ExFigConfig`   | PKL config parsing, evaluation, type bridging             |
 | `FigmaAPI`      | Figma REST API client, endpoints, response models         |
 | `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.) |
 | `ExFig-Android` | Android platform plugin                                   |
@@ -170,7 +170,7 @@ Sources/ExFig-{iOS,Android,Flutter,Web}/
 └── Export/          # Exporters (iOSColorsExporter, AndroidImagesExporter, etc.)
 
 Sources/ExFigConfig/
-└── PKL/             # PKL locator, evaluator, error types
+└── PKL/             # PKL evaluator, error types
 
 Sources/ExFigCLI/Resources/
 ├── Schemas/         # PKL schemas (ExFig.pkl, iOS.pkl, Android.pkl, Flutter.pkl, Web.pkl, Common.pkl, Figma.pkl)
@@ -234,7 +234,7 @@ Filter predicate sites that ALL need updating:
 When relocating a type (e.g., `Android.WebpOptions` → `Common.WebpOptions`), update ALL reference sites:
 
 1. PKL schemas (`Schemas/*.pkl`) — definition + imports + field types
-2. Codegen (`./bin/mise run codegen:pkl` or `.build/debug/pkl-gen-swift`)
+2. Codegen (`./bin/mise run codegen:pkl`)
 3. Swift bridging (`Sources/ExFig-*/Config/*Entry.swift`) — typealiases + extensions
 4. Init-template configs (`Sources/ExFigCLI/Resources/*Config.swift`) — `new Type { }` refs
 5. PKL examples (`Schemas/examples/*.pkl`)
@@ -352,13 +352,15 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | swift-resvg           | 0.45.1  | SVG parsing/rendering           |
 | swift-docc-plugin     | 1.4.5+  | DocC documentation              |
 | swift-yyjson          | 0.5.0+  | High-performance JSON codec     |
-| pkl-swift             | 0.7.2+  | PKL config evaluation & codegen |
+| pkl-swift             | 0.8.0+  | PKL config evaluation & codegen |
 
 ## Troubleshooting
 
 | Problem                     | Solution                                                                                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| pkl-gen-swift not found     | Build from SPM: `swift build --product pkl-gen-swift`, then `.build/debug/pkl-gen-swift`                     |
+| codegen:pkl gen.pkl error   | gen.pkl `read?` bug: needs `--generator-settings` + `--project-dir` flags (see mise.toml)                    |
+| xcsift "signal code 5"      | False positive when piping `swift test` through xcsift; run `swift test` directly to verify                  |
+| PKL tests need Pkl 0.31+    | Schemas use `isNotEmpty`; run tests via `./bin/mise exec -- swift test` to get correct Pkl in PATH           |
 | PKL FrameSource change      | Update ALL entry init calls in tests (EnumBridgingTests, IconsLoaderConfigTests)                             |
 | Build fails                 | `swift package clean && swift build`                                                                         |
 | Tests fail                  | Check `FIGMA_PERSONAL_TOKEN` is set                                                                          |

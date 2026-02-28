@@ -1018,6 +1018,26 @@ Available per-entry overrides:
 | Flutter  | `figmaFileId`, `templatesPath`                       |
 | Web      | `figmaFileId`, `templatesPath`                       |
 
+## Breaking: Pkl 0.31+ Required (v2.7.0)
+
+ExFig now requires **Pkl 0.31+** (previously 0.30.x). The PKL schemas use `isNotEmpty` / `isNotBlank` constraint builtins introduced in Pkl 0.31 — older versions will fail with a parse error during config evaluation.
+
+**How to upgrade:**
+
+- **mise (recommended):** Automatic — `mise.toml` pins `pkl = "0.31.0"`, no action needed
+- **Homebrew:** `brew upgrade pkl`
+- **Manual:** Download from [pkl-lang.org/main/current/pkl-cli/index.html](https://pkl-lang.org/main/current/pkl-cli/index.html#installation)
+
+Verify: `pkl --version` should show `0.31.0` or higher.
+
+**What changed internally:**
+
+- pkl-swift upgraded from 0.7.2 to 0.8.0 (new `registerPklTypes` API for faster type resolution)
+- Codegen switched from removed `pkl-gen-swift` binary to `pkl run @pkl.swift/gen.pkl`
+- PKL schemas use `isNotEmpty` instead of `!isEmpty` for constraint validation
+
+**Impact on consumer configs:** None — `.pkl` config files are fully compatible. Only the Pkl CLI version requirement changed.
+
 ## Cleanup
 
 After successful migration:

@@ -1,5 +1,5 @@
 {
-  "originHash" : "011f6ae74b685e4f02cbafb2b52fa7c4999ec379a804ef0dd84111453b28e959",
+  "originHash" : "4579a4d7673ce1d4fb4b31b7df0fc906f78237ed8c418874c56b9fbe086e1097",
   "pins" : [
     {
       "identity" : "aexml",
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/pkl-swift",
       "state" : {
-        "revision" : "d40f084bd85d1a2c871ca6542a7c4ebfc9bc6f65",
-        "version" : "0.7.2"
+        "revision" : "e105ad6d1a8b67cd94c0f7389f87da0ab59c18b2",
+        "version" : "0.8.0"
       }
     },
     {

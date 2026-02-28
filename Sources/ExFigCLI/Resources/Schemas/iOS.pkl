@@ -115,7 +115,7 @@ class IconsEntry extends Common.FrameSource {
 /// iOS images entry configuration.
 class ImagesEntry extends Common.FrameSource {
   /// Path to .xcassets folder for images.
-  assetsFolder: String(!isEmpty)
+  assetsFolder: String(isNotEmpty)
 
   /// Naming style for generated image names.
   nameStyle: Common.NameStyle = "camelCase"
@@ -199,10 +199,10 @@ class Typography {
 /// Root iOS platform configuration.
 class iOSConfig {
   /// Path to .xcodeproj file.
-  xcodeprojPath: String(!isEmpty)
+  xcodeprojPath: String(isNotEmpty)
 
   /// Xcode target name.
-  target: String(!isEmpty)
+  target: String(isNotEmpty)
 
   /// Path to main .xcassets folder.
   /// Required for colors (with useColorAssets), icons, and images export.

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "resolvedDependencies": {
+    "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@0": {
+      "type": "remote",
+      "uri": "projectpackage://pkg.pkl-lang.org/pkl-swift/pkl.swift@0.8.0",
+      "checksums": {
+        "sha256": "78099089810b37e32b06a0ab9afdc6e53e27f529ea766f3262ebf9c485234b3d"
+      }
+    }
+  }
+}

@@ -19,52 +19,84 @@ extension Android {
         case webp = "webp"
     }
 
-    /// Root Android platform configuration.
-    public struct AndroidConfig: PklRegisteredType, Decodable, Hashable, Sendable {
-        public static let registeredIdentifier: String = "Android#AndroidConfig"
+    /// Android platform configuration for ExFig.
+    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "Android"
 
-        /// Path to main res directory.
-        public var mainRes: String
+        public init() {}
+    }
 
-        /// Resource package name (R class package).
-        public var resourcePackage: String?
+    /// Name transformation for theme attributes.
+    public struct NameTransform: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "Android#NameTransform"
 
-        /// Path to main src directory for Kotlin generation.
-        public var mainSrc: String?
+        /// Target case style for attribute names.
+        public var style: Common.NameStyle?
 
-        /// Path to custom Jinja2 templates.
-        public var templatesPath: String?
+        /// Prefix to add to attribute names.
+        public var prefix: String?
 
-        /// Colors configuration entries.
-        public var colors: [ColorsEntry]?
+        /// Prefixes to strip from color names before transformation.
+        public var stripPrefixes: [String]?
 
-        /// Icons configuration entries.
-        public var icons: [IconsEntry]?
+        public init(style: Common.NameStyle?, prefix: String?, stripPrefixes: [String]?) {
+            self.style = style
+            self.prefix = prefix
+            self.stripPrefixes = stripPrefixes
+        }
+    }
 
-        /// Images configuration entries.
-        public var images: [ImagesEntry]?
+    /// Theme attributes configuration for generating attrs.xml and styles.xml.
+    public struct ThemeAttributes: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "Android#ThemeAttributes"
 
-        /// Typography configuration.
-        public var typography: Typography?
+        /// Whether theme attributes generation is enabled.
+        public var enabled: Bool?
+
+        /// Path to attrs.xml relative to mainRes.
+        public var attrsFile: String?
+
+        /// Path to styles.xml relative to mainRes.
+        public var stylesFile: String?
+
+        /// Path to styles-night.xml relative to mainRes.
+        public var stylesNightFile: String?
+
+        /// Theme name used in markers (e.g., "Theme.MyApp.Main").
+        public var themeName: String
+
+        /// Custom marker start text.
+        public var markerStart: String?
+
+        /// Custom marker end text.
+        public var markerEnd: String?
+
+        /// Name transformation configuration.
+        public var nameTransform: NameTransform?
+
+        /// If true, create file with markers if missing.
+        public var autoCreateMarkers: Bool?
 
         public init(
-            mainRes: String,
-            resourcePackage: String?,
-            mainSrc: String?,
-            templatesPath: String?,
-            colors: [ColorsEntry]?,
-            icons: [IconsEntry]?,
-            images: [ImagesEntry]?,
-            typography: Typography?
+            enabled: Bool?,
+            attrsFile: String?,
+            stylesFile: String?,
+            stylesNightFile: String?,
+            themeName: String,
+            markerStart: String?,
+            markerEnd: String?,
+            nameTransform: NameTransform?,
+            autoCreateMarkers: Bool?
         ) {
-            self.mainRes = mainRes
-            self.resourcePackage = resourcePackage
-            self.mainSrc = mainSrc
-            self.templatesPath = templatesPath
-            self.colors = colors
-            self.icons = icons
-            self.images = images
-            self.typography = typography
+            self.enabled = enabled
+            self.attrsFile = attrsFile
+            self.stylesFile = stylesFile
+            self.stylesNightFile = stylesNightFile
+            self.themeName = themeName
+            self.markerStart = markerStart
+            self.markerEnd = markerEnd
+            self.nameTransform = nameTransform
+            self.autoCreateMarkers = autoCreateMarkers
         }
     }
 
@@ -168,87 +200,6 @@ extension Android {
             self.nameValidateRegexp = nameValidateRegexp
             self.nameReplaceRegexp = nameReplaceRegexp
         }
-    }
-
-    /// Theme attributes configuration for generating attrs.xml and styles.xml.
-    public struct ThemeAttributes: PklRegisteredType, Decodable, Hashable, Sendable {
-        public static let registeredIdentifier: String = "Android#ThemeAttributes"
-
-        /// Whether theme attributes generation is enabled.
-        public var enabled: Bool?
-
-        /// Path to attrs.xml relative to mainRes.
-        public var attrsFile: String?
-
-        /// Path to styles.xml relative to mainRes.
-        public var stylesFile: String?
-
-        /// Path to styles-night.xml relative to mainRes.
-        public var stylesNightFile: String?
-
-        /// Theme name used in markers (e.g., "Theme.MyApp.Main").
-        public var themeName: String
-
-        /// Custom marker start text.
-        public var markerStart: String?
-
-        /// Custom marker end text.
-        public var markerEnd: String?
-
-        /// Name transformation configuration.
-        public var nameTransform: NameTransform?
-
-        /// If true, create file with markers if missing.
-        public var autoCreateMarkers: Bool?
-
-        public init(
-            enabled: Bool?,
-            attrsFile: String?,
-            stylesFile: String?,
-            stylesNightFile: String?,
-            themeName: String,
-            markerStart: String?,
-            markerEnd: String?,
-            nameTransform: NameTransform?,
-            autoCreateMarkers: Bool?
-        ) {
-            self.enabled = enabled
-            self.attrsFile = attrsFile
-            self.stylesFile = stylesFile
-            self.stylesNightFile = stylesNightFile
-            self.themeName = themeName
-            self.markerStart = markerStart
-            self.markerEnd = markerEnd
-            self.nameTransform = nameTransform
-            self.autoCreateMarkers = autoCreateMarkers
-        }
-    }
-
-    /// Name transformation for theme attributes.
-    public struct NameTransform: PklRegisteredType, Decodable, Hashable, Sendable {
-        public static let registeredIdentifier: String = "Android#NameTransform"
-
-        /// Target case style for attribute names.
-        public var style: Common.NameStyle?
-
-        /// Prefix to add to attribute names.
-        public var prefix: String?
-
-        /// Prefixes to strip from color names before transformation.
-        public var stripPrefixes: [String]?
-
-        public init(style: Common.NameStyle?, prefix: String?, stripPrefixes: [String]?) {
-            self.style = style
-            self.prefix = prefix
-            self.stripPrefixes = stripPrefixes
-        }
-    }
-
-    /// Android platform configuration for ExFig.
-    public struct Module: PklRegisteredType, Decodable, Hashable, Sendable {
-        public static let registeredIdentifier: String = "Android"
-
-        public init() {}
     }
 
     /// Android icons entry configuration.
@@ -475,6 +426,55 @@ extension Android {
             self.nameReplaceRegexp = nameReplaceRegexp
             self.nameStyle = nameStyle
             self.composePackageName = composePackageName
+        }
+    }
+
+    /// Root Android platform configuration.
+    public struct AndroidConfig: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "Android#AndroidConfig"
+
+        /// Path to main res directory.
+        public var mainRes: String
+
+        /// Resource package name (R class package).
+        public var resourcePackage: String?
+
+        /// Path to main src directory for Kotlin generation.
+        public var mainSrc: String?
+
+        /// Path to custom Jinja2 templates.
+        public var templatesPath: String?
+
+        /// Colors configuration entries.
+        public var colors: [ColorsEntry]?
+
+        /// Icons configuration entries.
+        public var icons: [IconsEntry]?
+
+        /// Images configuration entries.
+        public var images: [ImagesEntry]?
+
+        /// Typography configuration.
+        public var typography: Typography?
+
+        public init(
+            mainRes: String,
+            resourcePackage: String?,
+            mainSrc: String?,
+            templatesPath: String?,
+            colors: [ColorsEntry]?,
+            icons: [IconsEntry]?,
+            images: [ImagesEntry]?,
+            typography: Typography?
+        ) {
+            self.mainRes = mainRes
+            self.resourcePackage = resourcePackage
+            self.mainSrc = mainSrc
+            self.templatesPath = templatesPath
+            self.colors = colors
+            self.icons = icons
+            self.images = images
+            self.typography = typography
         }
     }
 

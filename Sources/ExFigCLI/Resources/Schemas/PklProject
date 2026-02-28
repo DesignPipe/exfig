@@ -13,3 +13,9 @@ package {
   sourceCodeUrlScheme = "https://github.com/alexey1312/ExFig/blob/v\(version)/Sources/ExFigCLI/Resources/Schemas%{path}#L%{line}-L%{endLine}"
   license = "MIT"
 }
+
+dependencies {
+  ["pkl.swift"] {
+    uri = "package://pkg.pkl-lang.org/pkl-swift/pkl.swift@0.8.0"
+  }
+}

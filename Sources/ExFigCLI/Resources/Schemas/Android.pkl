@@ -40,7 +40,7 @@ class ThemeAttributes {
   stylesNightFile: String? = "values-night/styles.xml"
 
   /// Theme name used in markers (e.g., "Theme.MyApp.Main").
-  themeName: String(!isEmpty)
+  themeName: String(isNotEmpty)
 
   /// Custom marker start text.
   markerStart: String?
@@ -100,7 +100,7 @@ class IconsEntry extends Common.FrameSource {
   templatesPath: String?
 
   /// Output directory for vector drawables.
-  output: String(!isEmpty)
+  output: String(isNotEmpty)
 
   /// Package name for generated Compose icons.
   composePackageName: String?
@@ -140,7 +140,7 @@ class ImagesEntry extends Common.FrameSource {
   scales: Listing<Number>? = new Listing { 1.0; 1.5; 2.0; 3.0; 4.0 }
 
   /// Output directory for images.
-  output: String(!isEmpty)
+  output: String(isNotEmpty)
 
   /// Output format for images.
   format: ImageFormat = "png"
@@ -183,7 +183,7 @@ class Typography {
 /// Root Android platform configuration.
 class AndroidConfig {
   /// Path to main res directory.
-  mainRes: String(!isEmpty)
+  mainRes: String(isNotEmpty)
 
   /// Resource package name (R class package).
   resourcePackage: String?

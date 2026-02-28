@@ -36,7 +36,7 @@ class WebpOptions {
 /// When set on a colors entry, bypasses Figma API and reads tokens from a local file.
 class TokensFile {
   /// Path to the .tokens.json file.
-  path: String(!isEmpty)
+  path: String(isNotEmpty)
 
   /// Optional dot-path prefix to filter tokens (e.g., "Brand.Colors").
   groupFilter: String?
@@ -177,13 +177,13 @@ class Typography extends NameProcessing {
 /// Used when all platforms share the same color source via common.variablesColors.
 class VariablesColors extends NameProcessing {
   /// Figma file ID containing the variables (required).
-  tokensFileId: String(!isEmpty)
+  tokensFileId: String(isNotEmpty)
 
   /// Name of the variable collection (required).
-  tokensCollectionName: String(!isEmpty)
+  tokensCollectionName: String(isNotEmpty)
 
   /// Mode name for light theme (required).
-  lightModeName: String(!isEmpty)
+  lightModeName: String(isNotEmpty)
 
   /// Mode name for dark theme.
   darkModeName: String?

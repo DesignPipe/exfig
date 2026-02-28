@@ -37,7 +37,7 @@ class IconsEntry extends Common.FrameSource {
   templatesPath: String?
 
   /// Output directory for generated icon components.
-  outputDirectory: String(!isEmpty)
+  outputDirectory: String(isNotEmpty)
 
   /// Directory for raw SVG files.
   svgDirectory: String?
@@ -61,7 +61,7 @@ class ImagesEntry extends Common.FrameSource {
   templatesPath: String?
 
   /// Output directory for generated image components.
-  outputDirectory: String(!isEmpty)
+  outputDirectory: String(isNotEmpty)
 
   /// Directory for image asset files.
   assetsDirectory: String?
@@ -78,7 +78,7 @@ class ImagesEntry extends Common.FrameSource {
 /// Root Web platform configuration.
 class WebConfig {
   /// Base output directory for all generated files.
-  output: String(!isEmpty)
+  output: String(isNotEmpty)
 
   /// Path to custom Jinja2 templates.
   templatesPath: String?

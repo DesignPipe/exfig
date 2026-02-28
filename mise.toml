@@ -50,7 +50,7 @@ actionlint = "1.7.9" # GitHub Actions linting
 git-cliff = "2.10.1" # Changelog generation
 
 # --- Configuration ---
-pkl = "0.30.2" # Configuration language (for hk.pkl)
+pkl = "0.31.0" # Configuration language (for hk.pkl)
 
 # --- Search ---
 "github:alexey1312/swift-index" = { version = "latest", os = [
@@ -179,23 +179,22 @@ description = "Preview unreleased changes"
 run = "git-cliff --unreleased"
 
 [tasks."codegen:pkl"]
-description = "Regenerate Swift types from PKL schemas (requires pkl-gen-swift)"
+description = "Regenerate Swift types from PKL schemas (requires pkl 0.31+)"
 run = """
 #!/bin/bash
 set -euo pipefail
 
-if ! command -v pkl-gen-swift &>/dev/null; then
-  echo "pkl-gen-swift not found. Install from:"
-  echo "  https://github.com/apple/pkl-swift/releases"
-  exit 1
-fi
-
 OUTPUT_DIR="Sources/ExFigConfig/Generated"
 SCHEMAS_DIR="Sources/ExFigCLI/Resources/Schemas"
 
-rm -f "$OUTPUT_DIR"/*.pkl.swift
+# Generate to temp dir first — avoids losing files if pkl run fails
+TEMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
-pkl-gen-swift \
+pkl run \
+  --project-dir "$SCHEMAS_DIR" \
+  "@pkl.swift/gen.pkl" \
+  --generator-settings "$SCHEMAS_DIR/generator-settings.pkl" \
   "$SCHEMAS_DIR/ExFig.pkl" \
   "$SCHEMAS_DIR/Common.pkl" \
   "$SCHEMAS_DIR/Figma.pkl" \
@@ -203,7 +202,11 @@ pkl-gen-swift \
   "$SCHEMAS_DIR/Android.pkl" \
   "$SCHEMAS_DIR/Flutter.pkl" \
   "$SCHEMAS_DIR/Web.pkl" \
-  -o "$OUTPUT_DIR/"
+  -o "$TEMP_DIR/"
+
+# Only replace files on success
+rm -f "$OUTPUT_DIR"/*.pkl.swift
+mv "$TEMP_DIR"/*.pkl.swift "$OUTPUT_DIR/"
 
 echo "✓ Generated $(ls -1 "$OUTPUT_DIR"/*.pkl.swift | wc -l | tr -d ' ') files in $OUTPUT_DIR/"
 """
