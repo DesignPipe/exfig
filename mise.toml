@@ -187,7 +187,9 @@ set -euo pipefail
 OUTPUT_DIR="Sources/ExFigConfig/Generated"
 SCHEMAS_DIR="Sources/ExFigCLI/Resources/Schemas"
 
-rm -f "$OUTPUT_DIR"/*.pkl.swift
+# Generate to temp dir first — avoids losing files if pkl run fails
+TEMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
 pkl run \
   --project-dir "$SCHEMAS_DIR" \
@@ -200,7 +202,11 @@ pkl run \
   "$SCHEMAS_DIR/Android.pkl" \
   "$SCHEMAS_DIR/Flutter.pkl" \
   "$SCHEMAS_DIR/Web.pkl" \
-  -o "$OUTPUT_DIR/"
+  -o "$TEMP_DIR/"
+
+# Only replace files on success
+rm -f "$OUTPUT_DIR"/*.pkl.swift
+mv "$TEMP_DIR"/*.pkl.swift "$OUTPUT_DIR/"
 
 echo "✓ Generated $(ls -1 "$OUTPUT_DIR"/*.pkl.swift | wc -l | tr -d ' ') files in $OUTPUT_DIR/"
 """

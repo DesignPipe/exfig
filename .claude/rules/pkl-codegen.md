@@ -28,7 +28,7 @@ Output: `Sources/ExFigConfig/Generated/*.pkl.swift` (committed to repo)
 
 ## Enum Bridging
 
-Generated enums use PKL raw values converted to Swift case names by pkl-gen-swift:
+Generated enums use PKL raw values converted to Swift case names by the pkl-swift codegen:
 - `"snake_case"` → `.snake_case` (underscore preserved)
 - `"kebab-case"` → `.kebabCase` (hyphen converted to camelCase)
 - `"SCREAMING_SNAKE_CASE"` → `.sCREAMING_SNAKE_CASE`

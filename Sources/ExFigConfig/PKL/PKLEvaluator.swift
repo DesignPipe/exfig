@@ -7,10 +7,10 @@ extension PklError: @retroactive LocalizedError {
     }
 }
 
-/// Evaluates PKL configuration files using pkl-swift's embedded evaluator.
+/// Evaluates PKL configuration files using pkl-swift's evaluator.
 ///
-/// Uses PklSwift's MessagePack-based evaluation instead of spawning a subprocess.
-/// This eliminates the need for pkl CLI to be installed (PKLLocator is no longer used).
+/// Spawns `pkl` CLI as a child process and communicates via MessagePack protocol.
+/// Requires `pkl` 0.31+ in PATH (managed by mise).
 ///
 /// Usage:
 /// ```swift
@@ -99,6 +99,8 @@ public enum PKLEvaluator {
             throw PKLError.configNotFound(path: configPath.path)
         }
 
+        // CRITICAL: Must execute before withEvaluator(), which triggers TypeRegistry.get()
+        // during decoding. registerPklTypes() has precondition(_shared == nil).
         _ = _typeRegistration
 
         var options = EvaluatorOptions.preconfigured

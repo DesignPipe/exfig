@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ExFigConfig evaluates PKL configuration files into strongly-typed Swift models and bridges them to ExFigCore domain types. It has three layers:
 
 1. **Generated types** (`Generated/*.pkl.swift`) — structs, protocols, and enums produced by `pkl run @pkl.swift/gen.pkl` from PKL schemas. Never edit manually.
-2. **PKL evaluator** (`PKL/`) — async entry point that evaluates `.pkl` files via PklSwift's embedded evaluator (requires `pkl` CLI in PATH).
+2. **PKL evaluator** (`PKL/`) — async entry point that spawns `pkl` CLI and communicates via MessagePack protocol. Requires `pkl` 0.31+ in PATH.
 3. **Bridging extensions** — convert PKL types to ExFigCore types (`NameStyleBridging.swift`, `VariablesSourceValidation.swift`).
 
 ## Commands
@@ -61,7 +61,7 @@ ExFigCore domain types (NameStyle, ColorsSourceInput, etc.)
 
 ### registerPklTypes Pattern
 
-`PKLEvaluator` uses `registerPklTypes()` (pkl-swift 0.8.0+) to bypass O(N) type scanning.
+`PKLEvaluator` uses `registerPklTypes(_:)` (pkl-swift 0.8.0+) to bypass O(N) type scanning.
 Uses `static let _typeRegistration` for thread-safe dispatch_once semantics.
 When adding new PKL types to schemas, regenerate with `codegen:pkl` and add the new type to the registration list in `PKLEvaluator.swift`.
 `registerPklTypes` has a hard `precondition(_shared == nil)` — must be called before any `TypeRegistry.get()`.

@@ -127,7 +127,7 @@ Fourteen modules in `Sources/`:
 | --------------- | --------------------------------------------------------- |
 | `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI              |
 | `ExFigCore`     | Domain models (Color, Image, TextStyle), processors       |
-| `ExFigConfig`   | PKL config parsing, evaluation, locator                   |
+| `ExFigConfig`   | PKL config parsing, evaluation, type bridging             |
 | `FigmaAPI`      | Figma REST API client, endpoints, response models         |
 | `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.) |
 | `ExFig-Android` | Android platform plugin                                   |
@@ -170,7 +170,7 @@ Sources/ExFig-{iOS,Android,Flutter,Web}/
 └── Export/          # Exporters (iOSColorsExporter, AndroidImagesExporter, etc.)
 
 Sources/ExFigConfig/
-└── PKL/             # PKL locator, evaluator, error types
+└── PKL/             # PKL evaluator, error types
 
 Sources/ExFigCLI/Resources/
 ├── Schemas/         # PKL schemas (ExFig.pkl, iOS.pkl, Android.pkl, Flutter.pkl, Web.pkl, Common.pkl, Figma.pkl)
@@ -234,7 +234,7 @@ Filter predicate sites that ALL need updating:
 When relocating a type (e.g., `Android.WebpOptions` → `Common.WebpOptions`), update ALL reference sites:
 
 1. PKL schemas (`Schemas/*.pkl`) — definition + imports + field types
-2. Codegen (`./bin/mise run codegen:pkl` or `.build/debug/pkl-gen-swift`)
+2. Codegen (`./bin/mise run codegen:pkl`)
 3. Swift bridging (`Sources/ExFig-*/Config/*Entry.swift`) — typealiases + extensions
 4. Init-template configs (`Sources/ExFigCLI/Resources/*Config.swift`) — `new Type { }` refs
 5. PKL examples (`Schemas/examples/*.pkl`)
