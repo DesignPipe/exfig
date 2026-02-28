@@ -488,7 +488,8 @@ final class TokensFileSourceTests: XCTestCase {
         }
         """.utf8
 
-        let source = try TokensFileSource.parse(data: Data(json))
+        var source = try TokensFileSource.parse(data: Data(json))
+        try source.resolveAliases()
         let colors = source.toColors()
         XCTAssertEqual(colors.count, 1)
         XCTAssertEqual(colors[0].name, "Brand/Primary")
@@ -509,7 +510,8 @@ final class TokensFileSourceTests: XCTestCase {
         }
         """.utf8
 
-        let source = try TokensFileSource.parse(data: Data(json))
+        var source = try TokensFileSource.parse(data: Data(json))
+        try source.resolveAliases()
         let styles = source.toTextStyles()
         XCTAssertEqual(styles.count, 1)
         XCTAssertEqual(styles[0].name, "Heading")
@@ -528,7 +530,8 @@ final class TokensFileSourceTests: XCTestCase {
         }
         """.utf8
 
-        let source = try TokensFileSource.parse(data: Data(json))
+        var source = try TokensFileSource.parse(data: Data(json))
+        try source.resolveAliases()
         let tokens = source.toDimensionTokens()
         XCTAssertEqual(tokens.count, 1)
         XCTAssertEqual(tokens[0].name, "Spacing")
@@ -546,7 +549,8 @@ final class TokensFileSourceTests: XCTestCase {
         }
         """.utf8
 
-        let source = try TokensFileSource.parse(data: Data(json))
+        var source = try TokensFileSource.parse(data: Data(json))
+        try source.resolveAliases()
         let tokens = source.toNumberTokens()
         XCTAssertEqual(tokens.count, 1)
         XCTAssertEqual(tokens[0].value, 0.5)
