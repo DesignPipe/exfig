@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.2] - 2026-03-03
+
+### Refactor
+
+- Update icon generation to class-based structure by @alexey1312
+
+
 ## [2.7.1] - 2026-03-03
 
 ### Features
