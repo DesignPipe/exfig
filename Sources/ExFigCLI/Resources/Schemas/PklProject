@@ -3,7 +3,7 @@ amends "pkl:Project"
 package {
   name = "exfig"
   baseUri = "package://github.com/alexey1312/ExFig/releases/download/v\(version)/exfig"
-  version = "2.7.0"
+  version = "2.7.1"
   packageZipUrl = "https://github.com/alexey1312/ExFig/releases/download/v\(version)/\(name)@\(version).zip"
   description = "ExFig configuration schemas for exporting Figma assets to iOS, Android, Flutter, and Web"
   authors {
