@@ -245,6 +245,28 @@ When `groupUsingNamespace = true`, colors are organized in folders:
 | `text/primary`    | `Colors/text/primary.colorset`    | `textPrimary`    |
 | `background/card` | `Colors/background/card.colorset` | `backgroundCard` |
 
+## Assets Folder Namespace
+
+When `assetsFolderProvidesNamespace = true`, the assets folder itself gets `provides-namespace` in its
+`Contents.json`. Colors are then accessed with the folder prefix:
+
+```pkl
+colors = new iOS.ColorsEntry {
+  assetsFolder = "MyColors"
+  assetsFolderProvidesNamespace = true
+  // ...
+}
+```
+
+| Figma Name | Asset Path                           | Swift Access                          |
+| ---------- | ------------------------------------ | ------------------------------------- |
+| `primary`  | `MyColors/primary.colorset`         | `UIColor(named: "MyColors/primary")` |
+| `accent`   | `MyColors/accent.colorset`          | `Color("MyColors/accent")`           |
+
+This is useful when multiple `.xcassets` share color names — the folder prefix disambiguates them.
+
+> Note: `assetsFolder` is required when `assetsFolderProvidesNamespace = true`.
+
 ## See Also
 
 - <doc:iOS>

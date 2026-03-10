@@ -10,6 +10,8 @@ public struct XcodeColorsOutput {
     public let colorSwiftURL: URL?
     public let swiftuiColorSwiftURL: URL?
     public let groupUsingNamespace: Bool
+    public let assetsFolderProvidesNamespace: Bool
+    public let assetsFolderName: String?
     public let templatesPath: URL?
 
     public init(
@@ -21,6 +23,8 @@ public struct XcodeColorsOutput {
         colorSwiftURL: URL? = nil,
         swiftuiColorSwiftURL: URL? = nil,
         groupUsingNamespace: Bool? = nil,
+        assetsFolderProvidesNamespace: Bool? = nil,
+        assetsFolderName: String? = nil,
         templatesPath: URL? = nil
     ) {
         self.assetsColorsURL = assetsColorsURL
@@ -31,6 +35,8 @@ public struct XcodeColorsOutput {
         self.colorSwiftURL = colorSwiftURL
         self.swiftuiColorSwiftURL = swiftuiColorSwiftURL
         self.groupUsingNamespace = groupUsingNamespace ?? false
+        self.assetsFolderProvidesNamespace = assetsFolderProvidesNamespace ?? false
+        self.assetsFolderName = assetsFolderName
         self.templatesPath = templatesPath
     }
 }

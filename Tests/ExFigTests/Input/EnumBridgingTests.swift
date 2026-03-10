@@ -60,6 +60,7 @@ final class EnumBridgingTests: XCTestCase {
                 assetsFolder: nil,
                 nameStyle: pklStyle,
                 groupUsingNamespace: nil,
+                assetsFolderProvidesNamespace: nil,
                 colorSwift: nil,
                 swiftuiColorSwift: nil,
                 xcassetsPath: nil,
@@ -427,6 +428,7 @@ final class EnumBridgingTests: XCTestCase {
             assetsFolder: nil,
             nameStyle: .camelCase,
             groupUsingNamespace: nil,
+            assetsFolderProvidesNamespace: nil,
             colorSwift: nil,
             swiftuiColorSwift: nil,
             xcassetsPath: nil,
@@ -454,6 +456,7 @@ final class EnumBridgingTests: XCTestCase {
             assetsFolder: nil,
             nameStyle: .camelCase,
             groupUsingNamespace: nil,
+            assetsFolderProvidesNamespace: nil,
             colorSwift: nil,
             swiftuiColorSwift: nil,
             xcassetsPath: nil,
@@ -481,6 +484,7 @@ final class EnumBridgingTests: XCTestCase {
             assetsFolder: nil,
             nameStyle: .camelCase,
             groupUsingNamespace: nil,
+            assetsFolderProvidesNamespace: nil,
             colorSwift: nil,
             swiftuiColorSwift: nil,
             xcassetsPath: nil,
@@ -512,6 +516,7 @@ final class EnumBridgingTests: XCTestCase {
             assetsFolder: nil,
             nameStyle: .camelCase,
             groupUsingNamespace: nil,
+            assetsFolderProvidesNamespace: nil,
             colorSwift: nil,
             swiftuiColorSwift: nil,
             xcassetsPath: nil,
@@ -541,6 +546,7 @@ final class EnumBridgingTests: XCTestCase {
             assetsFolder: nil,
             nameStyle: .camelCase,
             groupUsingNamespace: nil,
+            assetsFolderProvidesNamespace: nil,
             colorSwift: nil,
             swiftuiColorSwift: nil,
             xcassetsPath: nil,
@@ -570,6 +576,7 @@ final class EnumBridgingTests: XCTestCase {
             assetsFolder: nil,
             nameStyle: .camelCase,
             groupUsingNamespace: nil,
+            assetsFolderProvidesNamespace: nil,
             colorSwift: nil,
             swiftuiColorSwift: nil,
             xcassetsPath: nil,
@@ -676,7 +683,7 @@ final class EnumBridgingTests: XCTestCase {
     func testiOSColorsEntryThrowsOnMissingTokensCollectionName() {
         let entry = iOS.ColorsEntry(
             useColorAssets: false, assetsFolder: nil, nameStyle: .camelCase,
-            groupUsingNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
+            groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
             tokensFile: nil, tokensFileId: "file123", tokensCollectionName: nil, lightModeName: "Light",
@@ -691,7 +698,7 @@ final class EnumBridgingTests: XCTestCase {
     func testiOSColorsEntryThrowsOnEmptyTokensCollectionName() {
         let entry = iOS.ColorsEntry(
             useColorAssets: false, assetsFolder: nil, nameStyle: .camelCase,
-            groupUsingNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
+            groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
             tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "", lightModeName: "Light",
@@ -706,7 +713,7 @@ final class EnumBridgingTests: XCTestCase {
     func testiOSColorsEntryThrowsOnMissingLightModeName() {
         let entry = iOS.ColorsEntry(
             useColorAssets: false, assetsFolder: nil, nameStyle: .camelCase,
-            groupUsingNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
+            groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
             tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "Collection", lightModeName: nil,
@@ -721,7 +728,7 @@ final class EnumBridgingTests: XCTestCase {
     func testiOSColorsEntryThrowsOnEmptyLightModeName() {
         let entry = iOS.ColorsEntry(
             useColorAssets: false, assetsFolder: nil, nameStyle: .camelCase,
-            groupUsingNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
+            groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
             tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "Collection", lightModeName: "",

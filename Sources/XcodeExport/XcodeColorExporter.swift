@@ -2,6 +2,18 @@ import ExFigCore
 import Foundation
 
 public final class XcodeColorExporter: XcodeExporterBase {
+    enum Error: LocalizedError {
+        case missingAssetsFolderName
+
+        var errorDescription: String? {
+            "assetsFolderProvidesNamespace requires a non-empty assetsFolder name"
+        }
+
+        var recoverySuggestion: String? {
+            "Set assetsFolder in your iOS colors entry when using assetsFolderProvidesNamespace"
+        }
+    }
+
     private let output: XcodeColorsOutput
 
     public init(output: XcodeColorsOutput) {
@@ -9,6 +21,12 @@ public final class XcodeColorExporter: XcodeExporterBase {
     }
 
     public func export(colorPairs: [AssetPair<Color>]) throws -> [FileContents] {
+        if output.assetsFolderProvidesNamespace {
+            guard let name = output.assetsFolderName, !name.isEmpty else {
+                throw Error.missingAssetsFolderName
+            }
+        }
+
         var files: [FileContents] = []
 
         // UIKit UIColor extension
@@ -24,7 +42,11 @@ public final class XcodeColorExporter: XcodeExporterBase {
         guard let assetCatalogURL = output.assetsColorsURL else { return files }
 
         // Assets.xcassets/Colors/Contents.json
-        files.append(makeXcodeEmptyFileContents(directoryURL: assetCatalogURL))
+        if output.assetsFolderProvidesNamespace {
+            files.append(makeXcodeNamespaceFileContents(directoryURL: assetCatalogURL))
+        } else {
+            files.append(makeXcodeEmptyFileContents(directoryURL: assetCatalogURL))
+        }
 
         // Assets.xcassets/Colors/***.colorset/Contents.json
         try files.append(contentsOf: makeAssets(for: colorPairs, assetCatalogURL: assetCatalogURL))
@@ -53,7 +75,7 @@ public final class XcodeColorExporter: XcodeExporterBase {
 
             let name = normalizeName(colorPair.light.name)
             obj["name"] = name
-            obj["originalName"] = colorPair.light.originalName
+            obj["originalName"] = assetFolderPrefixed(colorPair.light.originalName)
 
             if !useAssets {
                 let lightComponents = colorPair.light.toRgbComponents()
@@ -73,7 +95,7 @@ public final class XcodeColorExporter: XcodeExporterBase {
             "resourceBundleNames": output.resourceBundleNames ?? [],
             "colorFromAssetCatalog": useAssets,
             "assetsInMainBundle": output.assetsInMainBundle,
-            "useNamespace": output.groupUsingNamespace,
+            "useNamespace": output.groupUsingNamespace || output.assetsFolderProvidesNamespace,
             "colors": colors,
         ]
 
@@ -92,7 +114,7 @@ public final class XcodeColorExporter: XcodeExporterBase {
 
             var obj: [String: Any] = [:]
             obj["name"] = name
-            obj["originalName"] = colorPair.light.originalName
+            obj["originalName"] = assetFolderPrefixed(colorPair.light.originalName)
 
             if !useAssets {
                 let lightComponents = colorPair.light.toRgbComponents()
@@ -130,7 +152,7 @@ public final class XcodeColorExporter: XcodeExporterBase {
             "addObjcPrefix": output.addObjcAttribute,
             "colorFromAssetCatalog": useAssets,
             "assetsInMainBundle": output.assetsInMainBundle,
-            "useNamespace": output.groupUsingNamespace,
+            "useNamespace": output.groupUsingNamespace || output.assetsFolderProvidesNamespace,
             "colors": colors,
         ]
 
@@ -139,6 +161,21 @@ public final class XcodeColorExporter: XcodeExporterBase {
             name: "UIColor+extension.swift.jinja",
             context: fullContext,
             templatesPath: output.templatesPath
+        )
+    }
+
+    private func assetFolderPrefixed(_ originalName: String) -> String {
+        if output.assetsFolderProvidesNamespace, let prefix = output.assetsFolderName {
+            return "\(prefix)/\(originalName)"
+        }
+        return originalName
+    }
+
+    private func makeXcodeNamespaceFileContents(directoryURL: URL) -> FileContents {
+        let contentsJson = XcodeFolderNamespaceContents()
+        return FileContents(
+            destination: Destination(directory: directoryURL, file: contentsJson.fileURL),
+            data: contentsJson.data
         )
     }
 

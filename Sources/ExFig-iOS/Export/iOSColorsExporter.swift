@@ -128,6 +128,8 @@ public struct iOSColorsExporter: ColorsExporter {
             colorSwiftURL: entry.colorSwiftURL,
             swiftuiColorSwiftURL: entry.swiftuiColorSwiftURL,
             groupUsingNamespace: entry.groupUsingNamespace,
+            assetsFolderProvidesNamespace: entry.assetsFolderProvidesNamespace,
+            assetsFolderName: entry.assetsFolder,
             templatesPath: entry.resolvedTemplatesPath(fallback: platformConfig.templatesPath)
         )
 

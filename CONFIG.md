@@ -389,6 +389,7 @@ colors = new iOS.ColorsEntry {
   colorSwift = "./Sources/UIColor+extension.swift"
   swiftuiColorSwift = "./Source/Color+extension.swift"
   // groupUsingNamespace = false
+  // assetsFolderProvidesNamespace = false
   // syncCodeSyntax = true
   // codeSyntaxTemplate = "Color.{name}"
 }
@@ -398,16 +399,17 @@ colors = new iOS.ColorsEntry {
 (`tokensFileId`, `tokensCollectionName`, `lightModeName`, etc.) for multi-entry configs where each entry specifies its
 own source. When using a single entry, the source comes from `common.variablesColors`.
 
-| Field                 | Type        | Required | Description                                                                 |
-| --------------------- | ----------- | -------- | --------------------------------------------------------------------------- |
-| `useColorAssets`      | `Boolean`   | Yes      | Export to `.xcassets` (true) or code-only (false)                           |
-| `assetsFolder`        | `String?`   | No*      | Folder inside Assets.xcassets for `.colorset` files                         |
-| `nameStyle`           | `NameStyle` | Yes      | Name style: `camelCase`, `snake_case`, `PascalCase`, `SCREAMING_SNAKE_CASE` |
-| `colorSwift`          | `String?`   | No       | Path to generate UIColor extension file                                     |
-| `swiftuiColorSwift`   | `String?`   | No       | Path to generate SwiftUI Color extension file                               |
-| `groupUsingNamespace` | `Boolean?`  | No       | Group by "/" using Xcode namespaces (default: false)                        |
-| `syncCodeSyntax`      | `Boolean?`  | No       | Sync names to Figma codeSyntax.iOS field                                    |
-| `codeSyntaxTemplate`  | `String?`   | No       | Template for codeSyntax, e.g. `"Color.{name}"`                              |
+| Field                           | Type        | Required | Description                                                                 |
+| ------------------------------- | ----------- | -------- | --------------------------------------------------------------------------- |
+| `useColorAssets`                | `Boolean`   | Yes      | Export to `.xcassets` (true) or code-only (false)                           |
+| `assetsFolder`                  | `String?`   | No*      | Folder inside Assets.xcassets for `.colorset` files                         |
+| `nameStyle`                     | `NameStyle` | Yes      | Name style: `camelCase`, `snake_case`, `PascalCase`, `SCREAMING_SNAKE_CASE` |
+| `colorSwift`                    | `String?`   | No       | Path to generate UIColor extension file                                     |
+| `swiftuiColorSwift`             | `String?`   | No       | Path to generate SwiftUI Color extension file                               |
+| `groupUsingNamespace`           | `Boolean?`  | No       | Group by "/" using Xcode namespaces (default: false)                        |
+| `assetsFolderProvidesNamespace` | `Boolean?`  | No       | Set `provides-namespace` on assetsFolder (default: false)                   |
+| `syncCodeSyntax`                | `Boolean?`  | No       | Sync names to Figma codeSyntax.iOS field                                    |
+| `codeSyntaxTemplate`            | `String?`   | No       | Template for codeSyntax, e.g. `"Color.{name}"`                              |
 
 *Required when `useColorAssets = true`.
 

@@ -360,6 +360,174 @@ final class XcodeColorExporterTests: XCTestCase {
         """)
     }
 
+    func testExport_withAssetsFolderProvidesNamespace() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: colorsAssetCatalog,
+            assetsInMainBundle: true,
+            colorSwiftURL: colorsFile,
+            assetsFolderProvidesNamespace: true,
+            assetsFolderName: "MyColors"
+        )
+        let exporter = XcodeColorExporter(output: output)
+
+        let result = try exporter.export(colorPairs: [colorPair1, colorPair2])
+
+        XCTAssertEqual(result.count, 4)
+        XCTAssertTrue(result[0].destination.url.absoluteString.hasSuffix("Colors.swift"))
+        XCTAssertTrue(result[1].destination.url.absoluteString.hasSuffix("Assets.xcassets/Colors/Contents.json"))
+        XCTAssertTrue(result[2].destination.url.absoluteString.hasSuffix("colorPair1.colorset/Contents.json"))
+        XCTAssertTrue(result[3].destination.url.absoluteString.hasSuffix("colorPair2.colorset/Contents.json"))
+
+        // Verify folder Contents.json has provides-namespace
+        let folderContents = try XCTUnwrap(result[1].data)
+        let folderJson = try XCTUnwrap(String(data: folderContents, encoding: .utf8))
+        XCTAssertTrue(folderJson.contains("provides-namespace"), "Folder Contents.json should have provides-namespace")
+
+        // Verify Swift extension uses folder-prefixed names
+        let content = result[0].data
+        XCTAssertNotNil(content)
+
+        try assertCodeEquals(content, """
+        \(header)
+
+        import UIKit
+
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
+        public extension UIColor {
+            static var colorPair1: UIColor { UIColor(named: "MyColors/colorPair1")! }
+            static var colorPair2: UIColor { UIColor(named: "MyColors/colorPair2")! }
+        }
+
+        """)
+    }
+
+    func testExport_withAssetsFolderProvidesNamespace_swiftui() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: colorsAssetCatalog,
+            assetsInMainBundle: true,
+            colorSwiftURL: nil,
+            swiftuiColorSwiftURL: colorsFile,
+            assetsFolderProvidesNamespace: true,
+            assetsFolderName: "MyColors"
+        )
+        let exporter = XcodeColorExporter(output: output)
+
+        let result = try exporter.export(colorPairs: [colorPair1])
+
+        let content = result[0].data
+
+        try assertCodeEquals(content, """
+        \(header)
+
+        import SwiftUI
+
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
+        public extension ShapeStyle where Self == Color {
+            static var colorPair1: Color { Color("MyColors/colorPair1") }
+        }
+
+        """)
+    }
+
+    func testExport_withAssetsFolderProvidesNamespace_nilFolderName_throws() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: colorsAssetCatalog,
+            assetsInMainBundle: true,
+            colorSwiftURL: colorsFile,
+            assetsFolderProvidesNamespace: true,
+            assetsFolderName: nil
+        )
+        let exporter = XcodeColorExporter(output: output)
+
+        XCTAssertThrowsError(try exporter.export(colorPairs: [colorPair1]))
+    }
+
+    func testExport_withAssetsFolderProvidesNamespace_emptyFolderName_throws() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: colorsAssetCatalog,
+            assetsInMainBundle: true,
+            colorSwiftURL: colorsFile,
+            assetsFolderProvidesNamespace: true,
+            assetsFolderName: ""
+        )
+        let exporter = XcodeColorExporter(output: output)
+
+        XCTAssertThrowsError(try exporter.export(colorPairs: [colorPair1]))
+    }
+
+    func testExport_withAssetsFolderProvidesNamespace_false_usesFunction() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: colorsAssetCatalog,
+            assetsInMainBundle: true,
+            colorSwiftURL: colorsFile,
+            assetsFolderProvidesNamespace: false,
+            assetsFolderName: "MyColors"
+        )
+        let exporter = XcodeColorExporter(output: output)
+
+        let result = try exporter.export(colorPairs: [colorPair1])
+
+        let content = result[0].data
+
+        try assertCodeEquals(content, """
+        \(header)
+
+        import UIKit
+
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
+        public extension UIColor {
+            static var colorPair1: UIColor { UIColor(named: #function)! }
+        }
+
+        """)
+    }
+
+    func testExport_withGroupUsingNamespace_andAssetsFolderProvidesNamespace() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: colorsAssetCatalog,
+            assetsInMainBundle: true,
+            colorSwiftURL: colorsFile,
+            groupUsingNamespace: true,
+            assetsFolderProvidesNamespace: true,
+            assetsFolderName: "MyColors"
+        )
+        let exporter = XcodeColorExporter(output: output)
+
+        let result = try exporter.export(colorPairs: [colorPair3])
+
+        // Verify folder Contents.json has provides-namespace
+        let folderContents = try XCTUnwrap(result[1].data)
+        let folderJson = try XCTUnwrap(String(data: folderContents, encoding: .utf8))
+        XCTAssertTrue(folderJson.contains("provides-namespace"))
+
+        // Verify Swift extension uses folder-prefixed originalName
+        let content = result[0].data
+
+        try assertCodeEquals(content, """
+        \(header)
+
+        import UIKit
+
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
+        public extension UIColor {
+            static var backgroundPrimary: UIColor { UIColor(named: "MyColors/background/primary")! }
+        }
+
+        """)
+    }
+
     func testExportWhenNameIsSwiftKeyword() throws {
         let output = XcodeColorsOutput(assetsColorsURL: nil, assetsInMainBundle: true, colorSwiftURL: colorsFile)
         let exporter = XcodeColorExporter(output: output)

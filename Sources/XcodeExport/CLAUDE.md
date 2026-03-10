@@ -32,11 +32,11 @@ XcodeExporterBase                  # Shared: Jinja template loading, Swift keywo
 
 Each exporter is initialized with an Output struct that declares **what to generate** via optional URLs:
 
-| Output Type             | Controls                                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `XcodeColorsOutput`     | `assetsColorsURL`, `colorSwiftURL`, `swiftuiColorSwiftURL`, namespace                                        |
-| `XcodeImagesOutput`     | `assetsFolderURL`, `uiKitImageExtensionURL`, `swiftUIImageExtensionURL`, `codeConnectSwiftURL`, `renderMode` |
-| `XcodeTypographyOutput` | Font extension URLs, label directory, label style extension URL                                              |
+| Output Type             | Controls                                                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `XcodeColorsOutput`     | `assetsColorsURL`, `colorSwiftURL`, `swiftuiColorSwiftURL`, `groupUsingNamespace`, `assetsFolderProvidesNamespace` |
+| `XcodeImagesOutput`     | `assetsFolderURL`, `uiKitImageExtensionURL`, `swiftUIImageExtensionURL`, `codeConnectSwiftURL`, `renderMode`       |
+| `XcodeTypographyOutput` | Font extension URLs, label directory, label style extension URL                                                    |
 
 A `nil` URL means "skip generating that file". This is how callers control which outputs are produced.
 

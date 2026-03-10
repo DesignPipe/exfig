@@ -65,6 +65,10 @@ extension iOS {
         /// Group colors using namespace in asset catalog.
         public var groupUsingNamespace: Bool?
 
+        /// Set "provides-namespace" on the assetsFolder in asset catalog.
+        /// When true, colors are accessed with folder prefix: "FolderName/colorName".
+        public var assetsFolderProvidesNamespace: Bool?
+
         /// Path to generate UIColor extension Swift file.
         public var colorSwift: String?
 
@@ -121,6 +125,7 @@ extension iOS {
             assetsFolder: String?,
             nameStyle: Common.NameStyle,
             groupUsingNamespace: Bool?,
+            assetsFolderProvidesNamespace: Bool?,
             colorSwift: String?,
             swiftuiColorSwift: String?,
             xcassetsPath: String?,
@@ -142,6 +147,7 @@ extension iOS {
             self.assetsFolder = assetsFolder
             self.nameStyle = nameStyle
             self.groupUsingNamespace = groupUsingNamespace
+            self.assetsFolderProvidesNamespace = assetsFolderProvidesNamespace
             self.colorSwift = colorSwift
             self.swiftuiColorSwift = swiftuiColorSwift
             self.xcassetsPath = xcassetsPath
