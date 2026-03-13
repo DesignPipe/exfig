@@ -33,7 +33,7 @@ cmd "colors" help="Exports colors from Figma" {
     flag "--timeout <seconds>" help="Figma API request timeout in seconds (overrides config)"
     flag "--report <path>" help="Path to write JSON report"
 
-    arg "[filter]" help="Name of the colors to export (e.g., 'background/*', 'background/default, background/secondary')"
+    arg "[filter]" help="Name of colors to export (e.g., 'background/default' for one, 'background/default, background/secondary' for several, 'background/*' for all from folder)"
 }
 
 // =============================================================================
@@ -57,7 +57,7 @@ cmd "icons" help="Exports icons from Figma" {
     flag "--strict-path-validation" help="Exit with error if any Android icon pathData exceeds 32,767 bytes (AAPT limit)"
     flag "--report <path>" help="Path to write JSON report"
 
-    arg "[filter]" help="Name of the icons to export (e.g., 'ic/24/edit', 'ic/16/*')"
+    arg "[filter]" help="Name of icons to export (e.g., 'ic/24/edit' for one, 'ic/24/edit, ic/16/notification' for several, 'ic/16/*' for all of size 16 pt)"
 }
 
 // =============================================================================
@@ -80,7 +80,7 @@ cmd "images" help="Exports images from Figma" {
     flag "--concurrent-downloads <n>" help="Maximum concurrent CDN downloads" default="20"
     flag "--report <path>" help="Path to write JSON report"
 
-    arg "[filter]" help="Name of the images to export (e.g., 'img/login', 'img/onboarding/*')"
+    arg "[filter]" help="Name of images to export (e.g., 'img/login' for one, 'img/onboarding/1, img/onboarding/2' for several, 'img/onboarding/*' for all from group)"
 }
 
 // =============================================================================
