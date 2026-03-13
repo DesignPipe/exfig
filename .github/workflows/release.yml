@@ -194,12 +194,21 @@ jobs:
 
       - name: Generate shell completions
         run: |
-          curl -sL "https://github.com/jdx/usage/releases/latest/download/usage-x86_64-unknown-linux-gnu.tar.gz" | tar xz
+          set -euo pipefail
+          USAGE_VERSION="2.18.2"
+          curl --fail -sL "https://github.com/jdx/usage/releases/download/v${USAGE_VERSION}/usage-x86_64-unknown-linux-gnu.tar.gz" -o usage.tar.gz
+          tar xzf usage.tar.gz
           chmod +x usage/bin/usage
           mkdir -p completions
           usage/bin/usage generate completion bash exfig -f exfig.usage.kdl > completions/exfig.bash
           usage/bin/usage generate completion zsh exfig -f exfig.usage.kdl > completions/_exfig
           usage/bin/usage generate completion fish exfig -f exfig.usage.kdl > completions/exfig.fish
+          for f in completions/exfig.bash completions/_exfig completions/exfig.fish; do
+            if [[ ! -s "$f" ]]; then
+              echo "::error::Generated completion file is empty: $f"
+              exit 1
+            fi
+          done
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

@@ -6,7 +6,7 @@
 
 name "ExFig"
 bin "exfig"
-version "2.8.0"
+version "v2.8.0"
 about "Exports resources from Figma to iOS, Android, Flutter, and Web projects"
 
 // =============================================================================
@@ -121,7 +121,7 @@ cmd "init" help="Generates config file" {
 cmd "schemas" help="Extracts PKL schemas to local directory" {
     long_help "Extracts PKL schema files used for config validation and IDE support. Schemas are extracted to .exfig/schemas/ by default."
 
-    flag "-o --output <dir>" help="Output directory for schemas." default=".exfig/schemas/"
+    flag "-o --output <dir>" help="Output directory for schemas." default=".exfig/schemas"
     flag "-f --force" help="Overwrite existing schema files."
 }
 

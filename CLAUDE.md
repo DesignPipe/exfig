@@ -285,7 +285,7 @@ Changing `load()` return type affects:
 
 See `ExFigCLI/CLAUDE.md` (Adding a New Subcommand).
 
-**Important:** When adding/changing CLI flags or subcommands, update `exfig.usage.kdl` (Usage spec) to keep shell completions and docs in sync.
+**Important:** When adding/changing CLI flags or subcommands, update `exfig.usage.kdl` (Usage spec) to keep shell completions and docs in sync. When bumping the app version in `ExFigCommand.swift`, also update the `version` field in `exfig.usage.kdl`.
 
 ### Adding a Figma API Endpoint
 
