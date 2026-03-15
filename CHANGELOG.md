@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [2.8.1] - 2026-03-15
 
+### Bug Fixes
+
+- **ci**: Update usage CLI to 3.0.0 and fix archive path by @alexey1312
+
+
 ### Miscellaneous Tasks
 
 - Migrate to DesignPipe org by @alexey1312
