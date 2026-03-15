@@ -37,7 +37,7 @@ git config core.hooksPath .githooks 2>/dev/null || true
 swift = "6.2.3"        # Swift compiler and toolchain
 swiftformat = "0.59.1" # Swift code formatting
 swiftlint = "0.63.2"   # Swift linting
-xcsift = "latest"      # xcodebuild output filtering
+xcsift = "1.1.6"      # xcodebuild output filtering
 
 # --- Documentation & Formatting ---
 dprint = "0.50.2" # MD/JSON/YAML formatting (Rust, fast)
