@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.1] - 2026-03-15
+
+### Miscellaneous Tasks
+
+- Migrate to DesignPipe org by @alexey1312
+
+
+### Other
+
+- Add Usage CLI spec for shell completions and docs 
+
+* feat: add Usage CLI spec for shell completions and docs
+
+Add exfig.usage.kdl with full specification of all 19 CLI commands,
+flags, and arguments. This enables generating shell completions
+(bash/zsh/fish) and markdown documentation from a single source of truth.
+
+- Add usage tool to mise.toml with completions and docs tasks
+- Generate and attach shell completions as GitHub Release assets
+- Update CLAUDE.md with completions commands and KDL sync reminder
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
+* fix: harden release workflow and fix Usage spec inaccuracies
+
+Pin usage tool to v2.18.2 in both mise.toml and release workflow,
+add --fail/pipefail to curl, validate generated completion files are
+non-empty. Fix version prefix (v2.8.0) and schemas default path in
+exfig.usage.kdl. Add version sync reminder to CLAUDE.md.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
+* fix: improve filter argument help texts in Usage spec
+
+Match the Swift source help descriptions with single/multiple/wildcard
+examples for colors, icons, and images filter arguments.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com> by @alexey1312 in [#69](https://github.com/DesignPipe/exfig/pull/69)
+
+
 ## [2.8.0] - 2026-03-10
 
 ### Features
@@ -27,23 +71,23 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
-- Migrate to pkl-swift 0.8.0 + Pkl 0.31  by @alexey1312 in [#68](https://github.com/alexey1312/ExFig/pull/68)
+- Migrate to pkl-swift 0.8.0 + Pkl 0.31  by @alexey1312 in [#68](https://github.com/DesignPipe/exfig/pull/68)
 
 
 ## [2.6.0] - 2026-02-25
 
 ### Features
 
-- W3C DTCG v2025.10 design tokens compliance  by @alexey1312 in [#67](https://github.com/alexey1312/ExFig/pull/67)
+- W3C DTCG v2025.10 design tokens compliance  by @alexey1312 in [#67](https://github.com/DesignPipe/exfig/pull/67)
 
 
 ## [2.5.2] - 2026-02-25
 
 ### Bug Fixes
 
-- Validate and correct export-report proposal against codebase  by @alexey1312 in [#61](https://github.com/alexey1312/ExFig/pull/61)
+- Validate and correct export-report proposal against codebase  by @alexey1312 in [#61](https://github.com/DesignPipe/exfig/pull/61)
 
-- **spec**: Align w3c-tokens-v2 proposal with DTCG v2025.10 specification  by @alexey1312 in [#62](https://github.com/alexey1312/ExFig/pull/62)
+- **spec**: Align w3c-tokens-v2 proposal with DTCG v2025.10 specification  by @alexey1312 in [#62](https://github.com/DesignPipe/exfig/pull/62)
 
 - Warning by @alexey1312
 
@@ -55,7 +99,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
-- **cli**: Add --report flag for structured JSON export reports  by @alexey1312 in [#66](https://github.com/alexey1312/ExFig/pull/66)
+- **cli**: Add --report flag for structured JSON export reports  by @alexey1312 in [#66](https://github.com/DesignPipe/exfig/pull/66)
 
 - Add concurrency by @alexey1312
 
@@ -67,7 +111,7 @@ All notable changes to this project will be documented in this file.
 
 ### Styling
 
-- Fix markdown table alignment in openspec design docs  by @alexey1312 in [#65](https://github.com/alexey1312/ExFig/pull/65)
+- Fix markdown table alignment in openspec design docs  by @alexey1312 in [#65](https://github.com/DesignPipe/exfig/pull/65)
 
 
 ## [2.5.1] - 2026-02-23
@@ -81,12 +125,12 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- Address 6 security vulnerabilities  by @alexey1312 in [#59](https://github.com/alexey1312/ExFig/pull/59)
+- Address 6 security vulnerabilities  by @alexey1312 in [#59](https://github.com/DesignPipe/exfig/pull/59)
 
 
 ### Features
 
-- Migrate template engine from Stencil to swift-jinja  by @alexey1312 in [#60](https://github.com/alexey1312/ExFig/pull/60)
+- Migrate template engine from Stencil to swift-jinja  by @alexey1312 in [#60](https://github.com/DesignPipe/exfig/pull/60)
 
 
 ### Miscellaneous Tasks
@@ -125,14 +169,14 @@ Figma Dev Mode.
 - Created tests for `AndroidCodeConnectExporter` to ensure expected
   behavior, including asset filtering, URL generation, and file output.
 
-* fix: after review by @alexey1312 in [#58](https://github.com/alexey1312/ExFig/pull/58)
+* fix: after review by @alexey1312 in [#58](https://github.com/DesignPipe/exfig/pull/58)
 
 
 ## [2.3.1] - 2026-02-13
 
 ### Bug Fixes
 
-- Filter out deleted but referenced variables  by @alexey1312 in [#57](https://github.com/alexey1312/ExFig/pull/57)
+- Filter out deleted but referenced variables  by @alexey1312 in [#57](https://github.com/DesignPipe/exfig/pull/57)
 
 
 ### Miscellaneous Tasks
@@ -144,7 +188,7 @@ Figma Dev Mode.
 
 ### Features
 
-- Add parallel entry processing for all platform exporters  by @alexey1312 in [#56](https://github.com/alexey1312/ExFig/pull/56)
+- Add parallel entry processing for all platform exporters  by @alexey1312 in [#56](https://github.com/DesignPipe/exfig/pull/56)
 
 
 ## [2.2.2] - 2026-02-11
@@ -158,7 +202,7 @@ Figma Dev Mode.
 
 ### Bug Fixes
 
-- Code Connect using variant node IDs instead of component set node IDs  by @alexey1312 in [#55](https://github.com/alexey1312/ExFig/pull/55)
+- Code Connect using variant node IDs instead of component set node IDs  by @alexey1312 in [#55](https://github.com/DesignPipe/exfig/pull/55)
 
 
 ### Miscellaneous Tasks
@@ -170,28 +214,28 @@ Figma Dev Mode.
 
 ### Features
 
-- Add page-level filtering for icons and images  by @alexey1312 in [#54](https://github.com/alexey1312/ExFig/pull/54)
+- Add page-level filtering for icons and images  by @alexey1312 in [#54](https://github.com/DesignPipe/exfig/pull/54)
 
 
 ### Refactor
 
-- Standardize WebpOptions type to Common across platforms  by @alexey1312 in [#53](https://github.com/alexey1312/ExFig/pull/53)
+- Standardize WebpOptions type to Common across platforms  by @alexey1312 in [#53](https://github.com/DesignPipe/exfig/pull/53)
 
 
 ## [2.1.0] - 2026-02-10
 
 ### Features
 
-- Add RTL variant detection via Figma component property  by @alexey1312 in [#52](https://github.com/alexey1312/ExFig/pull/52)
+- Add RTL variant detection via Figma component property  by @alexey1312 in [#52](https://github.com/DesignPipe/exfig/pull/52)
 
 
 ## [2.0.1] - 2026-02-09
 
 ### Bug Fixes
 
-- Use correct target name ExFigCLI for DocC build  by @alexey1312 in [#50](https://github.com/alexey1312/ExFig/pull/50)
+- Use correct target name ExFigCLI for DocC build  by @alexey1312 in [#50](https://github.com/DesignPipe/exfig/pull/50)
 
-- Use correct mise hooks syntax (shell+script instead of run)  by @alexey1312 in [#51](https://github.com/alexey1312/ExFig/pull/51)
+- Use correct mise hooks syntax (shell+script instead of run)  by @alexey1312 in [#51](https://github.com/DesignPipe/exfig/pull/51)
 
 
 ## [2.0.0] - 2026-02-09
@@ -200,7 +244,7 @@ Figma Dev Mode.
 
 - Migrate to PKL configuration and plugin architecture (v2.0) 
 
-* feat!: migrate to PKL config and plugin architecture by @alexey1312 in [#48](https://github.com/alexey1312/ExFig/pull/48)
+* feat!: migrate to PKL config and plugin architecture by @alexey1312 in [#48](https://github.com/DesignPipe/exfig/pull/48)
 
 
 ## [1.3.2] - 2026-02-06
@@ -230,9 +274,9 @@ Figma Dev Mode.
 
 ### Features
 
-- Integrate Noora terminal UI design system  by @alexey1312 in [#46](https://github.com/alexey1312/ExFig/pull/46)
+- Integrate Noora terminal UI design system  by @alexey1312 in [#46](https://github.com/DesignPipe/exfig/pull/46)
 
-- Add YYJSON  by @alexey1312 in [#47](https://github.com/alexey1312/ExFig/pull/47)
+- Add YYJSON  by @alexey1312 in [#47](https://github.com/DesignPipe/exfig/pull/47)
 
 
 ### Miscellaneous Tasks
@@ -420,7 +464,7 @@ Figma Dev Mode.
 
 ### Bug Fixes
 
-- **ci**: Add xcsift install path to PATH on Linux  by @alexey1312 in [#45](https://github.com/alexey1312/ExFig/pull/45)
+- **ci**: Add xcsift install path to PATH on Linux  by @alexey1312 in [#45](https://github.com/DesignPipe/exfig/pull/45)
 
 
 ### Features
@@ -441,11 +485,11 @@ Figma Dev Mode.
 
 ### Features
 
-- **cli**: Improve init command next steps guidance  by @google-labs-jules[bot] in [#24](https://github.com/alexey1312/ExFig/pull/24)
+- **cli**: Improve init command next steps guidance  by @google-labs-jules[bot] in [#24](https://github.com/DesignPipe/exfig/pull/24)
 
-- Add confirmation prompt before overwriting config file in `exfig init`  by @google-labs-jules[bot] in [#26](https://github.com/alexey1312/ExFig/pull/26)
+- Add confirmation prompt before overwriting config file in `exfig init`  by @google-labs-jules[bot] in [#26](https://github.com/DesignPipe/exfig/pull/26)
 
-- **ios**: Add Figma Code Connect generation for icons and images  by @alexey1312 in [#44](https://github.com/alexey1312/ExFig/pull/44)
+- **ios**: Add Figma Code Connect generation for icons and images  by @alexey1312 in [#44](https://github.com/DesignPipe/exfig/pull/44)
 
 
 ### Miscellaneous Tasks
@@ -489,7 +533,7 @@ Enhanced the update notification message with a colorful box design using box-dr
 
 ---------
 
-Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com> by @google-labs-jules[bot] in [#22](https://github.com/alexey1312/ExFig/pull/22)
+Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com> by @google-labs-jules[bot] in [#22](https://github.com/DesignPipe/exfig/pull/22)
 
 - ⚡ Bolt: Optimize SVG path parsing using UTF8View 
 
@@ -514,7 +558,7 @@ Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.n
 ---------
 
 Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>
-Co-authored-by: alexey1312 <alexey1312ru@gmail.com> by @google-labs-jules[bot] in [#25](https://github.com/alexey1312/ExFig/pull/25)
+Co-authored-by: alexey1312 <alexey1312ru@gmail.com> by @google-labs-jules[bot] in [#25](https://github.com/DesignPipe/exfig/pull/25)
 
 
 ## [1.2.16] - 2025-12-30
@@ -531,12 +575,12 @@ Co-authored-by: alexey1312 <alexey1312ru@gmail.com> by @google-labs-jules[bot] i
 
 ### Features
 
-- **svg**: Add Tree Traversal API support via swift-resvg upgrade  by @alexey1312 in [#19](https://github.com/alexey1312/ExFig/pull/19)
+- **svg**: Add Tree Traversal API support via swift-resvg upgrade  by @alexey1312 in [#19](https://github.com/DesignPipe/exfig/pull/19)
 
 
 ### Other
 
-- ⚡ Bolt: Implement dynamic concurrency in SharedDownloadQueue  by @google-labs-jules[bot] in [#18](https://github.com/alexey1312/ExFig/pull/18)
+- ⚡ Bolt: Implement dynamic concurrency in SharedDownloadQueue  by @google-labs-jules[bot] in [#18](https://github.com/DesignPipe/exfig/pull/18)
 
 - 🛡️ Sentinel: Fix XXE vulnerability in SVG parser 
 
@@ -570,7 +614,7 @@ Co-authored-by: alexey1312 <alexey1312ru@gmail.com> by @google-labs-jules[bot] i
 
 ---------
 
-Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com> by @google-labs-jules[bot] in [#21](https://github.com/alexey1312/ExFig/pull/21)
+Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com> by @google-labs-jules[bot] in [#21](https://github.com/DesignPipe/exfig/pull/21)
 
 
 ### Performance
@@ -695,7 +739,7 @@ Co-authored-by: google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.n
 
 ### Documentation
 
-- Fix installation instructions  by @alexey1312 in [#17](https://github.com/alexey1312/ExFig/pull/17)
+- Fix installation instructions  by @alexey1312 in [#17](https://github.com/DesignPipe/exfig/pull/17)
 
 
 ### Features
@@ -784,7 +828,7 @@ Add mise tasks for cleaning build artifacts and all caches.
 
 * build(deps): update mise to 2025.12.12
 
-* Disable GitHub attestations in mise.toml by @alexey1312 in [#15](https://github.com/alexey1312/ExFig/pull/15)
+* Disable GitHub attestations in mise.toml by @alexey1312 in [#15](https://github.com/DesignPipe/exfig/pull/15)
 
 - Add HEIC output format for iOS images 
 
@@ -818,7 +862,7 @@ full transparency support.
 
 ---------
 
-Co-authored-by: Claude <noreply@anthropic.com> by @alexey1312 in [#16](https://github.com/alexey1312/ExFig/pull/16)
+Co-authored-by: Claude <noreply@anthropic.com> by @alexey1312 in [#16](https://github.com/DesignPipe/exfig/pull/16)
 
 
 ## [1.2.6-beta.2] - 2025-12-19
@@ -832,7 +876,7 @@ Co-authored-by: Claude <noreply@anthropic.com> by @alexey1312 in [#16](https://g
 
 ### Features
 
-- **images**: Add SVG source format with local rasterization via resvg  by @alexey1312 in [#13](https://github.com/alexey1312/ExFig/pull/13)
+- **images**: Add SVG source format with local rasterization via resvg  by @alexey1312 in [#13](https://github.com/DesignPipe/exfig/pull/13)
 
 
 ### Miscellaneous Tasks

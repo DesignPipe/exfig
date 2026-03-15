@@ -3,7 +3,7 @@ amends "pkl:Project"
 package {
   name = "exfig"
   baseUri = "package://pkg.pkl-lang.org/github.com/DesignPipe/exfig/exfig"
-  version = "2.8.0"
+  version = "2.8.1"
   packageZipUrl = "https://github.com/DesignPipe/exfig/releases/download/v\(version)/\(name)@\(version).zip"
   description = "ExFig configuration schemas for exporting Figma assets to iOS, Android, Flutter, and Web"
   authors {
