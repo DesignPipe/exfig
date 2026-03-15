@@ -24,7 +24,7 @@ jobs:
         with:
           lfs: true
 
-      - uses: jdx/mise-action@v3
+      - uses: jdx/mise-action@v4
         with:
           experimental: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +55,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-xcode-26.1.1-spm-
 
-      - uses: jdx/mise-action@v3
+      - uses: jdx/mise-action@v4
         with:
           experimental: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -106,7 +106,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-swift-6.2.3-spm-
 
-      - uses: jdx/mise-action@v3
+      - uses: jdx/mise-action@v4
         with:
           experimental: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
