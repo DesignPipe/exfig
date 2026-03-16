@@ -26,6 +26,7 @@ let package = Package(
         .package(url: "https://github.com/alexey1312/swift-resvg.git", exact: "0.45.1-swift.3"),
         .package(url: "https://github.com/mattt/swift-yyjson", from: "0.5.0"),
         .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
+        .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.1.0"),
     ],
     targets: [
         // Main target
@@ -39,7 +40,7 @@ let package = Package(
                 "AndroidExport",
                 "FlutterExport",
                 "WebExport",
-                "SVGKit",
+                .product(name: "SVGKit", package: "swift-svgkit"),
                 "ExFig-iOS",
                 "ExFig-Android",
                 "ExFig-Flutter",
@@ -109,22 +110,12 @@ let package = Package(
             ]
         ),
 
-        // SVG parsing and code generation
-        .target(
-            name: "SVGKit",
-            dependencies: [
-                .product(name: "Logging", package: "swift-log"),
-                .product(name: "Resvg", package: "swift-resvg"),
-            ],
-            exclude: ["CLAUDE.md", "AGENTS.md"]
-        ),
-
         // Exports resources to Android project
         .target(
             name: "AndroidExport",
             dependencies: [
                 "ExFigCore",
-                "SVGKit",
+                .product(name: "SVGKit", package: "swift-svgkit"),
                 "JinjaSupport",
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ],
@@ -180,7 +171,7 @@ let package = Package(
                 "ExFigCore",
                 "ExFigConfig",
                 "AndroidExport",
-                "SVGKit",
+                .product(name: "SVGKit", package: "swift-svgkit"),
             ],
             exclude: ["CLAUDE.md", "AGENTS.md"]
         ),
@@ -270,10 +261,6 @@ let package = Package(
             dependencies: [
                 "WebExport", .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
-        ),
-        .testTarget(
-            name: "SVGKitTests",
-            dependencies: ["SVGKit", .product(name: "CustomDump", package: "swift-custom-dump")]
         ),
 
         // MARK: - Plugin Tests

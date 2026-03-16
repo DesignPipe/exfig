@@ -97,7 +97,7 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Architecture
 
-Fourteen modules in `Sources/`:
+Thirteen modules in `Sources/`:
 
 | Module          | Purpose                                                   |
 | --------------- | --------------------------------------------------------- |
@@ -113,7 +113,6 @@ Fourteen modules in `Sources/`:
 | `AndroidExport` | Android export (XML resources, Compose, Vector Drawables) |
 | `FlutterExport` | Flutter export (Dart code, SVG/PNG assets)                |
 | `WebExport`     | Web/React export (CSS variables, JSX icons)               |
-| `SVGKit`        | SVG parsing, ImageVector/VectorDrawable generation        |
 | `JinjaSupport`  | Shared Jinja2 template rendering across Export modules    |
 
 **Data flow:** CLI -> PKL config parsing -> FigmaAPI fetch -> ExFigCore processing -> Platform plugin -> Export module -> File write
@@ -315,22 +314,23 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 
 ## Dependencies
 
-| Package               | Version | Purpose                         |
-| --------------------- | ------- | ------------------------------- |
-| swift-argument-parser | 1.5.0+  | CLI framework                   |
-| swift-collections     | 1.2.x   | Ordered collections             |
-| swift-jinja           | 2.0.0+  | Jinja2 template engine          |
-| XcodeProj             | 8.27.0+ | Xcode project manipulation      |
-| swift-log             | 1.6.0+  | Logging                         |
-| Rainbow               | 4.2.0+  | Terminal colors                 |
-| libwebp               | 1.4.1+  | WebP encoding                   |
-| libpng                | 1.6.45+ | PNG decoding                    |
-| swift-custom-dump     | 1.3.0+  | Test assertions                 |
-| Noora                 | 0.54.0+ | Terminal UI design system       |
-| swift-resvg           | 0.45.1  | SVG parsing/rendering           |
-| swift-docc-plugin     | 1.4.5+  | DocC documentation              |
-| swift-yyjson          | 0.5.0+  | High-performance JSON codec     |
-| pkl-swift             | 0.8.0+  | PKL config evaluation & codegen |
+| Package               | Version | Purpose                                            |
+| --------------------- | ------- | -------------------------------------------------- |
+| swift-argument-parser | 1.5.0+  | CLI framework                                      |
+| swift-collections     | 1.2.x   | Ordered collections                                |
+| swift-jinja           | 2.0.0+  | Jinja2 template engine                             |
+| XcodeProj             | 8.27.0+ | Xcode project manipulation                         |
+| swift-log             | 1.6.0+  | Logging                                            |
+| Rainbow               | 4.2.0+  | Terminal colors                                    |
+| libwebp               | 1.4.1+  | WebP encoding                                      |
+| libpng                | 1.6.45+ | PNG decoding                                       |
+| swift-custom-dump     | 1.3.0+  | Test assertions                                    |
+| Noora                 | 0.54.0+ | Terminal UI design system                          |
+| swift-svgkit          | 0.1.0+  | SVG parsing, ImageVector/VectorDrawable generation |
+| swift-resvg           | 0.45.1  | SVG parsing/rendering                              |
+| swift-docc-plugin     | 1.4.5+  | DocC documentation                                 |
+| swift-yyjson          | 0.5.0+  | High-performance JSON codec                        |
+| pkl-swift             | 0.8.0+  | PKL config evaluation & codegen                    |
 
 ## Troubleshooting
 
