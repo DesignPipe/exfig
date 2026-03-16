@@ -97,14 +97,13 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Architecture
 
-Thirteen modules in `Sources/`:
+Twelve modules in `Sources/`:
 
 | Module          | Purpose                                                   |
 | --------------- | --------------------------------------------------------- |
 | `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI              |
 | `ExFigCore`     | Domain models (Color, Image, TextStyle), processors       |
 | `ExFigConfig`   | PKL config parsing, evaluation, type bridging             |
-| `FigmaAPI`      | Figma REST API client, endpoints, response models         |
 | `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.) |
 | `ExFig-Android` | Android platform plugin                                   |
 | `ExFig-Flutter` | Flutter platform plugin                                   |
@@ -115,7 +114,7 @@ Thirteen modules in `Sources/`:
 | `WebExport`     | Web/React export (CSS variables, JSX icons)               |
 | `JinjaSupport`  | Shared Jinja2 template rendering across Export modules    |
 
-**Data flow:** CLI -> PKL config parsing -> FigmaAPI fetch -> ExFigCore processing -> Platform plugin -> Export module -> File write
+**Data flow:** CLI -> PKL config parsing -> FigmaAPI (external) fetch -> ExFigCore processing -> Platform plugin -> Export module -> File write
 **Alt data flow (tokens):** CLI -> local .tokens.json file -> TokensFileSource -> ExFigCore models -> W3C JSON export
 
 **Batch mode:** Single `@TaskLocal` via `BatchSharedState` actor — see `ExFigCLI/CLAUDE.md`.
@@ -258,7 +257,7 @@ See `ExFigCLI/CLAUDE.md` (Adding a New Subcommand).
 
 ### Adding a Figma API Endpoint
 
-See `FigmaAPI/CLAUDE.md`.
+FigmaAPI is now an external package (`swift-figma-api`). See its repository for endpoint patterns.
 
 ### Adding a Platform Plugin Exporter
 
@@ -326,6 +325,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | libpng                | 1.6.45+ | PNG decoding                                       |
 | swift-custom-dump     | 1.3.0+  | Test assertions                                    |
 | Noora                 | 0.54.0+ | Terminal UI design system                          |
+| swift-figma-api       | 0.1.0+  | Figma REST API client (async/await, rate limiting) |
 | swift-svgkit          | 0.1.0+  | SVG parsing, ImageVector/VectorDrawable generation |
 | swift-resvg           | 0.45.1  | SVG parsing/rendering                              |
 | swift-docc-plugin     | 1.4.5+  | DocC documentation                                 |

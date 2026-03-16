@@ -27,13 +27,14 @@ let package = Package(
         .package(url: "https://github.com/mattt/swift-yyjson", from: "0.5.0"),
         .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
         .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.1.0"),
+        .package(url: "https://github.com/DesignPipe/swift-figma-api.git", from: "0.1.0"),
     ],
     targets: [
         // Main target
         .executableTarget(
             name: "ExFigCLI",
             dependencies: [
-                "FigmaAPI",
+                .product(name: "FigmaAPI", package: "swift-figma-api"),
                 "ExFigCore",
                 "ExFigConfig",
                 "XcodeExport",
@@ -75,15 +76,6 @@ let package = Package(
             dependencies: [
                 "ExFigCore",
                 .product(name: "PklSwift", package: "pkl-swift"),
-            ],
-            exclude: ["CLAUDE.md", "AGENTS.md"]
-        ),
-
-        // Loads data via Figma REST API
-        .target(
-            name: "FigmaAPI",
-            dependencies: [
-                "ExFigCore",
             ],
             exclude: ["CLAUDE.md", "AGENTS.md"]
         ),
@@ -201,20 +193,10 @@ let package = Package(
         // MARK: - Tests
 
         .testTarget(
-            name: "FigmaAPITests",
-            dependencies: [
-                "FigmaAPI",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
-            ],
-            resources: [
-                .copy("Fixtures/"),
-            ]
-        ),
-        .testTarget(
             name: "ExFigTests",
             dependencies: [
                 "ExFigCLI",
-                "FigmaAPI",
+                .product(name: "FigmaAPI", package: "swift-figma-api"),
                 "ExFig-Flutter",
                 "ExFig-Web",
                 .product(name: "CustomDump", package: "swift-custom-dump"),

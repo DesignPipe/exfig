@@ -18,7 +18,6 @@ Test targets mirror source modules:
 | `XcodeExportTests`   | iOS export output              |
 | `AndroidExportTests` | Android export output          |
 | `FlutterExportTests` | Flutter export output          |
-| `FigmaAPITests`      | API client, endpoints          |
 | `SVGKitTests`        | SVG parsing, code generation   |
 
 Run specific tests:

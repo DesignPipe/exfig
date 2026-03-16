@@ -1,8 +1,0 @@
-{
-  "images": {
-    "10:1": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/abc123-arrow_right.svg",
-    "10:2": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/def456-arrow_left.svg",
-    "10:3": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/ghi789-close.svg",
-    "20:1": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/jkl012-hero_banner.png"
-  }
-}
