@@ -73,7 +73,7 @@ chore: update dependencies
 
 ### Scope (optional)
 
-Common scopes: `colors`, `icons`, `images`, `typography`, `api`, `cli`, `ios`, `android`
+Common scopes: `colors`, `icons`, `images`, `typography`, `api`, `cli`, `mcp`, `ios`, `android`
 
 ## Pull Request Process
 

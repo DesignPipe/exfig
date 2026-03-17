@@ -24,6 +24,7 @@ exfig schemas               → ExtractSchemas
 exfig fetch                 → FetchImages
 exfig download {colors|icons|images|typography|tokens|all} → Download (nested)
 exfig batch                 → Batch
+exfig mcp                   → MCPServe
 ```
 
 Each subcommand composes options via `@OptionGroup`:
@@ -165,6 +166,23 @@ Converter factories (`WebpConverterFactory`, `HeicConverterFactory`) handle plat
 | `Output/W3CTokensExporter.swift`         | W3C design token JSON exporter (v1/v2025 formats)                  |
 | `Loaders/NumberVariablesLoader.swift`    | Figma number variables → dimension/number tokens                   |
 | `Subcommands/DownloadTokens.swift`       | Unified `download tokens` subcommand                               |
+| `MCP/ExFigMCPServer.swift`               | MCP server setup and lifecycle (stdio transport)                   |
+| `MCP/MCPToolDefinitions.swift`           | MCP tool schemas (export colors, icons, images, etc.)              |
+| `MCP/MCPToolHandlers.swift`              | MCP tool request handlers                                          |
+| `MCP/MCPResources.swift`                 | MCP resource providers (config, schemas)                           |
+| `MCP/MCPPrompts.swift`                   | MCP prompt templates                                               |
+| `MCP/MCPServerState.swift`               | MCP server shared state                                            |
+
+### MCP Server Architecture
+
+`MCPServe` subcommand does NOT use `ExFigOptions` or `@OptionGroup` — it creates its own
+`OutputMode.mcp` and bootstraps logging independently. `MCPServerState` actor manages a lazy
+`FigmaClient` shared across all tool calls (long-lived process, unlike one-shot CLI commands).
+
+`TerminalOutputManager.setStderrMode(true)` must be called before any output — stdout is
+reserved for MCP JSON-RPC protocol.
+
+**Name collision:** Both `FigmaAPI` and `MCP` export `Client` — always use `FigmaAPI.Client` in MCP/ files.
 
 ## Modification Patterns
 

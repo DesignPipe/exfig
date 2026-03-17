@@ -93,6 +93,7 @@ struct ExFigCommand: AsyncParsableCommand {
             Download.self,
             Tokens.self,
             Batch.self,
+            MCPServe.self,
         ],
         defaultSubcommand: ExportColors.self
     )

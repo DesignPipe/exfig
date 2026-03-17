@@ -9,11 +9,17 @@ final class TerminalOutputManager: @unchecked Sendable {
     private struct State {
         var hasActiveAnimation = false
         var lastAnimationLine: String = ""
+        var usesStderr = false
     }
 
     private let state = Lock(State())
 
     private init() {}
+
+    /// Configure output to use stderr (for MCP mode where stdout is reserved for JSON-RPC).
+    func setStderrMode(_ enabled: Bool) {
+        state.withLock { $0.usesStderr = enabled }
+    }
 
     var hasActiveAnimation: Bool {
         get { state.withLock { $0.hasActiveAnimation } }
@@ -27,7 +33,7 @@ final class TerminalOutputManager: @unchecked Sendable {
             state.hasActiveAnimation = true
             state.lastAnimationLine = initialFrame
             // Render initial frame immediately so it's visible before any logs arrive
-            printDirectUnsafe(initialFrame)
+            writeUnsafe(initialFrame, stderr: state.usesStderr)
         }
     }
 
@@ -35,17 +41,18 @@ final class TerminalOutputManager: @unchecked Sendable {
     /// If an animation is active, clears the current line first, then redraws animation.
     func print(_ message: String) {
         state.withLock { state in
+            let stderr = state.usesStderr
             if state.hasActiveAnimation {
                 // Clear current line before printing
-                printDirectUnsafe("\(ANSICodes.carriageReturn)\(ANSICodes.clearToEndOfLine)")
+                writeUnsafe("\(ANSICodes.carriageReturn)\(ANSICodes.clearToEndOfLine)", stderr: stderr)
                 // Print message on new line
-                printDirectUnsafe("\(message)\n")
+                writeUnsafe("\(message)\n", stderr: stderr)
                 // Redraw the animation line immediately to prevent flicker
                 if !state.lastAnimationLine.isEmpty {
-                    printDirectUnsafe(state.lastAnimationLine)
+                    writeUnsafe(state.lastAnimationLine, stderr: stderr)
                 }
             } else {
-                printDirectUnsafe("\(message)\n")
+                writeUnsafe("\(message)\n", stderr: stderr)
             }
         }
     }
@@ -55,14 +62,17 @@ final class TerminalOutputManager: @unchecked Sendable {
     func writeAnimationFrame(_ frame: String) {
         state.withLock { state in
             state.lastAnimationLine = frame
-            printDirectUnsafe("\(ANSICodes.carriageReturn)\(ANSICodes.clearToEndOfLine)\(frame)")
+            writeUnsafe(
+                "\(ANSICodes.carriageReturn)\(ANSICodes.clearToEndOfLine)\(frame)",
+                stderr: state.usesStderr
+            )
         }
     }
 
     /// Write raw output without coordination (for cursor show/hide, final messages).
     func writeDirect(_ string: String) {
-        state.withLock { _ in
-            printDirectUnsafe(string)
+        state.withLock { state in
+            writeUnsafe(string, stderr: state.usesStderr)
         }
     }
 
@@ -73,9 +83,10 @@ final class TerminalOutputManager: @unchecked Sendable {
         }
     }
 
-    /// Direct write to stdout, bypassing Swift's print buffering.
-    /// Must be called within lock for thread safety.
-    private func printDirectUnsafe(_ string: String) {
-        FileHandle.standardOutput.write(Data(string.utf8))
+    /// Direct write to the configured output handle, bypassing Swift's print buffering.
+    /// Must be called within lock for thread safety — no additional locking here.
+    private func writeUnsafe(_ string: String, stderr: Bool) {
+        let handle = stderr ? FileHandle.standardError : FileHandle.standardOutput
+        handle.write(Data(string.utf8))
     }
 }

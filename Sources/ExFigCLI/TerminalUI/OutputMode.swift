@@ -10,13 +10,15 @@ enum OutputMode: Sendable {
     case quiet
     /// Plain text mode for non-TTY environments (CI, pipes)
     case plain
+    /// MCP server mode - all output to stderr, stdout reserved for JSON-RPC
+    case mcp
 
     /// Determines if progress indicators should be shown
     var showProgress: Bool {
         switch self {
         case .normal, .verbose:
             true
-        case .quiet, .plain:
+        case .quiet, .plain, .mcp:
             false
         }
     }
@@ -31,7 +33,7 @@ enum OutputMode: Sendable {
         switch self {
         case .normal, .verbose:
             true
-        case .quiet, .plain:
+        case .quiet, .plain, .mcp:
             false
         }
     }
@@ -39,5 +41,10 @@ enum OutputMode: Sendable {
     /// Determines if debug messages should be shown
     var showDebug: Bool {
         self == .verbose
+    }
+
+    /// Whether output should go to stderr instead of stdout
+    var usesStderr: Bool {
+        self == .mcp
     }
 }

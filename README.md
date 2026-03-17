@@ -61,6 +61,7 @@ Flutter, and React/TypeScript.
 
 - 🤖 CI/CD ready (quiet mode, exit codes, JSON reports)
 - 🔄 [GitHub Action](https://github.com/DesignPipe/exfig-action) for automated exports
+- 🧠 MCP server for AI assistant integration
 - 📊 Rich progress indicators with ETA
 - 🔇 Verbose, normal, and quiet output modes
 - 🚀 Swift 6 / Strict Concurrency
@@ -245,6 +246,30 @@ exfig icons --cache --experimental-granular-cache       # Per-node change detect
 ```
 
 Configure in `exfig.pkl` via `common.cache` or use CLI flags. See [CONFIG.md](CONFIG.md) for details.
+
+### MCP Server
+
+ExFig includes a [Model Context Protocol](https://modelcontextprotocol.io) server for AI assistant integration:
+
+```bash
+exfig mcp   # Start MCP server over stdio
+```
+
+Add to your `.mcp.json` (Claude Code, Cursor, etc.):
+
+```json
+{
+  "mcpServers": {
+    "exfig": {
+      "command": "exfig",
+      "args": ["mcp"],
+      "env": {
+        "FIGMA_PERSONAL_TOKEN": "figd_..."
+      }
+    }
+  }
+}
+```
 
 ### Fault Tolerance
 

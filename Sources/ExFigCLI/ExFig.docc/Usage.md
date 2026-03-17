@@ -302,6 +302,54 @@ exfig fetch -f abc123 -r "Images" -o ./images \
 | `--webp-encoding`    | -     | WebP encoding: lossy, lossless         | lossy   |
 | `--webp-quality`     | -     | WebP quality (0-100)                   | 80      |
 
+## MCP Server (AI Agent Integration)
+
+Start an MCP (Model Context Protocol) server for AI agents like Claude Code, Cursor, or Codex:
+
+```bash
+exfig mcp
+```
+
+The server runs over stdin/stdout using JSON-RPC. All CLI output goes to stderr.
+
+### Available Tools
+
+| Tool | Description | Requires Token |
+| ---- | ----------- | -------------- |
+| `exfig_validate` | Validate PKL config | No |
+| `exfig_tokens_info` | Inspect .tokens.json | No |
+| `exfig_inspect` | List Figma resources | Yes |
+
+### Client Configuration
+
+Add to your `.mcp.json` or MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "exfig": {
+      "command": "exfig",
+      "args": ["mcp"],
+      "env": {
+        "FIGMA_PERSONAL_TOKEN": "figd_..."
+      }
+    }
+  }
+}
+```
+
+### Resources
+
+The server exposes PKL schemas (`exfig://schemas/*.pkl`) and starter config templates
+(`exfig://templates/{ios,android,flutter,web}`).
+
+### Prompts
+
+| Prompt | Description |
+| ------ | ----------- |
+| `setup-config` | Guide AI through creating exfig.pkl |
+| `troubleshoot-export` | Diagnose export errors |
+
 ## Help and Version
 
 ```bash

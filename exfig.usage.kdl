@@ -332,3 +332,11 @@ cmd "batch" help="Process multiple config files in parallel" {
 
     arg "<paths>..." help="Config files or directory to process"
 }
+
+// =============================================================================
+// mcp
+// =============================================================================
+
+cmd "mcp" help="Start MCP (Model Context Protocol) server over stdio" {
+    long_help "Starts a Model Context Protocol server that exposes ExFig tools, resources, and prompts to AI assistants. Communicates over stdio using JSON-RPC. Requires FIGMA_PERSONAL_TOKEN environment variable."
+}

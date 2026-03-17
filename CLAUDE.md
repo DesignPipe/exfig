@@ -75,6 +75,7 @@ and Flutter projects.
 .build/debug/exfig batch exfig.pkl            # All resources from unified config (positional arg!)
 .build/debug/exfig fetch -f FILE_ID -r "Frame" -o ./output
 .build/debug/exfig download tokens -o tokens.json  # Unified W3C design tokens
+.build/debug/exfig mcp                              # Start MCP server over stdio
 
 # PKL Validation (validate config templates against schemas)
 pkl eval --format json <file.pkl>   # Package URI requires published package
@@ -117,6 +118,9 @@ Twelve modules in `Sources/`:
 **Data flow:** CLI -> PKL config parsing -> FigmaAPI (external) fetch -> ExFigCore processing -> Platform plugin -> Export module -> File write
 **Alt data flow (tokens):** CLI -> local .tokens.json file -> TokensFileSource -> ExFigCore models -> W3C JSON export
 
+**MCP data flow:** `exfig mcp` → StdioTransport (JSON-RPC on stdin/stdout) → tool handlers → PKLEvaluator / TokensFileSource / FigmaAPI
+**MCP stdout safety:** `OutputMode.mcp` + `TerminalOutputManager.setStderrMode(true)` — all CLI output goes to stderr
+
 **Batch mode:** Single `@TaskLocal` via `BatchSharedState` actor — see `ExFigCLI/CLAUDE.md`.
 
 **Entry-level parallelism:** All exporters use `parallelMapEntries()` (max 5 concurrent) — see `ExFigCore/CLAUDE.md`.
@@ -137,6 +141,7 @@ Sources/ExFigCLI/
 ├── Sync/            # Figma sync functionality (state tracking, diff detection)
 ├── Plugin/          # Plugin registry
 ├── Context/         # Export context implementations (ColorsExportContextImpl, etc.)
+├── MCP/             # Model Context Protocol server (tools, resources, prompts)
 └── Shared/          # Cross-cutting helpers (PlatformExportResult, HashMerger)
 
 Sources/ExFig-{iOS,Android,Flutter,Web}/
@@ -357,6 +362,8 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Jinja trailing `\n`         | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results   |
 | `Bundle.module` in tests    | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle    |
 | SwiftLint trailing closure  | When function takes 2+ closures, use explicit label for last closure (`export: { ... }`) not trailing syntax |
+| MCP `Client` ambiguous      | `FigmaAPI.Client` vs `MCP.Client` — always use `FigmaAPI.Client` in MCP/ files                               |
+| MCP `FigmaConfig` fields    | No `colorsFileId` — use `config.getFileIds()` or `figma.lightFileId`/`darkFileId`                            |
 
 ## Additional Rules
 
