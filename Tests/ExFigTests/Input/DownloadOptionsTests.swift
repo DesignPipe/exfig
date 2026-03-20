@@ -28,10 +28,17 @@ final class DownloadOptionsTests: XCTestCase {
         XCTAssertEqual(options.outputPath, "/tmp/output")
     }
 
-    func testFailsWithoutRequiredOptions() {
-        XCTAssertThrowsError(try DownloadOptions.parse([]))
-        XCTAssertThrowsError(try DownloadOptions.parse(["--file-id", "abc"]))
-        XCTAssertThrowsError(try DownloadOptions.parse(["--file-id", "abc", "--frame", "Icons"]))
+    func testParsesWithoutRequiredOptions() throws {
+        // Fields are now optional to support interactive wizard mode
+        let empty = try DownloadOptions.parse([])
+        XCTAssertNil(empty.fileId)
+        XCTAssertNil(empty.frameName)
+        XCTAssertNil(empty.outputPath)
+
+        let partial = try DownloadOptions.parse(["--file-id", "abc"])
+        XCTAssertEqual(partial.fileId, "abc")
+        XCTAssertNil(partial.frameName)
+        XCTAssertNil(partial.outputPath)
     }
 
     // MARK: - Format Options
@@ -272,6 +279,6 @@ final class DownloadOptionsTests: XCTestCase {
             "-f", "abc", "-r", "Frame", "-o", "/tmp/images",
         ])
 
-        XCTAssertEqual(options.outputURL.path, "/tmp/images")
+        XCTAssertEqual(options.outputURL?.path, "/tmp/images")
     }
 }

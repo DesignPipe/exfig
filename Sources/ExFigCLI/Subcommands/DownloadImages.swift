@@ -13,7 +13,13 @@ extension ExFigCommand {
             Downloads images from a specific Figma frame to a local directory.
             All parameters are passed via command-line arguments.
 
+            When required options (--file-id, --frame, --output) are omitted in an
+            interactive terminal, a guided wizard helps you fill them in.
+
             Examples:
+              # Interactive wizard (TTY only)
+              exfig fetch
+
               # Download PNGs at 3x scale (default)
               exfig fetch --file-id abc123 --frame "Illustrations" --output ./images
 
@@ -46,32 +52,70 @@ extension ExFigCommand {
         @OptionGroup
         var faultToleranceOptions: HeavyFaultToleranceOptions
 
-        // swiftlint:disable:next function_body_length
+        // swiftlint:disable function_body_length cyclomatic_complexity
+
         func run() async throws {
             // Initialize terminal UI
             ExFigCommand.initializeTerminalUI(verbose: globalOptions.verbose, quiet: globalOptions.quiet)
             let ui = ExFigCommand.terminalUI!
 
+            // Resolve required options via wizard if missing
+            var options = downloadOptions
+            if options.fileId == nil || options.frameName == nil || options.outputPath == nil {
+                guard TTYDetector.isTTY else {
+                    throw ValidationError(
+                        "Missing required options: --file-id, --frame, --output. " +
+                            "Run in interactive terminal for guided setup."
+                    )
+                }
+                let result = FetchWizard.run()
+                options.fileId = options.fileId ?? result.fileId
+                options.frameName = options.frameName ?? result.frameName
+                options.outputPath = options.outputPath ?? result.outputPath
+                options.pageName = options.pageName ?? result.pageName
+                options.filter = options.filter ?? result.filter
+                if options.format == .png {
+                    options.format = result.format
+                }
+                if options.nameStyle == nil {
+                    options.nameStyle = result.nameStyle
+                }
+                if options.scale == nil {
+                    options.scale = result.scale
+                }
+            }
+
+            // Validate required fields are now populated
+            guard let fileId = options.fileId else {
+                throw ValidationError("--file-id is required")
+            }
+            guard let frameName = options.frameName else {
+                throw ValidationError("--frame is required")
+            }
+            guard let outputPath = options.outputPath else {
+                throw ValidationError("--output is required")
+            }
+
             // Validate access token
-            guard let accessToken = downloadOptions.accessToken else {
+            guard let accessToken = options.accessToken else {
                 throw ExFigError.accessTokenNotFound
             }
 
             // Create output directory if needed
-            let outputURL = downloadOptions.outputURL
+            let outputURL = URL(fileURLWithPath: outputPath, isDirectory: true)
             try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
 
             ui.info("Downloading images from Figma...")
-            ui.debug("File ID: \(downloadOptions.fileId)")
-            ui.debug("Frame: \(downloadOptions.frameName)")
+            ui.debug("File ID: \(fileId)")
+            ui.debug("Frame: \(frameName)")
             ui.debug("Output: \(outputURL.path)")
-            ui.debug("Format: \(downloadOptions.format.rawValue)")
-            if !downloadOptions.isVectorFormat {
-                ui.debug("Scale: \(downloadOptions.effectiveScale)x")
+            ui.debug("Format: \(options.format.rawValue)")
+            if !options.isVectorFormat {
+                ui.debug("Scale: \(options.effectiveScale)x")
             }
 
             // Create Figma client with fault tolerance
-            let baseClient = FigmaClient(accessToken: accessToken, timeout: TimeInterval(downloadOptions.timeout))
+            let baseClient = FigmaClient(accessToken: accessToken, timeout: TimeInterval(options.timeout))
             let rateLimiter = faultToleranceOptions.createRateLimiter()
             let maxRetries = faultToleranceOptions.maxRetries
             let client = faultToleranceOptions.createRateLimitedClient(
@@ -94,16 +138,28 @@ extension ExFigCommand {
                 logger: ExFigCommand.logger
             )
 
+            // Snapshot options for use in @Sendable closures
+            let resolvedOptions = options
+
             // Load images from Figma
             let imagePacks = try await ui.withSpinnerProgress("Fetching images from Figma...") { onProgress in
-                try await loadImages(using: loader, onBatchProgress: onProgress)
+                try await loadImages(
+                    using: loader,
+                    fileId: fileId,
+                    frameName: frameName,
+                    pageName: resolvedOptions.pageName,
+                    format: resolvedOptions.format,
+                    effectiveScale: resolvedOptions.effectiveScale,
+                    filter: resolvedOptions.filter,
+                    onBatchProgress: onProgress
+                )
             }
 
             guard !imagePacks.isEmpty else {
                 ui.warning(.noAssetsFound(
                     assetType: "images",
-                    frameName: downloadOptions.frameName,
-                    pageName: downloadOptions.pageName
+                    frameName: frameName,
+                    pageName: resolvedOptions.pageName
                 ))
                 return
             }
@@ -113,32 +169,32 @@ extension ExFigCommand {
             // Process names using extracted processor
             let processedPacks = DownloadImageProcessor.processNames(
                 imagePacks,
-                validateRegexp: downloadOptions.nameValidateRegexp,
-                replaceRegexp: downloadOptions.nameReplaceRegexp,
-                nameStyle: downloadOptions.nameStyle
+                validateRegexp: resolvedOptions.nameValidateRegexp,
+                replaceRegexp: resolvedOptions.nameReplaceRegexp,
+                nameStyle: resolvedOptions.nameStyle
             )
 
             // Handle dark mode if suffix is specified
             let (lightPacks, darkPacks) = DownloadImageProcessor.splitByDarkMode(
                 processedPacks,
-                darkSuffix: downloadOptions.darkModeSuffix
+                darkSuffix: resolvedOptions.darkModeSuffix
             )
 
             // Create file contents for download
             var allFiles = DownloadImageProcessor.createFileContents(
                 from: lightPacks,
                 outputURL: outputURL,
-                format: downloadOptions.format,
+                format: resolvedOptions.format,
                 dark: false,
-                darkModeSuffix: downloadOptions.darkModeSuffix
+                darkModeSuffix: resolvedOptions.darkModeSuffix
             )
             if let darkPacks {
                 allFiles += DownloadImageProcessor.createFileContents(
                     from: darkPacks,
                     outputURL: outputURL,
-                    format: downloadOptions.format,
+                    format: resolvedOptions.format,
                     dark: true,
-                    darkModeSuffix: downloadOptions.darkModeSuffix
+                    darkModeSuffix: resolvedOptions.darkModeSuffix
                 )
             }
             let filesToDownload = allFiles
@@ -146,15 +202,18 @@ extension ExFigCommand {
             // Download files with progress
             ui.info("Downloading \(filesToDownload.count) files...")
             let fileDownloader = faultToleranceOptions.createFileDownloader()
-            let downloadedFiles = try await ui.withProgress("Downloading", total: filesToDownload.count) { progress in
+            let downloadedFiles = try await ui.withProgress(
+                "Downloading",
+                total: filesToDownload.count
+            ) { progress in
                 try await fileDownloader.fetch(files: filesToDownload) { current, _ in
                     progress.update(current: current)
                 }
             }
 
             // Convert to WebP if needed
-            let finalFiles: [FileContents] = if downloadOptions.format == .webp {
-                try await convertToWebP(downloadedFiles, ui: ui)
+            let finalFiles: [FileContents] = if resolvedOptions.format == .webp {
+                try await convertToWebP(downloadedFiles, options: resolvedOptions, ui: ui)
             } else {
                 downloadedFiles
             }
@@ -167,39 +226,56 @@ extension ExFigCommand {
             ui.success("Downloaded \(finalFiles.count) images to \(outputURL.path)")
         }
 
+        // swiftlint:enable function_body_length cyclomatic_complexity
+
         // MARK: - Private Methods
+
+        // swiftlint:disable function_parameter_count
 
         private func loadImages(
             using loader: DownloadImageLoader,
+            fileId: String,
+            frameName: String,
+            pageName: String?,
+            format: ImageFormat,
+            effectiveScale: Double,
+            filter: String?,
             onBatchProgress: @escaping BatchProgressCallback = { _, _ in }
         ) async throws -> [ImagePack] {
-            if downloadOptions.isVectorFormat {
-                let params: FormatParams = downloadOptions.format == .svg ? SVGParams() : PDFParams()
+            let isVector = format == .svg || format == .pdf
+            if isVector {
+                let params: FormatParams = format == .svg ? SVGParams() : PDFParams()
                 return try await loader.loadVectorImages(
-                    fileId: downloadOptions.fileId,
-                    frameName: downloadOptions.frameName,
-                    pageName: downloadOptions.pageName,
+                    fileId: fileId,
+                    frameName: frameName,
+                    pageName: pageName,
                     params: params,
-                    filter: downloadOptions.filter,
+                    filter: filter,
                     onBatchProgress: onBatchProgress
                 )
             } else {
                 return try await loader.loadRasterImages(
-                    fileId: downloadOptions.fileId,
-                    frameName: downloadOptions.frameName,
-                    pageName: downloadOptions.pageName,
-                    scale: downloadOptions.effectiveScale,
-                    format: downloadOptions.format.rawValue,
-                    filter: downloadOptions.filter,
+                    fileId: fileId,
+                    frameName: frameName,
+                    pageName: pageName,
+                    scale: effectiveScale,
+                    format: format.rawValue,
+                    filter: filter,
                     onBatchProgress: onBatchProgress
                 )
             }
         }
 
-        private func convertToWebP(_ files: [FileContents], ui: TerminalUI) async throws -> [FileContents] {
-            let encoding: WebpConverter.Encoding = switch downloadOptions.webpEncoding {
+        // swiftlint:enable function_parameter_count
+
+        private func convertToWebP(
+            _ files: [FileContents],
+            options: DownloadOptions,
+            ui: TerminalUI
+        ) async throws -> [FileContents] {
+            let encoding: WebpConverter.Encoding = switch options.webpEncoding {
             case .lossy:
-                .lossy(quality: downloadOptions.webpQuality)
+                .lossy(quality: options.webpQuality)
             case .lossless:
                 .lossless
             }

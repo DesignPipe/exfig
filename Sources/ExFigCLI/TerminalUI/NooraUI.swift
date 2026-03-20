@@ -135,6 +135,80 @@ enum NooraUI {
         return "\u{001B}[4m\(format(.primary(text)))\u{001B}[24m"
     }
 
+    // MARK: - Interactive Prompts
+
+    /// Prompt the user for text input with optional validation.
+    /// - Parameters:
+    ///   - title: Optional title above the prompt
+    ///   - prompt: The question text
+    ///   - description: Optional description for context
+    ///   - collapseOnAnswer: Whether to collapse after input (default: true)
+    ///   - validationRules: Validation rules applied to input
+    /// - Returns: The user's text input
+    static func textPrompt(
+        title: TerminalText? = nil,
+        prompt: TerminalText,
+        description: TerminalText? = nil,
+        collapseOnAnswer: Bool = true,
+        validationRules: [any ValidatableRule] = []
+    ) -> String {
+        shared.textPrompt(
+            title: title,
+            prompt: prompt,
+            description: description,
+            collapseOnAnswer: collapseOnAnswer,
+            validationRules: validationRules
+        )
+    }
+
+    /// Prompt the user to select a single option from a list.
+    /// - Parameters:
+    ///   - title: Optional title above the prompt
+    ///   - question: The question text
+    ///   - options: Array of options to choose from
+    ///   - description: Optional description for context
+    ///   - collapseOnSelection: Whether to collapse after selection (default: true)
+    /// - Returns: The selected option
+    static func singleChoicePrompt<T: Equatable & CustomStringConvertible>(
+        title: TerminalText? = nil,
+        question: TerminalText,
+        options: [T],
+        description: TerminalText? = nil,
+        collapseOnSelection: Bool = true
+    ) -> T {
+        shared.singleChoicePrompt(
+            title: title,
+            question: question,
+            options: options,
+            description: description,
+            collapseOnSelection: collapseOnSelection
+        )
+    }
+
+    /// Prompt the user with a yes/no question.
+    /// - Parameters:
+    ///   - title: Optional title above the prompt
+    ///   - question: The question text
+    ///   - defaultAnswer: Default answer (default: true)
+    ///   - description: Optional description for context
+    ///   - collapseOnSelection: Whether to collapse after selection (default: true)
+    /// - Returns: true for yes, false for no
+    static func yesOrNoPrompt(
+        title: TerminalText? = nil,
+        question: TerminalText,
+        defaultAnswer: Bool = true,
+        description: TerminalText? = nil,
+        collapseOnSelection: Bool = true
+    ) -> Bool {
+        shared.yesOrNoChoicePrompt(
+            title: title,
+            question: question,
+            defaultAnswer: defaultAnswer,
+            description: description,
+            collapseOnSelection: collapseOnSelection
+        )
+    }
+
     // MARK: - Progress Components
 
     /// Execute an async operation with a Noora progress bar (0-100%).

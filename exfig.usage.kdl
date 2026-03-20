@@ -130,12 +130,12 @@ cmd "schemas" help="Extracts PKL schemas to local directory" {
 // =============================================================================
 
 cmd "fetch" help="Downloads images from Figma without config file" {
-    long_help "Downloads images from a specific Figma frame to a local directory. All parameters are passed via command-line arguments. Requires FIGMA_PERSONAL_TOKEN environment variable."
+    long_help "Downloads images from a specific Figma frame to a local directory. All parameters are passed via command-line arguments. When required options are omitted in an interactive terminal, a guided wizard helps fill them in. Requires FIGMA_PERSONAL_TOKEN environment variable."
 
-    flag "-f --file-id <id>" help="Figma file ID (from the URL: figma.com/file/<FILE_ID>/...)" required=#true
-    flag "-r --frame <name>" help="Name of the Figma frame containing images" required=#true
+    flag "-f --file-id <id>" help="Figma file ID (from the URL: figma.com/file/<FILE_ID>/...). Prompted interactively if omitted in TTY."
+    flag "-r --frame <name>" help="Name of the Figma frame containing images. Prompted interactively if omitted in TTY."
     flag "-p --page <name>" help="Filter by Figma page name."
-    flag "-o --output <dir>" help="Output directory for downloaded images" required=#true
+    flag "-o --output <dir>" help="Output directory for downloaded images. Prompted interactively if omitted in TTY."
     flag "--format <fmt>" help="Image format" default="png" {
         choices "png" "svg" "jpg" "pdf" "webp"
     }

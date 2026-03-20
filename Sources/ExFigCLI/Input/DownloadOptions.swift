@@ -54,13 +54,13 @@ struct DownloadOptions: ParsableArguments {
         name: [.customLong("file-id"), .customShort("f")],
         help: "Figma file ID (from the URL: figma.com/file/<FILE_ID>/...)"
     )
-    var fileId: String
+    var fileId: String?
 
     @Option(
         name: [.customLong("frame"), .customShort("r")],
         help: "Name of the Figma frame containing images"
     )
-    var frameName: String
+    var frameName: String?
 
     @Option(name: [.customLong("page"), .customShort("p")], help: "Filter by Figma page name.")
     var pageName: String?
@@ -69,7 +69,7 @@ struct DownloadOptions: ParsableArguments {
         name: [.customLong("output"), .customShort("o")],
         help: "Output directory for downloaded images"
     )
-    var outputPath: String
+    var outputPath: String?
 
     // MARK: - Format Options
 
@@ -186,8 +186,23 @@ struct DownloadOptions: ParsableArguments {
         ProcessInfo.processInfo.environment["FIGMA_PERSONAL_TOKEN"]
     }
 
-    /// Returns the output directory URL
-    var outputURL: URL {
-        URL(fileURLWithPath: outputPath, isDirectory: true)
+    /// Returns the output directory URL (nil if outputPath not set)
+    var outputURL: URL? {
+        guard let outputPath else { return nil }
+        return URL(fileURLWithPath: outputPath, isDirectory: true)
+    }
+}
+
+// MARK: - ImageFormat Display
+
+extension ImageFormat: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .png: "PNG"
+        case .svg: "SVG"
+        case .jpg: "JPG"
+        case .pdf: "PDF"
+        case .webp: "WebP"
+        }
     }
 }
