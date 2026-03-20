@@ -395,6 +395,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `distantFuture` on clock    | `ContinuousClock.Instant` has no `distantFuture`; use `withCheckedContinuation { _ in }` for infinite suspend                                                                          |
 | MCP stderr duplication      | `TerminalOutputManager.setStderrMode(true)` handles all output routing — don't duplicate in `ExFigLogHandler`                                                                          |
 | PKL template word search    | Template comments on `lightFileId` contain cross-refs (`variablesColors`, `typography`); test section removal by matching full markers (`colors = new Common.Colors {`) not bare words |
+| CI llms-full.txt stale      | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result               |
 | Release build .pcm warnings | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                    |
 
 ## Additional Rules
