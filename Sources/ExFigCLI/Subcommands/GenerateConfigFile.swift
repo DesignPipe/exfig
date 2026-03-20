@@ -44,35 +44,43 @@ extension ExFigCommand {
             }
 
             // Determine file contents: wizard or direct template
-            let fileContents: String
+            let rawContents: String
             let wizardResult: InitWizardResult?
 
             if let platform {
                 // Direct flag — use full template
-                fileContents = templateForPlatform(platform)
+                rawContents = templateForPlatform(platform)
                 wizardResult = nil
             } else if TTYDetector.isTTY {
                 // Interactive wizard
                 let result = InitWizard.run()
                 let template = templateForPlatform(result.platform)
-                fileContents = InitWizard.applyResult(result, to: template)
+                rawContents = InitWizard.applyResult(result, to: template)
                 wizardResult = result
             } else {
                 // Non-TTY without --platform
                 throw ValidationError("Missing required option: --platform. Use -p ios|android|flutter|web.")
             }
 
-            // Extract PKL schemas for local validation
-            let extractedSchemas = try SchemaExtractor.extract()
+            // Substitute local schema paths with published package URIs
+            let fileContents = Self.substitutePackageURI(in: rawContents)
 
             // Write new config file
             try writeConfigFile(
                 contents: fileContents,
                 to: destination,
                 ui: ui,
-                extractedSchemas: extractedSchemas,
                 wizardResult: wizardResult
             )
+        }
+
+        /// Replace `.exfig/schemas/` paths with published `package://` URIs using current CLI version.
+        static func substitutePackageURI(in template: String) -> String {
+            let version = ExFigCommand.version // e.g. "v2.8.1"
+            let semver = version.hasPrefix("v") ? String(version.dropFirst()) : version
+            let packagePrefix =
+                "package://github.com/DesignPipe/exfig/releases/download/\(version)/exfig@\(semver)#/"
+            return template.replacingOccurrences(of: ".exfig/schemas/", with: packagePrefix)
         }
 
         /// Return the full PKL template for a given platform.
@@ -121,15 +129,12 @@ extension ExFigCommand {
             return true
         }
 
-        // swiftlint:disable function_parameter_count
         private func writeConfigFile(
             contents: String,
             to destination: String,
             ui: TerminalUI,
-            extractedSchemas: [String] = [],
             wizardResult: InitWizardResult? = nil
         ) throws {
-            // swiftlint:enable function_parameter_count
             guard let fileData = contents.data(using: .utf8) else {
                 throw ExFigError.custom(errorString: "Failed to encode config file contents")
             }
@@ -137,14 +142,6 @@ extension ExFigCommand {
             let success = FileManager.default.createFile(atPath: destination, contents: fileData, attributes: nil)
             if success {
                 ui.success("Config file generated: \(destination)")
-
-                if !extractedSchemas.isEmpty {
-                    ui
-                        .success(
-                            "Extracted \(extractedSchemas.count) PKL schemas to \(SchemaExtractor.defaultOutputDir)/"
-                        )
-                }
-
                 ui.info("")
                 ui.info("Next steps:")
 
