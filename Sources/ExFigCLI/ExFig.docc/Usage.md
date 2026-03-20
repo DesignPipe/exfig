@@ -70,8 +70,6 @@ exfig typography "heading/*"
 
 Skip unchanged exports with version tracking:
 
-### Enable via CLI
-
 ```bash
 # Enable version tracking
 exfig colors --cache
@@ -88,6 +86,8 @@ exfig icons --cache-path ./custom-cache.json
 ```
 
 > Note: The version changes when a Figma library is **published**, not on every auto-save.
+
+For batch mode version tracking and granular cache, see <doc:BatchProcessing>.
 
 ## Fault Tolerance
 
@@ -138,99 +138,6 @@ exfig icons --resume
 # Checkpoints expire after 24 hours
 # Successful completion deletes the checkpoint
 ```
-
-## Batch Processing
-
-Export all resource types from a single unified config:
-
-```bash
-# Export colors, icons, images, typography from one config
-exfig batch exfig.pkl
-
-# With version tracking
-exfig batch exfig.pkl --cache
-
-# With rate limiting
-exfig batch exfig.pkl --cache --rate-limit 25
-```
-
-Process multiple configuration files in parallel:
-
-```bash
-# Process all configs in a directory
-exfig batch ./configs/
-
-# Process specific config files
-exfig batch ios-app.pkl android-app.pkl flutter-app.pkl
-
-# With custom parallelism (default: 3)
-exfig batch ./configs/ --parallel 5
-
-# Stop on first error
-exfig batch ./configs/ --fail-fast
-
-# Generate JSON report
-exfig batch ./configs/ --report batch-results.json
-
-# Resume from checkpoint
-exfig batch ./configs/ --resume
-```
-
-> Note: The `batch` command takes config paths as **positional arguments**, not via `-i` flag.
-
-| Option          | Description                     | Default |
-| --------------- | ------------------------------- | ------- |
-| `--parallel`    | Maximum concurrent configs      | 3       |
-| `--fail-fast`   | Stop processing on first error  | false   |
-| `--rate-limit`  | Figma API requests per minute   | 10      |
-| `--max-retries` | Maximum retry attempts          | 4       |
-| `--resume`      | Resume from previous checkpoint | false   |
-| `--report`      | Path to write JSON report       | -       |
-
-> Note: Directory scanning is non-recursive. Use shell globbing for nested configs: `./configs/*/*.pkl`
-
-## JSON Export (Design Tokens)
-
-Export Figma data as JSON for design token pipelines:
-
-```bash
-# Export colors as W3C Design Tokens
-exfig download colors -o tokens/colors.json
-
-# Export raw Figma API response
-exfig download colors -o debug/colors.json --format raw
-
-# Export icons with SVG URLs
-exfig download icons -o tokens/icons.json --asset-format svg
-
-# Export unified design tokens (colors + typography + dimensions + numbers)
-exfig download tokens -o tokens/design-tokens.json
-
-# Export all token types
-exfig download all -o ./tokens/
-```
-
-### Download Subcommands
-
-| Subcommand   | Description                     |
-| ------------ | ------------------------------- |
-| `colors`     | Export colors as JSON                                              |
-| `icons`      | Export icon metadata with URLs                                     |
-| `images`     | Export image metadata with URLs                                    |
-| `typography` | Export text styles as JSON                                         |
-| `tokens`     | Export unified design tokens (colors, typography, dimensions, numbers) |
-| `all`        | Export all types to a directory                                    |
-
-### Download Options
-
-| Option           | Short | Description                      | Default |
-| ---------------- | ----- | -------------------------------- | ------- |
-| `--output`       | `-o`  | Output file path                 | varies  |
-| `--format`       | `-f`  | Output format: w3c, raw          | w3c     |
-| `--compact`      | -     | Output minified JSON             | false   |
-| `--asset-format` | -     | Image format: svg, png, pdf, jpg | svg     |
-| `--scale`        | -     | Scale for raster formats         | 3       |
-| `--w3c-version`  | -     | W3C format version: v1, v2025   | v2025   |
 
 ## Quick Fetch
 
@@ -302,54 +209,6 @@ exfig fetch -f abc123 -r "Images" -o ./images \
 | `--webp-encoding`    | -     | WebP encoding: lossy, lossless         | lossy   |
 | `--webp-quality`     | -     | WebP quality (0-100)                   | 80      |
 
-## MCP Server (AI Agent Integration)
-
-Start an MCP (Model Context Protocol) server for AI agents like Claude Code, Cursor, or Codex:
-
-```bash
-exfig mcp
-```
-
-The server runs over stdin/stdout using JSON-RPC. All CLI output goes to stderr.
-
-### Available Tools
-
-| Tool | Description | Requires Token |
-| ---- | ----------- | -------------- |
-| `exfig_validate` | Validate PKL config | No |
-| `exfig_tokens_info` | Inspect .tokens.json | No |
-| `exfig_inspect` | List Figma resources | Yes |
-
-### Client Configuration
-
-Add to your `.mcp.json` or MCP client config:
-
-```json
-{
-  "mcpServers": {
-    "exfig": {
-      "command": "exfig",
-      "args": ["mcp"],
-      "env": {
-        "FIGMA_PERSONAL_TOKEN": "figd_..."
-      }
-    }
-  }
-}
-```
-
-### Resources
-
-The server exposes PKL schemas (`exfig://schemas/*.pkl`) and starter config templates
-(`exfig://templates/{ios,android,flutter,web}`).
-
-### Prompts
-
-| Prompt | Description |
-| ------ | ----------- |
-| `setup-config` | Guide AI through creating exfig.pkl |
-| `troubleshoot-export` | Diagnose export errors |
-
 ## Help and Version
 
 ```bash
@@ -363,6 +222,9 @@ exfig --version
 
 ## See Also
 
+- <doc:BatchProcessing>
+- <doc:DesignTokens>
+- <doc:MCPServer>
 - <doc:Configuration>
 - <doc:DesignRequirements>
 - <doc:iOS>

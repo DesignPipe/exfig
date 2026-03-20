@@ -52,7 +52,7 @@ and Flutter projects.
 
 # Docs & Coverage
 ./bin/mise run docs                 # Generate DocC documentation
-./bin/mise run docs:preview         # Preview docs in browser
+./bin/mise run docs:preview         # Preview docs in browser (localhost:8080/documentation/exfigcli)
 ./bin/mise run coverage             # Run tests with coverage report
 
 # Maintenance
@@ -274,13 +274,13 @@ See `ExFigCore/CLAUDE.md` (Modification Checklist) and platform module CLAUDE.md
 
 ## Code Conventions
 
-| Area            | Use                               | Instead of                            |
-| --------------- | --------------------------------- | ------------------------------------- |
-| JSON parsing    | `JSONCodec` (swift-yyjson)        | `JSONDecoder`/`JSONEncoder`           |
-| JSON DOM access | `JSONCodec.parseValue(from:)`     | `JSONSerialization` / `import YYJSON` |
-| Terminal UI     | Noora (`NooraUI`, `TerminalText`) | Rainbow color methods                 |
-| Terminal output | `TerminalUI` facade               | Direct `print()` calls                |
-| README.md       | Keep compact (~300 lines)         | Detailed docs (use CONFIG.md / DocC)  |
+| Area            | Use                                   | Instead of                            |
+| --------------- | ------------------------------------- | ------------------------------------- |
+| JSON parsing    | `JSONCodec` (swift-yyjson)            | `JSONDecoder`/`JSONEncoder`           |
+| JSON DOM access | `JSONCodec.parseValue(from:)`         | `JSONSerialization` / `import YYJSON` |
+| Terminal UI     | Noora (`NooraUI`, `TerminalText`)     | Rainbow color methods                 |
+| Terminal output | `TerminalUI` facade                   | Direct `print()` calls                |
+| README.md       | Keep compact (~80 lines, pain-driven) | Detailed docs (use CONFIG.md / DocC)  |
 
 **JSONCodec usage:**
 

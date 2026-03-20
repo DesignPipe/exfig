@@ -1,21 +1,64 @@
 # ``ExFigCLI``
 
-CLI tool for exporting colors, typography, icons, and images from Figma to iOS, Android, Flutter, and Web projects.
+Export colors, typography, icons, and images from Figma to iOS, Android, Flutter, and Web projects.
 
 ## Overview
 
-ExFig automates the export of design tokens from Figma to native platform resources:
+ExFig is a command-line tool that automates design-to-code handoff. Point it at a Figma file,
+and it generates platform-native resources: Color Sets for Xcode, XML resources for Android,
+Dart constants for Flutter, and CSS variables for React — all from one source of truth.
 
-- **Colors**: Export color palettes as Color Sets (iOS), XML resources (Android), or Dart constants (Flutter)
-- **Icons**: Export vector icons as PDF/SVG (iOS), VectorDrawable (Android), or SVG (Flutter)
-- **Images**: Export raster images with multi-scale support for all platforms
-- **Typography**: Export text styles as Swift extensions, XML styles, or Dart constants
-- **Design Tokens**: Export unified W3C DTCG design tokens (colors, typography, dimensions, numbers) as JSON
+ExFig handles the details that make manual export painful: light/dark mode variants, @1x/@2x/@3x
+image scales, high contrast colors, RTL icon mirroring, and Dynamic Type mappings. A single
+`exfig batch` command replaces hours of copy-paste work across platforms.
+
+It's built for teams that maintain a Figma-based design system and need a reliable, automated
+pipeline to keep code in sync with design. ExFig works locally for quick exports and in CI/CD
+for fully automated workflows.
+
+> Tip: ExFig also works with local `.tokens.json` files — no Figma API access needed.
+
+### Supported Platforms
+
+- **iOS / macOS** — SwiftUI, UIKit, `.xcassets`, PDF/SVG vectors, Figma Code Connect
+- **Android** — Jetpack Compose, XML resources, VectorDrawable, Figma Code Connect
+- **Flutter** — Dart constants, SVG/PNG assets with scale directories
+- **Web** — React/TypeScript, CSS variables, TSX icon components
+
+### Key Capabilities
+
+**Design Assets**
+Colors with light/dark/high-contrast variants, vector icons (PDF, SVG, VectorDrawable),
+raster images with multi-scale support, typography with Dynamic Type, RTL layout support,
+and Figma Variables integration.
+
+**Export Formats**
+PNG, SVG, PDF, JPEG, WebP, HEIC output formats with quality control.
+W3C Design Tokens (DTCG v2025) for token pipelines.
+Quick fetch mode for one-off downloads without a config file.
+
+**Performance and Reliability**
+Parallel downloads and writes, batch processing with shared rate limiting,
+automatic retries with exponential backoff, checkpoint/resume for interrupted exports,
+file version tracking, and experimental per-node granular cache.
+
+**Developer Experience**
+CI/CD ready (quiet mode, exit codes, JSON reports), GitHub Action for automated exports,
+MCP server for AI assistant integration, customizable Jinja2 code templates,
+and rich progress indicators with ETA.
+
+**Code Generation**
+Type-safe Swift/Kotlin/Dart/TypeScript extensions, pre-configured UILabel subclasses,
+Compose color and icon objects, and Flutter path constants.
+
+> Important: Exporting icons and images requires a Figma Professional or Organization plan
+> (uses Shareable Team Libraries).
 
 ## Topics
 
-### Essentials
+### Getting Started
 
+- <doc:WhyExFig>
 - <doc:GettingStarted>
 - <doc:Usage>
 - <doc:Configuration>
@@ -37,5 +80,12 @@ ExFig automates the export of design tokens from Figma to native platform resour
 
 ### Advanced
 
+- <doc:BatchProcessing>
+- <doc:DesignTokens>
 - <doc:CustomTemplates>
+- <doc:MCPServer>
+- <doc:CICDIntegration>
+
+### Contributing
+
 - <doc:Development>
