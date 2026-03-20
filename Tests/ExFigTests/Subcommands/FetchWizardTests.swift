@@ -131,4 +131,65 @@ struct FetchWizardTests {
         #expect(ImageFormat.pdf.description == "PDF")
         #expect(ImageFormat.webp.description == "WebP")
     }
+
+    // MARK: - extractFigmaFileId
+
+    @Test("extractFigmaFileId returns bare ID as-is")
+    func extractBareId() {
+        #expect(extractFigmaFileId(from: "abc123XYZ") == "abc123XYZ")
+    }
+
+    @Test("extractFigmaFileId extracts ID from /file/ URL")
+    func extractFromFileUrl() {
+        #expect(extractFigmaFileId(from: "https://www.figma.com/file/abc123/MyFile") == "abc123")
+    }
+
+    @Test("extractFigmaFileId extracts ID from /design/ URL")
+    func extractFromDesignUrl() {
+        #expect(extractFigmaFileId(from: "https://www.figma.com/design/XYZ789/MyDesign?node-id=0") == "XYZ789")
+    }
+
+    @Test("extractFigmaFileId trims whitespace")
+    func extractTrimsWhitespace() {
+        #expect(extractFigmaFileId(from: "  abc123  ") == "abc123")
+    }
+
+    @Test("extractFigmaFileId handles URL without https prefix")
+    func extractWithoutProtocol() {
+        #expect(extractFigmaFileId(from: "figma.com/design/FILEID/Title") == "FILEID")
+    }
+}
+
+// MARK: - GenerateConfigFile Tests
+
+@Suite("GenerateConfigFile")
+struct GenerateConfigFileTests {
+    @Test("substitutePackageURI replaces .exfig/schemas/ paths")
+    func substitutePackageURI() {
+        let template = """
+        amends ".exfig/schemas/ExFig.pkl"
+        import ".exfig/schemas/iOS.pkl"
+        """
+        let result = ExFigCommand.GenerateConfigFile.substitutePackageURI(in: template)
+        #expect(result.contains("package://github.com/DesignPipe/exfig/"))
+        #expect(!result.contains(".exfig/schemas/"))
+    }
+
+    @Test("substitutePackageURI strips v prefix for semver")
+    func substitutePackageURIVersionFormat() {
+        let template = "amends \".exfig/schemas/ExFig.pkl\""
+        let result = ExFigCommand.GenerateConfigFile.substitutePackageURI(in: template)
+        // Should contain both v-prefixed version and bare semver
+        // e.g. /download/v2.8.1/exfig@2.8.1#/
+        let version = ExFigCommand.version
+        let semver = version.hasPrefix("v") ? String(version.dropFirst()) : version
+        #expect(result.contains("exfig@\(semver)#/"))
+    }
+
+    @Test("substitutePackageURI preserves non-schema content")
+    func substitutePackageURIPreservesContent() {
+        let template = "// This is a comment\nsome other content"
+        let result = ExFigCommand.GenerateConfigFile.substitutePackageURI(in: template)
+        #expect(result == template)
+    }
 }

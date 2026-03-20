@@ -148,6 +148,7 @@ extension InitWizard {
     }
 
     /// Remove a PKL section starting with a line matching the marker, counting braces to find the end.
+    /// Also strips preceding comment lines and blank lines.
     static func removeSection(from template: String, matching marker: String) -> String {
         let lines = template.components(separatedBy: "\n")
         var result: [String] = []
@@ -172,6 +173,12 @@ extension InitWizard {
             braceDepth = braceBalance(in: line)
             stripTrailingCommentsAndBlanks(&result)
             if braceDepth <= 0 { removing = false }
+        }
+
+        // Safety: if still removing at EOF, the section was never closed — return template unchanged
+        if removing {
+            assertionFailure("removeSection: unclosed section for marker '\(marker)' — template may be malformed")
+            return template
         }
 
         return result.joined(separator: "\n")

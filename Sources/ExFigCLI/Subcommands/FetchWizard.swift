@@ -95,6 +95,23 @@ struct FetchWizardResult {
     let filter: String?
 }
 
+// MARK: - Figma File ID Helpers
+
+/// Extract Figma file ID from a full URL or return the input as-is if it looks like a bare ID.
+/// Supports: figma.com/file/<ID>/..., figma.com/design/<ID>/..., or bare alphanumeric IDs.
+func extractFigmaFileId(from input: String) -> String {
+    let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+    // Match figma.com/file/<ID> or figma.com/design/<ID>
+    if let range = trimmed.range(of: #"figma\.com/(?:file|design)/([A-Za-z0-9]+)"#, options: .regularExpression) {
+        let match = trimmed[range]
+        // Extract the ID part after the last /
+        if let lastSlash = match.lastIndex(of: "/") {
+            return String(match[match.index(after: lastSlash)...])
+        }
+    }
+    return trimmed
+}
+
 // MARK: - Wizard Flow
 
 /// Interactive wizard for `exfig fetch` when required options are missing.
@@ -110,12 +127,13 @@ enum FetchWizard {
     /// Run the interactive wizard and return populated options.
     static func run() -> FetchWizardResult {
         // 1–3: Core choices (file, asset type, platform)
-        let fileId = NooraUI.textPrompt(
+        let fileIdInput = NooraUI.textPrompt(
             title: "Figma Export Wizard",
-            prompt: "Figma file ID (from URL: figma.com/file/<ID>/...):",
-            description: "You can find it in the Figma file URL",
+            prompt: "Figma file ID or URL (figma.com/design/<ID>/...):",
+            description: "Paste the file URL or just the ID from it",
             validationRules: [NonEmptyValidationRule(error: "File ID cannot be empty.")]
         )
+        let fileId = extractFigmaFileId(from: fileIdInput)
 
         let assetType: WizardAssetType = NooraUI.singleChoicePrompt(
             question: "What are you exporting?",
@@ -135,15 +153,12 @@ enum FetchWizard {
         return promptDetails(assetType: assetType, platform: platform, defaults: defaults, fileId: fileId)
     }
 
-    // swiftlint:disable function_parameter_count
     private static func promptDetails(
         assetType: WizardAssetType,
         platform: WizardPlatform,
         defaults: PlatformDefaults,
         fileId: String
     ) -> FetchWizardResult {
-        // swiftlint:enable function_parameter_count
-
         let pageName = promptOptionalText(
             question: "Filter by Figma page name?",
             description: "Useful when multiple pages have frames with the same name",
@@ -154,7 +169,7 @@ enum FetchWizard {
         let frameInput = NooraUI.textPrompt(
             prompt: "Figma frame name (default: \(defaultFrame)):",
             description: "Name of the frame containing your assets. Press Enter for default."
-        )
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
         let frameName = frameInput.isEmpty ? defaultFrame : frameInput
 
         let sortedFormats = sortedFormats(recommended: defaults.format)
@@ -168,7 +183,7 @@ enum FetchWizard {
         let outputInput = NooraUI.textPrompt(
             prompt: "Output directory (default: \(defaultOutput)):",
             description: "Where to save exported assets. Press Enter for default."
-        )
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
         let outputPath = outputInput.isEmpty ? defaultOutput : outputInput
 
         let filter = promptOptionalText(

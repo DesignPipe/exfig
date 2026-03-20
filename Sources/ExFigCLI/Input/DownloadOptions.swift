@@ -77,7 +77,7 @@ struct DownloadOptions: ParsableArguments {
         name: .long,
         help: "Image format: \(ImageFormat.allValueStrings.joined(separator: ", ")). Default: png"
     )
-    var format: ImageFormat = .png
+    var format: ImageFormat?
 
     @Option(
         name: .long,
@@ -164,11 +164,16 @@ struct DownloadOptions: ParsableArguments {
 
     // MARK: - Computed Properties
 
+    /// Returns the effective format, defaulting to `.png` when not explicitly set.
+    var effectiveFormat: ImageFormat {
+        format ?? .png
+    }
+
     /// Returns the effective scale based on format.
     /// For PNG: defaults to 3 if not specified.
     /// For vector formats (SVG, PDF): scale is ignored.
     var effectiveScale: Double {
-        switch format {
+        switch effectiveFormat {
         case .png, .jpg, .webp:
             scale ?? 3.0
         case .svg, .pdf:
@@ -178,7 +183,7 @@ struct DownloadOptions: ParsableArguments {
 
     /// Returns true if format is a vector format (scale is ignored)
     var isVectorFormat: Bool {
-        format == .svg || format == .pdf
+        effectiveFormat == .svg || effectiveFormat == .pdf
     }
 
     /// Returns the Figma access token from environment

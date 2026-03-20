@@ -74,7 +74,7 @@ extension ExFigCommand {
                 options.outputPath = options.outputPath ?? result.outputPath
                 options.pageName = options.pageName ?? result.pageName
                 options.filter = options.filter ?? result.filter
-                if options.format == .png {
+                if options.format == nil {
                     options.format = result.format
                 }
                 if options.nameStyle == nil {
@@ -109,7 +109,7 @@ extension ExFigCommand {
             ui.debug("File ID: \(fileId)")
             ui.debug("Frame: \(frameName)")
             ui.debug("Output: \(outputURL.path)")
-            ui.debug("Format: \(options.format.rawValue)")
+            ui.debug("Format: \(options.effectiveFormat.rawValue)")
             if !options.isVectorFormat {
                 ui.debug("Scale: \(options.effectiveScale)x")
             }
@@ -148,7 +148,7 @@ extension ExFigCommand {
                     fileId: fileId,
                     frameName: frameName,
                     pageName: resolvedOptions.pageName,
-                    format: resolvedOptions.format,
+                    format: resolvedOptions.effectiveFormat,
                     effectiveScale: resolvedOptions.effectiveScale,
                     filter: resolvedOptions.filter,
                     onBatchProgress: onProgress
@@ -184,7 +184,7 @@ extension ExFigCommand {
             var allFiles = DownloadImageProcessor.createFileContents(
                 from: lightPacks,
                 outputURL: outputURL,
-                format: resolvedOptions.format,
+                format: resolvedOptions.effectiveFormat,
                 dark: false,
                 darkModeSuffix: resolvedOptions.darkModeSuffix
             )
@@ -192,7 +192,7 @@ extension ExFigCommand {
                 allFiles += DownloadImageProcessor.createFileContents(
                     from: darkPacks,
                     outputURL: outputURL,
-                    format: resolvedOptions.format,
+                    format: resolvedOptions.effectiveFormat,
                     dark: true,
                     darkModeSuffix: resolvedOptions.darkModeSuffix
                 )
@@ -212,7 +212,7 @@ extension ExFigCommand {
             }
 
             // Convert to WebP if needed
-            let finalFiles: [FileContents] = if resolvedOptions.format == .webp {
+            let finalFiles: [FileContents] = if resolvedOptions.effectiveFormat == .webp {
                 try await convertToWebP(downloadedFiles, options: resolvedOptions, ui: ui)
             } else {
                 downloadedFiles

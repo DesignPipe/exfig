@@ -207,8 +207,10 @@ Follow `InitWizard.swift` / `FetchWizard.swift` pattern:
 4. Reuse `WizardPlatform` from `FetchWizard.swift` (has `asPlatform` → `Platform` mapping)
 5. Gate on `TTYDetector.isTTY` in the calling command; throw `ValidationError` for non-TTY
 
-**File split pattern:** Keep types + interactive prompts in `*Wizard.swift` (<200 lines), extract pure
+**File split pattern:** Keep types + interactive prompts in `*Wizard.swift` (~230 lines), extract pure
 transformation logic into `*WizardTransform.swift` as `extension`. SwiftLint enforces 400-line file / 300-line type body limits.
+
+**Test file split pattern:** When a `@Suite` struct exceeds 300 lines, extract groups of tests into separate `@Suite` structs in the same file (e.g., `InitWizardCrossPlatformTests`, `InitWizardTransformUtilityTests`).
 
 **Template transformations** (three operations on PKL templates):
 

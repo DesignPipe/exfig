@@ -48,7 +48,8 @@ final class DownloadOptionsTests: XCTestCase {
             "-f", "abc", "-r", "Frame", "-o", "./out",
         ])
 
-        XCTAssertEqual(options.format, .png)
+        XCTAssertNil(options.format)
+        XCTAssertEqual(options.effectiveFormat, .png)
     }
 
     func testParsesAllFormats() throws {
@@ -58,6 +59,7 @@ final class DownloadOptionsTests: XCTestCase {
                 "--format", format.rawValue,
             ])
             XCTAssertEqual(options.format, format)
+            XCTAssertEqual(options.effectiveFormat, format)
         }
     }
 
@@ -67,6 +69,7 @@ final class DownloadOptionsTests: XCTestCase {
             "--format", "png",
         ])
 
+        XCTAssertEqual(options.format, .png)
         XCTAssertNil(options.scale)
         XCTAssertEqual(options.effectiveScale, 3.0)
     }

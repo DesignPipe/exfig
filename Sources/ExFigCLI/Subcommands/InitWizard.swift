@@ -98,18 +98,20 @@ enum InitWizard {
         )
 
         // 3. Figma file ID (light)
-        let lightFileId = NooraUI.textPrompt(
-            prompt: "Figma file ID (from URL: figma.com/design/<ID>/...):",
-            description: "The file containing your design system assets",
+        let lightFileIdInput = NooraUI.textPrompt(
+            prompt: "Figma file ID or URL (figma.com/design/<ID>/...):",
+            description: "Paste the file URL or just the ID from it",
             validationRules: [NonEmptyValidationRule(error: "File ID cannot be empty.")]
         )
+        let lightFileId = extractFigmaFileId(from: lightFileIdInput)
 
         // 4. Dark mode file ID (optional)
-        let darkFileId = promptOptionalText(
+        let darkFileIdRaw = promptOptionalText(
             question: "Do you have a separate dark mode file?",
             description: "If your dark colors/images are in a different Figma file",
-            inputPrompt: "Dark mode file ID:"
+            inputPrompt: "Dark mode file ID or URL:"
         )
+        let darkFileId = darkFileIdRaw.map { extractFigmaFileId(from: $0) }
 
         // 5. Colors source (if colors selected)
         let variablesConfig: InitVariablesConfig? = if selectedTypes.contains(.colors) {
@@ -159,7 +161,7 @@ enum InitWizard {
         let input = NooraUI.textPrompt(
             prompt: "Figma frame name for \(assetType) (default: \(defaultName)):",
             description: "Name of the frame containing your \(assetType). Press Enter for default."
-        )
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
         return input.isEmpty ? defaultName : input
     }
 
@@ -197,10 +199,10 @@ enum InitWizard {
 
         guard source == .variables else { return nil }
 
-        let tokensFileId = NooraUI.textPrompt(
-            prompt: "Variables file ID (default: same as light file):",
+        let tokensFileIdInput = NooraUI.textPrompt(
+            prompt: "Variables file ID or URL (default: same as light file):",
             description: "The Figma file containing your color variables. Press Enter to use the light file ID."
-        )
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
 
         let collectionName = NooraUI.textPrompt(
             prompt: "Variables collection name:",
@@ -211,7 +213,7 @@ enum InitWizard {
         let lightModeName = NooraUI.textPrompt(
             prompt: "Light mode column name (default: Light):",
             description: "Column name for light color values. Press Enter for default."
-        )
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
 
         let darkModeName = promptOptionalText(
             question: "Do you have a dark mode column?",
@@ -220,7 +222,7 @@ enum InitWizard {
         )
 
         return InitVariablesConfig(
-            tokensFileId: tokensFileId.isEmpty ? lightFileId : tokensFileId,
+            tokensFileId: tokensFileIdInput.isEmpty ? lightFileId : extractFigmaFileId(from: tokensFileIdInput),
             collectionName: collectionName,
             lightModeName: lightModeName.isEmpty ? "Light" : lightModeName,
             darkModeName: darkModeName

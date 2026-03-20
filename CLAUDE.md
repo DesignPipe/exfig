@@ -275,6 +275,8 @@ Follow `InitWizard.swift` / `FetchWizard.swift` pattern:
 - Pure function for testable transformation logic (e.g., `applyResult(_:to:)`)
 - Reuse `WizardPlatform` from `FetchWizard.swift` (has `asPlatform` property)
 - Gate on `TTYDetector.isTTY`; throw `ValidationError` for non-TTY without required flags
+- Use `extractFigmaFileId(from:)` for file ID inputs (auto-extracts ID from full Figma URLs)
+- Trim text prompt results with `.trimmingCharacters(in: .whitespacesAndNewlines)` before `.isEmpty` default checks
 
 ### Adding a NooraUI Prompt Wrapper
 
@@ -387,6 +389,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Jinja trailing `\n`         | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results                                                                             |
 | `Bundle.module` in tests    | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle                                                                              |
 | SwiftLint trailing closure  | When function takes 2+ closures, use explicit label for last closure (`export: { ... }`) not trailing syntax                                                                           |
+| CLI flag default vs absent  | swift-argument-parser can't distinguish explicit `--flag default_value` from omitted. Use `Optional` + computed `effectiveX` property for flags that wizard may override               |
 | MCP `Client` ambiguous      | `FigmaAPI.Client` vs `MCP.Client` — always use `FigmaAPI.Client` in MCP/ files                                                                                                         |
 | MCP `FigmaConfig` fields    | No `colorsFileId` — use `config.getFileIds()` or `figma.lightFileId`/`darkFileId`                                                                                                      |
 | `distantFuture` on clock    | `ContinuousClock.Instant` has no `distantFuture`; use `withCheckedContinuation { _ in }` for infinite suspend                                                                          |

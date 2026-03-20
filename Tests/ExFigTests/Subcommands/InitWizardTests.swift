@@ -295,3 +295,87 @@ struct InitWizardTests {
         )
     }
 }
+
+// MARK: - Cross-Platform Template Tests
+
+@Suite("InitWizard Cross-Platform")
+struct InitWizardCrossPlatformTests {
+    @Test("applyResult works with Android template")
+    func androidAllSelected() {
+        let result = InitWizardResult(
+            platform: .android,
+            selectedAssetTypes: [.colors, .icons, .images, .typography],
+            lightFileId: "ANDROID_ID",
+            darkFileId: "ANDROID_DARK",
+            iconsFrameName: nil,
+            iconsPageName: nil,
+            imagesFrameName: nil,
+            imagesPageName: nil,
+            variablesConfig: nil
+        )
+        let output = InitWizard.applyResult(result, to: androidConfigFileContents)
+        #expect(output.contains("ANDROID_ID"))
+        #expect(output.contains("ANDROID_DARK"))
+        #expect(output.contains("colors = new Android.ColorsEntry {"))
+        #expect(output.contains("icons = new Android.IconsEntry {"))
+        #expect(output.contains("images = new Android.ImagesEntry {"))
+        #expect(output.contains("typography = new Android.Typography {"))
+        let openCount = output.filter { $0 == "{" }.count
+        let closeCount = output.filter { $0 == "}" }.count
+        #expect(openCount == closeCount, "Unbalanced braces in Android: \(openCount) vs \(closeCount)")
+    }
+
+    @Test("applyResult works with Web template (no typography)")
+    func webAllSelected() {
+        let result = InitWizardResult(
+            platform: .web,
+            selectedAssetTypes: [.colors, .icons, .images],
+            lightFileId: "WEB_ID",
+            darkFileId: nil,
+            iconsFrameName: "WebIcons",
+            iconsPageName: nil,
+            imagesFrameName: nil,
+            imagesPageName: nil,
+            variablesConfig: nil
+        )
+        let output = InitWizard.applyResult(result, to: webConfigFileContents)
+        #expect(output.contains("WEB_ID"))
+        #expect(!output.contains("darkFileId"))
+        #expect(output.contains("colors = new Web.ColorsEntry {"))
+        #expect(output.contains("icons = new Web.IconsEntry {"))
+        #expect(output.contains("images = new Web.ImagesEntry {"))
+        #expect(output.contains("figmaFrameName = \"WebIcons\""))
+        let openCount = output.filter { $0 == "{" }.count
+        let closeCount = output.filter { $0 == "}" }.count
+        #expect(openCount == closeCount, "Unbalanced braces in Web: \(openCount) vs \(closeCount)")
+    }
+}
+
+// MARK: - Transform Utilities Tests
+
+@Suite("InitWizard Transform Utilities")
+struct InitWizardTransformUtilityTests {
+    @Test("removeSection returns template unchanged when marker not found")
+    func removeSectionMissingMarker() {
+        let template = "line 1\nline 2\nline 3"
+        let result = InitWizard.removeSection(from: template, matching: "nonexistent marker")
+        #expect(result == template)
+    }
+
+    @Test("collapseBlankLines collapses 3+ blank lines to 2")
+    func collapseBlankLines() {
+        let input = "a\n\n\n\n\nb"
+        let output = InitWizard.collapseBlankLines(input)
+        let blankCount = output.components(separatedBy: "\n").filter(\.isEmpty).count
+        #expect(blankCount <= 2)
+        #expect(output.contains("a"))
+        #expect(output.contains("b"))
+    }
+
+    @Test("collapseBlankLines preserves 2 blank lines")
+    func collapseBlankLinesPreserves() {
+        let input = "a\n\n\nb"
+        let output = InitWizard.collapseBlankLines(input)
+        #expect(output == input)
+    }
+}
