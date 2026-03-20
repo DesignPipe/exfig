@@ -90,6 +90,22 @@ local builtin_checks = new Mapping<String, Step> {
 }
 
 // =============================================================================
+// Generated File Checks
+// =============================================================================
+
+local generated_checks = new Mapping<String, Step> {
+    // Regenerate llms.txt / llms-full.txt when documentation sources change.
+    // check generates to a temp dir (parallel-safe), fix writes to repo.
+    ["llms-check"] {
+        glob = List("README.md", "Sources/ExFigCLI/ExFig.docc/**/*.md", "CONFIG.md", "docs/*.md")
+        check = "bash Scripts/check-llms-freshness.sh"
+        fix = "bash Scripts/generate-llms.sh"
+        stage = List("llms.txt", "llms-full.txt")
+        hide = true
+    }
+}
+
+// =============================================================================
 // Combined Linters
 // =============================================================================
 
@@ -97,6 +113,7 @@ local all_linters = new Mapping<String, Step> {
     ...swift_linters
     ...dprint_checks
     ...builtin_checks
+    ...generated_checks
 }
 
 // =============================================================================

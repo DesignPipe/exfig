@@ -9,8 +9,8 @@ cd "$REPO_ROOT"
 GITHUB_BLOB="https://github.com/DesignPipe/exfig/blob/main"
 DOCC_BASE="https://designpipe.github.io/exfig/documentation/exfigcli"
 
-LLMS_TXT="llms.txt"
-LLMS_FULL="llms-full.txt"
+LLMS_TXT="${LLMS_TXT:-llms.txt}"
+LLMS_FULL="${LLMS_FULL:-llms-full.txt}"
 
 # ── Header (shared) ──────────────────────────────────────────────────────────
 
