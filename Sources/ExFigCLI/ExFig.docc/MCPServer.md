@@ -64,6 +64,27 @@ AI assistants can read these to understand config structure and generate valid c
 | `setup-config`        | Guide through creating an `exfig.pkl` config  |
 | `troubleshoot-export` | Diagnose and fix export errors                |
 
+## Claude Code Plugins
+
+For a turnkey Claude Code experience, install the
+[exfig-plugins](https://github.com/DesignPipe/exfig-plugins) marketplace:
+
+```bash
+claude /plugin marketplace add https://github.com/DesignPipe/exfig-plugins
+```
+
+The marketplace includes:
+
+| Plugin | What it does |
+| ------ | ------------ |
+| **exfig-mcp** | Pre-configured `.mcp.json` + usage skill |
+| **exfig-setup** | Interactive wizard: install → token → config → first export → CI |
+| **exfig-export** | `/export-colors`, `/export-icons`, `/export-images`, `/export-all` commands |
+| **exfig-config-review** | Reviews `exfig.pkl` for issues and optimizations |
+| **exfig-troubleshooting** | Error catalog with diagnostic steps |
+| **exfig-migration** | Migration guide between major versions |
+| **exfig-rules** | Naming and structure conventions |
+
 ## See Also
 
 - <doc:Usage>

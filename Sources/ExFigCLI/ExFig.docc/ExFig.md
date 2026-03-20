@@ -45,8 +45,9 @@ file version tracking, and experimental per-node granular cache.
 
 **Developer Experience**
 CI/CD ready (quiet mode, exit codes, JSON reports), GitHub Action for automated exports,
-MCP server for AI assistant integration, customizable Jinja2 code templates,
-and rich progress indicators with ETA.
+MCP server for AI assistant integration,
+[Claude Code plugins](https://github.com/DesignPipe/exfig-plugins) for setup wizards and slash commands,
+customizable Jinja2 code templates, and rich progress indicators with ETA.
 
 **Code Generation**
 Type-safe Swift/Kotlin/Dart/TypeScript extensions, pre-configured UILabel subclasses,

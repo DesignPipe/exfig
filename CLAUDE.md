@@ -120,6 +120,7 @@ Fourteen modules in `Sources/`:
 
 **MCP data flow:** `exfig mcp` → StdioTransport (JSON-RPC on stdin/stdout) → tool handlers → PKLEvaluator / TokensFileSource / FigmaAPI
 **MCP stdout safety:** `OutputMode.mcp` + `TerminalOutputManager.setStderrMode(true)` — all CLI output goes to stderr
+**Claude Code plugins:** [exfig-plugins](https://github.com/DesignPipe/exfig-plugins) marketplace — MCP integration, setup wizard, export commands, config review, troubleshooting
 
 **Batch mode:** Single `@TaskLocal` via `BatchSharedState` actor — see `ExFigCLI/CLAUDE.md`.
 

@@ -63,6 +63,16 @@ See the [Getting Started guide](https://DesignPipe.github.io/exfig/documentation
     cache: true
 ```
 
+## Claude Code Plugins
+
+Use ExFig directly from Claude Code with the [exfig-plugins](https://github.com/DesignPipe/exfig-plugins) marketplace:
+
+```bash
+claude /plugin marketplace add https://github.com/DesignPipe/exfig-plugins
+```
+
+Includes MCP integration, setup wizard, config review, troubleshooting, and `/export-*` slash commands.
+
 ## Documentation
 
 Full documentation — platform guides, configuration reference, batch processing, design tokens, custom templates, and MCP server — is available at **[DesignPipe.github.io/exfig](https://DesignPipe.github.io/exfig/documentation/exfig)**.

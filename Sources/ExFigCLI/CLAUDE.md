@@ -197,6 +197,7 @@ reserved for MCP JSON-RPC protocol.
 5. `Color.hex` is in AndroidExport, not accessible from ExFigCLI — use RGBA components
 6. `ColorsVariablesLoader` takes `PKLConfig.Common.VariablesColors?`, not `.Colors?`
 7. MCP `JSONValue` accessors: `.stringValue`, `.intValue`, `.boolValue`
+8. Export tools: `exfig_export` runs subprocess (self-invoke), reads JSON report from temp file; `exfig_download` returns tokens inline via loaders
 
 ## Modification Patterns
 
