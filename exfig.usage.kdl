@@ -107,9 +107,9 @@ cmd "typography" help="Exports typography from Figma" {
 // =============================================================================
 
 cmd "init" help="Generates config file" {
-    long_help "Generates exfig.pkl config file in the current directory."
+    long_help "Generates exfig.pkl config file. When --platform is omitted in an interactive terminal, a guided wizard configures file IDs and asset types."
 
-    flag "-p --platform <platform>" help="Platform: ios, android, flutter, or web" required=#true {
+    flag "-p --platform <platform>" help="Platform: ios, android, flutter, or web. Prompted interactively if omitted in TTY." {
         choices "ios" "android" "flutter" "web"
     }
 }

@@ -13,6 +13,16 @@ enum WizardPlatform: String, CaseIterable, CustomStringConvertible, Equatable {
     var description: String {
         rawValue
     }
+
+    /// Convert to ExFigCore `Platform`.
+    var asPlatform: Platform {
+        switch self {
+        case .ios: .ios
+        case .android: .android
+        case .flutter: .flutter
+        case .web: .web
+        }
+    }
 }
 
 /// Asset type choice for the wizard.

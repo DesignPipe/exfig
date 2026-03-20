@@ -209,6 +209,33 @@ enum NooraUI {
         )
     }
 
+    /// Prompt the user to select multiple options from a list.
+    /// - Parameters:
+    ///   - title: Optional title above the prompt
+    ///   - question: The question text
+    ///   - options: Array of options to choose from
+    ///   - description: Optional description for context
+    ///   - collapseOnSelection: Whether to collapse after selection (default: true)
+    ///   - minLimit: Minimum number of selections required (default: unlimited)
+    /// - Returns: Array of selected options
+    static func multipleChoicePrompt<T: Equatable & CustomStringConvertible>(
+        title: TerminalText? = nil,
+        question: TerminalText,
+        options: [T],
+        description: TerminalText? = nil,
+        collapseOnSelection: Bool = true,
+        minLimit: MultipleChoiceLimit = .unlimited
+    ) -> [T] {
+        shared.multipleChoicePrompt(
+            title: title,
+            question: question,
+            options: options,
+            description: description,
+            collapseOnSelection: collapseOnSelection,
+            minLimit: minLimit
+        )
+    }
+
     // MARK: - Progress Components
 
     /// Execute an async operation with a Noora progress bar (0-100%).

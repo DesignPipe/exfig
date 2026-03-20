@@ -22,6 +22,22 @@ exfig images
 exfig typography
 ```
 
+## Getting Started
+
+Generate a config file with the interactive wizard:
+
+```bash
+exfig init
+```
+
+The wizard guides you through platform selection, asset types, and Figma file IDs.
+For non-interactive use, specify the platform directly:
+
+```bash
+exfig init -p ios       # Full iOS template
+exfig init -p android   # Full Android template
+```
+
 ## Configuration File
 
 By default, ExFig looks for `exfig.pkl` in the current directory. Specify a different location:

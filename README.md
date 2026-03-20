@@ -40,8 +40,8 @@ export FIGMA_PERSONAL_TOKEN=your_token_here
 # 3a. Quick one-off export (interactive wizard)
 exfig fetch
 
-# 3b. Or generate config for full pipeline
-exfig init -p ios
+# 3b. Or generate config for full pipeline (interactive wizard)
+exfig init
 exfig batch exfig.pkl
 ```
 

@@ -197,6 +197,16 @@ reserved for MCP JSON-RPC protocol.
 3. Use `@OptionGroup` for shared options
 4. Call `initializeTerminalUI()` + `checkSchemaVersionIfNeeded()` in `run()`
 
+### Adding an Interactive Wizard
+
+Follow `InitWizard.swift` / `FetchWizard.swift` pattern:
+
+1. Create `Subcommands/NewWizard.swift` as `enum` with `static func run() -> Result`
+2. Use NooraUI prompts (`textPrompt`, `singleChoicePrompt`, `multipleChoicePrompt`, `yesOrNoPrompt`)
+3. Extract testable pure logic into a separate static method (e.g., `applyResult(_:to:)`)
+4. Reuse `WizardPlatform` from `FetchWizard.swift` (has `asPlatform` → `Platform` mapping)
+5. Gate on `TTYDetector.isTTY` in the calling command; throw `ValidationError` for non-TTY
+
 ### Adding a New Platform Export
 
 1. Create platform export orchestrator in `Subcommands/Export/` (e.g., `NewPlatformColorsExport.swift`)
