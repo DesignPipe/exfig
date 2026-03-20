@@ -40,11 +40,13 @@ Add to your `.mcp.json` (Claude Code, Cursor, Codex):
 
 ## Available Tools
 
-| Tool                | Description                      | Requires Token |
-| ------------------- | -------------------------------- | -------------- |
-| `exfig_validate`    | Validate a PKL config file       | No             |
-| `exfig_tokens_info` | Inspect a local `.tokens.json`   | No             |
-| `exfig_inspect`     | List resources in a Figma file   | Yes            |
+| Tool                | Description                                          | Requires Token |
+| ------------------- | ---------------------------------------------------- | -------------- |
+| `exfig_validate`    | Validate a PKL config file                           | No             |
+| `exfig_tokens_info` | Inspect a local `.tokens.json`                       | No             |
+| `exfig_inspect`     | List resources in a Figma file                       | Yes            |
+| `exfig_export`      | Run code export (writes files, returns JSON report)  | Yes            |
+| `exfig_download`    | Export W3C Design Tokens JSON (inline, no file I/O)  | Yes            |
 
 ## Resources
 

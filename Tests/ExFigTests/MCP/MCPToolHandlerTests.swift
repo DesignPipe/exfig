@@ -197,4 +197,104 @@ struct MCPToolHandlerTests {
             #expect(text.contains("resource_type"))
         }
     }
+
+    // MARK: - Export Tool
+
+    @Test("export returns error for missing resource_type")
+    func exportMissingResourceType() async {
+        let params = CallTool.Parameters(
+            name: "exfig_export",
+            arguments: nil
+        )
+
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains("resource_type"))
+        }
+    }
+
+    @Test("export returns error for invalid resource_type")
+    func exportInvalidResourceType() async {
+        let params = CallTool.Parameters(
+            name: "exfig_export",
+            arguments: ["resource_type": .string("invalid")]
+        )
+
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains("Invalid resource_type"))
+        }
+    }
+
+    @Test("export returns error for missing config")
+    func exportMissingConfig() async {
+        let params = CallTool.Parameters(
+            name: "exfig_export",
+            arguments: [
+                "resource_type": .string("colors"),
+                "config_path": .string("/nonexistent/path.pkl"),
+            ]
+        )
+
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains("not found"))
+        }
+    }
+
+    // MARK: - Download Tool
+
+    @Test("download returns error for missing resource_type")
+    func downloadMissingResourceType() async {
+        let params = CallTool.Parameters(
+            name: "exfig_download",
+            arguments: nil
+        )
+
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains("resource_type"))
+        }
+    }
+
+    @Test("download returns error for invalid resource_type")
+    func downloadInvalidResourceType() async {
+        let params = CallTool.Parameters(
+            name: "exfig_download",
+            arguments: ["resource_type": .string("invalid")]
+        )
+
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains("Invalid resource_type"))
+        }
+    }
+
+    @Test("download returns error for missing config")
+    func downloadMissingConfig() async {
+        let params = CallTool.Parameters(
+            name: "exfig_download",
+            arguments: [
+                "resource_type": .string("colors"),
+                "config_path": .string("/nonexistent/path.pkl"),
+            ]
+        )
+
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains("not found"))
+        }
+    }
 }

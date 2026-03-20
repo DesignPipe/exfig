@@ -188,6 +188,16 @@ reserved for MCP JSON-RPC protocol.
 
 **Tool handler order:** Validate input parameters BEFORE expensive operations (PKL eval, API client creation).
 
+### Adding an MCP Tool Handler
+
+1. Add tool definition in `MCP/MCPToolDefinitions.swift` (JSON Schema via `.object([...])`)
+2. Add case in `MCPToolHandlers.handle()` dispatch switch
+3. Implement handler in an `extension MCPToolHandlers` (keeps `type_body_length` under 300)
+4. `ExFigWarning` → string via `ExFigWarningFormatter().format(warning)` (no `.formattedMessage` property)
+5. `Color.hex` is in AndroidExport, not accessible from ExFigCLI — use RGBA components
+6. `ColorsVariablesLoader` takes `PKLConfig.Common.VariablesColors?`, not `.Colors?`
+7. MCP `JSONValue` accessors: `.stringValue`, `.intValue`, `.boolValue`
+
 ## Modification Patterns
 
 ### Adding a New Subcommand

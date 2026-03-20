@@ -6,6 +6,8 @@ enum MCPToolDefinitions {
         validateTool,
         tokensInfoTool,
         inspectTool,
+        exportTool,
+        downloadTool,
     ]
 
     // MARK: - Tool Definitions
@@ -77,6 +79,103 @@ enum MCPToolDefinitions {
                         .string("typography"),
                         .string("all"),
                     ]),
+                ]),
+            ]),
+            "required": .array([.string("resource_type")]),
+        ])
+    )
+    static let exportTool = Tool(
+        name: "exfig_export",
+        description: """
+        Run platform code export (Swift/Kotlin/Dart/CSS) from PKL config. \
+        Writes generated files to disk and returns a structured JSON report. \
+        Requires FIGMA_PERSONAL_TOKEN.
+        """,
+        inputSchema: .object([
+            "type": .string("object"),
+            "properties": .object([
+                "resource_type": .object([
+                    "type": .string("string"),
+                    "description": .string("Type of resources to export"),
+                    "enum": .array([
+                        .string("colors"),
+                        .string("icons"),
+                        .string("images"),
+                        .string("typography"),
+                        .string("all"),
+                    ]),
+                ]),
+                "config_path": .object([
+                    "type": .string("string"),
+                    "description": .string(
+                        "Path to PKL config file. Auto-detects exfig.pkl in current directory if omitted."
+                    ),
+                ]),
+                "filter": .object([
+                    "type": .string("string"),
+                    "description": .string("Filter by name pattern (e.g., \"background/*\")"),
+                ]),
+                "rate_limit": .object([
+                    "type": .string("integer"),
+                    "description": .string("Figma API requests per minute (default: 10)"),
+                ]),
+                "max_retries": .object([
+                    "type": .string("integer"),
+                    "description": .string("Max retry attempts (default: 4)"),
+                ]),
+                "cache": .object([
+                    "type": .string("boolean"),
+                    "description": .string("Enable version tracking cache (default: false)"),
+                ]),
+                "force": .object([
+                    "type": .string("boolean"),
+                    "description": .string("Force export ignoring cache (default: false)"),
+                ]),
+                "granular_cache": .object([
+                    "type": .string("boolean"),
+                    "description": .string("Enable per-node granular cache (default: false)"),
+                ]),
+            ]),
+            "required": .array([.string("resource_type")]),
+        ])
+    )
+
+    static let downloadTool = Tool(
+        name: "exfig_download",
+        description: """
+        Export design data from Figma as W3C Design Tokens JSON. \
+        Returns JSON directly in the response — does not write files. \
+        Requires FIGMA_PERSONAL_TOKEN.
+        """,
+        inputSchema: .object([
+            "type": .string("object"),
+            "properties": .object([
+                "resource_type": .object([
+                    "type": .string("string"),
+                    "description": .string("Type of design data to export"),
+                    "enum": .array([
+                        .string("colors"),
+                        .string("typography"),
+                        .string("tokens"),
+                    ]),
+                ]),
+                "config_path": .object([
+                    "type": .string("string"),
+                    "description": .string(
+                        "Path to PKL config file. Auto-detects exfig.pkl if omitted."
+                    ),
+                ]),
+                "format": .object([
+                    "type": .string("string"),
+                    "description": .string("Token format: w3c (default) or raw"),
+                    "enum": .array([
+                        .string("w3c"),
+                        .string("raw"),
+                    ]),
+                ]),
+                "filter": .object([
+                    "type": .string("string"),
+                    "description": .string("Filter by name pattern. Only for colors."),
                 ]),
             ]),
             "required": .array([.string("resource_type")]),

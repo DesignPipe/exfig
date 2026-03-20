@@ -18,6 +18,10 @@ enum MCPToolHandlers {
                 return try await handleTokensInfo(params: params)
             case "exfig_inspect":
                 return try await handleInspect(params: params, state: state)
+            case "exfig_export":
+                return try await handleExport(params: params)
+            case "exfig_download":
+                return try await handleDownload(params: params, state: state)
             default:
                 return .init(content: [.text("Unknown tool: \(params.name)")], isError: true)
             }
@@ -288,6 +292,329 @@ enum MCPToolHandlers {
     }
 }
 
+// MARK: - Export & Download Handlers
+
+extension MCPToolHandlers {
+    static func handleExport(params: CallTool.Parameters) async throws -> CallTool.Result {
+        guard let resourceType = params.arguments?["resource_type"]?.stringValue else {
+            return .init(content: [.text("Missing required parameter: resource_type")], isError: true)
+        }
+
+        let validTypes: Set<String> = ["colors", "icons", "images", "typography", "all"]
+        guard validTypes.contains(resourceType) else {
+            let valid = validTypes.sorted().joined(separator: ", ")
+            return .init(
+                content: [.text("Invalid resource_type: \(resourceType). Must be one of: \(valid)")],
+                isError: true
+            )
+        }
+
+        let configPath = try resolveConfigPath(from: params.arguments?["config_path"]?.stringValue)
+
+        let reportPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent("exfig-report-\(UUID().uuidString).json").path
+
+        let exportParams = ExportParams(
+            resourceType: resourceType,
+            configPath: configPath,
+            reportPath: reportPath,
+            filter: params.arguments?["filter"]?.stringValue,
+            rateLimit: params.arguments?["rate_limit"]?.intValue,
+            maxRetries: params.arguments?["max_retries"]?.intValue,
+            cache: params.arguments?["cache"]?.boolValue ?? false,
+            force: params.arguments?["force"]?.boolValue ?? false,
+            granularCache: params.arguments?["granular_cache"]?.boolValue ?? false
+        )
+
+        let result = try await runSubprocess(arguments: exportParams.cliArgs)
+
+        defer { try? FileManager.default.removeItem(atPath: reportPath) }
+
+        if FileManager.default.fileExists(atPath: reportPath),
+           let reportData = FileManager.default.contents(atPath: reportPath),
+           let reportJSON = String(data: reportData, encoding: .utf8)
+        {
+            return .init(content: [.text(reportJSON)], isError: result.exitCode != 0)
+        }
+
+        if result.exitCode != 0 {
+            let message = result.stderr.isEmpty
+                ? "Export failed with exit code \(result.exitCode)"
+                : result.stderr
+            return .init(content: [.text(message)], isError: true)
+        }
+
+        return .init(content: [.text("{\"success\": true}")])
+    }
+
+    static func handleDownload(
+        params: CallTool.Parameters,
+        state: MCPServerState
+    ) async throws -> CallTool.Result {
+        guard let resourceType = params.arguments?["resource_type"]?.stringValue else {
+            return .init(content: [.text("Missing required parameter: resource_type")], isError: true)
+        }
+
+        let validTypes: Set<String> = ["colors", "typography", "tokens"]
+        guard validTypes.contains(resourceType) else {
+            let valid = validTypes.sorted().joined(separator: ", ")
+            return .init(
+                content: [.text("Invalid resource_type: \(resourceType). Must be one of: \(valid)")],
+                isError: true
+            )
+        }
+
+        let configPath = try resolveConfigPath(from: params.arguments?["config_path"]?.stringValue)
+        let configURL = URL(fileURLWithPath: configPath)
+        let config = try await PKLEvaluator.evaluate(configPath: configURL)
+        let client = try await state.getClient()
+
+        let format = params.arguments?["format"]?.stringValue ?? "w3c"
+        let filter = params.arguments?["filter"]?.stringValue
+
+        switch resourceType {
+        case "colors":
+            return try await downloadColors(
+                config: config, client: client, format: format, filter: filter
+            )
+        case "typography":
+            return try await downloadTypography(config: config, client: client, format: format)
+        case "tokens":
+            return try await downloadUnifiedTokens(config: config, client: client)
+        default:
+            return .init(content: [.text("Unknown resource_type: \(resourceType)")], isError: true)
+        }
+    }
+}
+
+// MARK: - Export Subprocess Helpers
+
+private struct ExportParams {
+    let resourceType: String
+    let configPath: String
+    let reportPath: String
+    let filter: String?
+    let rateLimit: Int?
+    let maxRetries: Int?
+    let cache: Bool
+    let force: Bool
+    let granularCache: Bool
+
+    var cliArgs: [String] {
+        var args: [String] = if resourceType == "all" {
+            ["batch", configPath, "--quiet", "--report", reportPath]
+        } else {
+            [resourceType, "-i", configPath, "--quiet", "--report", reportPath]
+        }
+        if let filter { args += ["--filter", filter] }
+        if let rateLimit { args += ["--rate-limit", "\(rateLimit)"] }
+        if let maxRetries { args += ["--max-retries", "\(maxRetries)"] }
+        if cache { args.append("--cache") }
+        if force { args.append("--force") }
+        if granularCache { args.append("--experimental-granular-cache") }
+        return args
+    }
+}
+
+struct SubprocessResult {
+    let exitCode: Int
+    let stderr: String
+}
+
+extension MCPToolHandlers {
+    static func runSubprocess(arguments: [String]) async throws -> SubprocessResult {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: ProcessInfo.processInfo.arguments[0])
+        process.arguments = arguments
+        process.environment = ProcessInfo.processInfo.environment
+
+        let stderrPipe = Pipe()
+        process.standardError = stderrPipe
+        process.standardOutput = FileHandle.nullDevice
+
+        try process.run()
+
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            process.terminationHandler = { _ in continuation.resume() }
+        }
+
+        let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+        let stderr = String(data: stderrData, encoding: .utf8) ?? ""
+
+        return SubprocessResult(exitCode: Int(process.terminationStatus), stderr: stderr)
+    }
+}
+
+// MARK: - Download Helpers
+
+extension MCPToolHandlers {
+    private static func downloadColors(
+        config: PKLConfig, client: FigmaAPI.Client,
+        format: String, filter: String?
+    ) async throws -> CallTool.Result {
+        guard let variableParams = config.common?.variablesColors else {
+            throw ExFigError.custom(errorString: "No variablesColors configured. Check config.")
+        }
+
+        let loader = ColorsVariablesLoader(client: client, variableParams: variableParams, filter: filter)
+        let result = try await loader.load()
+        let warnings = result.warnings.map { ExFigWarningFormatter().format($0) }
+
+        if format == "raw" {
+            return .init(content: [.text(encodeRawColors(result.output))])
+        }
+
+        let colorsByMode = ColorExportHelper.buildColorsByMode(from: result.output)
+        let exporter = W3CTokensExporter(version: .v2025)
+        let tokens = exporter.exportColors(
+            colorsByMode: colorsByMode,
+            descriptions: result.descriptions,
+            metadata: result.metadata,
+            aliases: result.aliases,
+            modeKeyToName: ColorExportHelper.modeKeyToName
+        )
+        let tokenCount = colorsByMode.values.reduce(0) { $0 + $1.count }
+
+        let meta = DownloadMeta(
+            resourceType: "colors", format: format,
+            tokenCount: tokenCount,
+            warnings: warnings.isEmpty ? nil : warnings
+        )
+        return buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
+    }
+
+    private static func downloadTypography(
+        config: PKLConfig, client: FigmaAPI.Client, format: String
+    ) async throws -> CallTool.Result {
+        guard let figmaParams = config.figma else {
+            throw ExFigError.custom(errorString: "No figma section configured. Check config.")
+        }
+
+        let loader = TextStylesLoader(client: client, params: figmaParams)
+        let textStyles = try await loader.load()
+
+        if format == "raw" {
+            return .init(content: [.text(encodeJSON(textStyles.map { RawTextStyle(from: $0) }))])
+        }
+
+        let exporter = W3CTokensExporter(version: .v2025)
+        let tokens = exporter.exportTypography(textStyles: textStyles)
+
+        let meta = DownloadMeta(
+            resourceType: "typography", format: format,
+            tokenCount: textStyles.count, warnings: nil
+        )
+        return buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
+    }
+
+    // swiftlint:disable function_body_length
+    private static func downloadUnifiedTokens(
+        config: PKLConfig, client: FigmaAPI.Client
+    ) async throws -> CallTool.Result {
+        let exporter = W3CTokensExporter(version: .v2025)
+        var allTokens: [String: Any] = [:]
+        var warnings: [String] = []
+        var tokenCount = 0
+
+        if let variableParams = config.common?.variablesColors {
+            let loader = ColorsVariablesLoader(client: client, variableParams: variableParams, filter: nil)
+            let colorsResult = try await loader.load()
+            warnings += colorsResult.warnings.map { ExFigWarningFormatter().format($0) }
+            let colorsByMode = ColorExportHelper.buildColorsByMode(from: colorsResult.output)
+            let colorTokens = exporter.exportColors(
+                colorsByMode: colorsByMode,
+                descriptions: colorsResult.descriptions,
+                metadata: colorsResult.metadata,
+                aliases: colorsResult.aliases,
+                modeKeyToName: ColorExportHelper.modeKeyToName
+            )
+            W3CTokensExporter.mergeTokens(from: colorTokens, into: &allTokens)
+            tokenCount += colorsByMode.values.reduce(0) { $0 + $1.count }
+        }
+
+        if let figmaParams = config.figma {
+            let loader = TextStylesLoader(client: client, params: figmaParams)
+            let textStyles = try await loader.load()
+            W3CTokensExporter.mergeTokens(
+                from: exporter.exportTypography(textStyles: textStyles),
+                into: &allTokens
+            )
+            tokenCount += textStyles.count
+        }
+
+        if let variableParams = config.common?.variablesColors {
+            let numLoader = NumberVariablesLoader(
+                client: client,
+                tokensFileId: variableParams.tokensFileId,
+                tokensCollectionName: variableParams.tokensCollectionName
+            )
+            let numberResult = try await numLoader.load()
+            warnings += numberResult.warnings.map { ExFigWarningFormatter().format($0) }
+            if !numberResult.dimensions.isEmpty {
+                W3CTokensExporter.mergeTokens(
+                    from: exporter.exportDimensions(tokens: numberResult.dimensions),
+                    into: &allTokens
+                )
+                tokenCount += numberResult.dimensions.count
+            }
+            if !numberResult.numbers.isEmpty {
+                W3CTokensExporter.mergeTokens(
+                    from: exporter.exportNumbers(tokens: numberResult.numbers),
+                    into: &allTokens
+                )
+                tokenCount += numberResult.numbers.count
+            }
+        }
+
+        if allTokens.isEmpty {
+            return .init(
+                content: [.text("No token sections configured for export. Check your config file.")],
+                isError: true
+            )
+        }
+
+        let meta = DownloadMeta(
+            resourceType: "tokens", format: "w3c",
+            tokenCount: tokenCount,
+            warnings: warnings.isEmpty ? nil : warnings
+        )
+        return buildDownloadResponse(tokens: allTokens, exporter: exporter, meta: meta)
+    }
+
+    // swiftlint:enable function_body_length
+
+    private static func buildDownloadResponse(
+        tokens: [String: Any], exporter: W3CTokensExporter,
+        meta: DownloadMeta
+    ) -> CallTool.Result {
+        guard let tokensData = try? exporter.serializeToJSON(tokens, compact: false),
+              let tokensJSON = String(data: tokensData, encoding: .utf8)
+        else {
+            return .init(content: [.text("Failed to serialize tokens to JSON")], isError: true)
+        }
+
+        return .init(content: [
+            .text(encodeJSON(meta)),
+            .text(tokensJSON),
+        ])
+    }
+
+    private static func encodeRawColors(_ output: ColorsLoaderOutput) -> String {
+        func colorToRaw(_ color: Color) -> RawColor {
+            RawColor(
+                name: color.name,
+                red: color.red, green: color.green,
+                blue: color.blue, alpha: color.alpha
+            )
+        }
+        var raw = RawColorsOutput(light: output.light.map(colorToRaw))
+        raw.dark = output.dark.map { $0.map(colorToRaw) }
+        raw.lightHC = output.lightHC.map { $0.map(colorToRaw) }
+        raw.darkHC = output.darkHC.map { $0.map(colorToRaw) }
+        return encodeJSON(raw)
+    }
+}
+
 // MARK: - Response Types
 
 private struct ValidateSummary: Codable, Sendable {
@@ -420,6 +747,59 @@ private struct TypographyInspectResult: Codable, Sendable {
         case textStylesCount = "text_styles_count"
         case sampleNames = "sample_names"
         case truncated
+    }
+}
+
+private struct DownloadMeta: Codable, Sendable {
+    let resourceType: String
+    let format: String
+    let tokenCount: Int
+    var warnings: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case resourceType = "resource_type"
+        case format
+        case tokenCount = "token_count"
+        case warnings
+    }
+}
+
+private struct RawColorsOutput: Codable, Sendable {
+    let light: [RawColor]
+    var dark: [RawColor]?
+    var lightHC: [RawColor]?
+    var darkHC: [RawColor]?
+}
+
+private struct RawColor: Codable, Sendable {
+    let name: String
+    let red: Double
+    let green: Double
+    let blue: Double
+    let alpha: Double
+}
+
+private struct RawTextStyle: Codable, Sendable {
+    let name: String
+    let fontName: String
+    let fontSize: Double
+    let lineHeight: Double?
+    let letterSpacing: Double
+
+    init(from textStyle: TextStyle) {
+        name = textStyle.name
+        fontName = textStyle.fontName
+        fontSize = textStyle.fontSize
+        lineHeight = textStyle.lineHeight
+        letterSpacing = textStyle.letterSpacing
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case fontName = "font_name"
+        case fontSize = "font_size"
+        case lineHeight = "line_height"
+        case letterSpacing = "letter_spacing"
     }
 }
 
