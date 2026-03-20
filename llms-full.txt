@@ -394,7 +394,8 @@ exfig icons --resume
 ## Quick Fetch
 
 Download images without a configuration file. Run `exfig fetch` with no arguments for an
-interactive wizard that guides you through file ID, platform, format, and output options:
+interactive wizard that guides you through file ID, asset type, platform, frame selection,
+format, output directory, and more:
 
 ```bash
 # Interactive wizard — asks platform, format, output step by step
