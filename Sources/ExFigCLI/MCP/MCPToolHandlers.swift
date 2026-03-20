@@ -452,12 +452,28 @@ extension MCPToolHandlers {
         config: PKLConfig, client: FigmaAPI.Client,
         format: String, filter: String?
     ) async throws -> CallTool.Result {
-        guard let variableParams = config.common?.variablesColors else {
-            throw ExFigError.custom(errorString: "No variablesColors configured. Check config.")
+        let result: ColorsVariablesLoader.LoadResult
+
+        if let variableParams = config.common?.variablesColors {
+            let loader = ColorsVariablesLoader(client: client, variableParams: variableParams, filter: filter)
+            result = try await loader.load()
+        } else if let figmaParams = config.figma {
+            let loader = ColorsLoader(
+                client: client,
+                figmaParams: figmaParams,
+                colorParams: config.common?.colors,
+                filter: filter
+            )
+            let output = try await loader.load()
+            result = ColorsVariablesLoader.LoadResult(
+                output: output, warnings: [], aliases: [:], descriptions: [:], metadata: [:]
+            )
+        } else {
+            throw ExFigError.custom(
+                errorString: "No variablesColors or figma section configured. Check config."
+            )
         }
 
-        let loader = ColorsVariablesLoader(client: client, variableParams: variableParams, filter: filter)
-        let result = try await loader.load()
         let warnings = result.warnings.map { ExFigWarningFormatter().format($0) }
 
         if format == "raw" {
@@ -507,7 +523,6 @@ extension MCPToolHandlers {
         return buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
     }
 
-    // swiftlint:disable function_body_length
     private static func downloadUnifiedTokens(
         config: PKLConfig, client: FigmaAPI.Client
     ) async throws -> CallTool.Result {
@@ -517,53 +532,31 @@ extension MCPToolHandlers {
         var tokenCount = 0
 
         if let variableParams = config.common?.variablesColors {
-            let loader = ColorsVariablesLoader(client: client, variableParams: variableParams, filter: nil)
-            let colorsResult = try await loader.load()
-            warnings += colorsResult.warnings.map { ExFigWarningFormatter().format($0) }
-            let colorsByMode = ColorExportHelper.buildColorsByMode(from: colorsResult.output)
-            let colorTokens = exporter.exportColors(
-                colorsByMode: colorsByMode,
-                descriptions: colorsResult.descriptions,
-                metadata: colorsResult.metadata,
-                aliases: colorsResult.aliases,
-                modeKeyToName: ColorExportHelper.modeKeyToName
+            let (tokens, count, w) = try await downloadAndMergeColors(
+                client: client, variableParams: variableParams, exporter: exporter
             )
-            W3CTokensExporter.mergeTokens(from: colorTokens, into: &allTokens)
-            tokenCount += colorsByMode.values.reduce(0) { $0 + $1.count }
+            W3CTokensExporter.mergeTokens(from: tokens, into: &allTokens)
+            tokenCount += count
+            warnings += w
         }
 
         if let figmaParams = config.figma {
-            let loader = TextStylesLoader(client: client, params: figmaParams)
-            let textStyles = try await loader.load()
-            W3CTokensExporter.mergeTokens(
-                from: exporter.exportTypography(textStyles: textStyles),
-                into: &allTokens
+            let (tokens, count) = try await downloadAndMergeTypography(
+                client: client, figmaParams: figmaParams, exporter: exporter
             )
-            tokenCount += textStyles.count
+            W3CTokensExporter.mergeTokens(from: tokens, into: &allTokens)
+            tokenCount += count
         }
 
         if let variableParams = config.common?.variablesColors {
-            let numLoader = NumberVariablesLoader(
-                client: client,
-                tokensFileId: variableParams.tokensFileId,
-                tokensCollectionName: variableParams.tokensCollectionName
+            let (tokens, count, w) = try await downloadAndMergeNumbers(
+                client: client, variableParams: variableParams, exporter: exporter
             )
-            let numberResult = try await numLoader.load()
-            warnings += numberResult.warnings.map { ExFigWarningFormatter().format($0) }
-            if !numberResult.dimensions.isEmpty {
-                W3CTokensExporter.mergeTokens(
-                    from: exporter.exportDimensions(tokens: numberResult.dimensions),
-                    into: &allTokens
-                )
-                tokenCount += numberResult.dimensions.count
+            for t in tokens {
+                W3CTokensExporter.mergeTokens(from: t, into: &allTokens)
             }
-            if !numberResult.numbers.isEmpty {
-                W3CTokensExporter.mergeTokens(
-                    from: exporter.exportNumbers(tokens: numberResult.numbers),
-                    into: &allTokens
-                )
-                tokenCount += numberResult.numbers.count
-            }
+            tokenCount += count
+            warnings += w
         }
 
         if allTokens.isEmpty {
@@ -581,7 +574,61 @@ extension MCPToolHandlers {
         return buildDownloadResponse(tokens: allTokens, exporter: exporter, meta: meta)
     }
 
-    // swiftlint:enable function_body_length
+    private static func downloadAndMergeColors(
+        client: FigmaAPI.Client,
+        variableParams: PKLConfig.Common.VariablesColors,
+        exporter: W3CTokensExporter
+    ) async throws -> (tokens: [String: Any], count: Int, warnings: [String]) {
+        let loader = ColorsVariablesLoader(client: client, variableParams: variableParams, filter: nil)
+        let colorsResult = try await loader.load()
+        let warnings = colorsResult.warnings.map { ExFigWarningFormatter().format($0) }
+        let colorsByMode = ColorExportHelper.buildColorsByMode(from: colorsResult.output)
+        let colorTokens = exporter.exportColors(
+            colorsByMode: colorsByMode,
+            descriptions: colorsResult.descriptions,
+            metadata: colorsResult.metadata,
+            aliases: colorsResult.aliases,
+            modeKeyToName: ColorExportHelper.modeKeyToName
+        )
+        let count = colorsByMode.values.reduce(0) { $0 + $1.count }
+        return (colorTokens, count, warnings)
+    }
+
+    private static func downloadAndMergeTypography(
+        client: FigmaAPI.Client,
+        figmaParams: PKLConfig.Figma,
+        exporter: W3CTokensExporter
+    ) async throws -> (tokens: [String: Any], count: Int) {
+        let loader = TextStylesLoader(client: client, params: figmaParams)
+        let textStyles = try await loader.load()
+        let tokens = exporter.exportTypography(textStyles: textStyles)
+        return (tokens, textStyles.count)
+    }
+
+    private static func downloadAndMergeNumbers(
+        client: FigmaAPI.Client,
+        variableParams: PKLConfig.Common.VariablesColors,
+        exporter: W3CTokensExporter
+    ) async throws -> (tokens: [[String: Any]], count: Int, warnings: [String]) {
+        let numLoader = NumberVariablesLoader(
+            client: client,
+            tokensFileId: variableParams.tokensFileId,
+            tokensCollectionName: variableParams.tokensCollectionName
+        )
+        let numberResult = try await numLoader.load()
+        let warnings = numberResult.warnings.map { ExFigWarningFormatter().format($0) }
+        var tokens: [[String: Any]] = []
+        var count = 0
+        if !numberResult.dimensions.isEmpty {
+            tokens.append(exporter.exportDimensions(tokens: numberResult.dimensions))
+            count += numberResult.dimensions.count
+        }
+        if !numberResult.numbers.isEmpty {
+            tokens.append(exporter.exportNumbers(tokens: numberResult.numbers))
+            count += numberResult.numbers.count
+        }
+        return (tokens, count, warnings)
+    }
 
     private static func buildDownloadResponse(
         tokens: [String: Any], exporter: W3CTokensExporter,
