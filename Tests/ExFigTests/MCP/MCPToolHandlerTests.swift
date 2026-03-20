@@ -12,37 +12,35 @@ struct MCPToolHandlerTests {
         .deletingLastPathComponent()
         .appendingPathComponent("Fixtures/PKL")
 
+    // MARK: - Test Helpers
+
+    private func expectError(
+        tool: String,
+        arguments: [String: Value]?,
+        containing substring: String
+    ) async {
+        let params = CallTool.Parameters(name: tool, arguments: arguments)
+        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
+        #expect(result.isError == true)
+        if case let .text(text) = result.content.first {
+            #expect(text.contains(substring))
+        }
+    }
+
     // MARK: - Validate Tool
 
     @Test("validate returns error for missing config")
     func validateMissingConfig() async {
-        let params = CallTool.Parameters(
-            name: "exfig_validate",
-            arguments: ["config_path": .string("/nonexistent/path.pkl")]
+        await expectError(
+            tool: "exfig_validate",
+            arguments: ["config_path": .string("/nonexistent/path.pkl")],
+            containing: "not found"
         )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("not found"))
-        }
     }
 
     @Test("validate auto-detects exfig.pkl when no path given")
     func validateAutoDetect() async {
-        let params = CallTool.Parameters(
-            name: "exfig_validate",
-            arguments: nil
-        )
-
-        // No exfig.pkl in working directory → error with helpful message
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("exfig.pkl"))
-        }
+        await expectError(tool: "exfig_validate", arguments: nil, containing: "exfig.pkl")
     }
 
     @Test("validate returns summary for valid config")
@@ -69,32 +67,16 @@ struct MCPToolHandlerTests {
 
     @Test("tokens_info returns error for missing file_path")
     func tokensInfoMissingParam() async {
-        let params = CallTool.Parameters(
-            name: "exfig_tokens_info",
-            arguments: nil
-        )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("file_path"))
-        }
+        await expectError(tool: "exfig_tokens_info", arguments: nil, containing: "file_path")
     }
 
     @Test("tokens_info returns error for nonexistent file")
     func tokensInfoFileNotFound() async {
-        let params = CallTool.Parameters(
-            name: "exfig_tokens_info",
-            arguments: ["file_path": .string("/tmp/nonexistent.tokens.json")]
+        await expectError(
+            tool: "exfig_tokens_info",
+            arguments: ["file_path": .string("/tmp/nonexistent.tokens.json")],
+            containing: "not found"
         )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("not found"))
-        }
     }
 
     @Test("tokens_info parses valid tokens file")
@@ -151,17 +133,7 @@ struct MCPToolHandlerTests {
 
     @Test("unknown tool returns error")
     func unknownTool() async {
-        let params = CallTool.Parameters(
-            name: "nonexistent_tool",
-            arguments: nil
-        )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("Unknown tool"))
-        }
+        await expectError(tool: "nonexistent_tool", arguments: nil, containing: "Unknown tool")
     }
 
     // MARK: - Inspect Tool
@@ -184,117 +156,80 @@ struct MCPToolHandlerTests {
     @Test("inspect returns error for missing resource_type")
     func inspectMissingResourceType() async {
         let configPath = Self.fixturesPath.appendingPathComponent("valid-config.pkl").path
-
-        let params = CallTool.Parameters(
-            name: "exfig_inspect",
-            arguments: ["config_path": .string(configPath)]
+        await expectError(
+            tool: "exfig_inspect",
+            arguments: ["config_path": .string(configPath)],
+            containing: "resource_type"
         )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("resource_type"))
-        }
     }
 
     // MARK: - Export Tool
 
     @Test("export returns error for missing resource_type")
     func exportMissingResourceType() async {
-        let params = CallTool.Parameters(
-            name: "exfig_export",
-            arguments: nil
-        )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("resource_type"))
-        }
+        await expectError(tool: "exfig_export", arguments: nil, containing: "resource_type")
     }
 
     @Test("export returns error for invalid resource_type")
     func exportInvalidResourceType() async {
-        let params = CallTool.Parameters(
-            name: "exfig_export",
-            arguments: ["resource_type": .string("invalid")]
+        await expectError(
+            tool: "exfig_export",
+            arguments: ["resource_type": .string("invalid")],
+            containing: "Invalid resource_type"
         )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("Invalid resource_type"))
-        }
     }
 
     @Test("export returns error for missing config")
     func exportMissingConfig() async {
-        let params = CallTool.Parameters(
-            name: "exfig_export",
+        await expectError(
+            tool: "exfig_export",
             arguments: [
                 "resource_type": .string("colors"),
                 "config_path": .string("/nonexistent/path.pkl"),
-            ]
+            ],
+            containing: "not found"
         )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("not found"))
-        }
     }
 
     // MARK: - Download Tool
 
     @Test("download returns error for missing resource_type")
     func downloadMissingResourceType() async {
-        let params = CallTool.Parameters(
-            name: "exfig_download",
-            arguments: nil
-        )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("resource_type"))
-        }
+        await expectError(tool: "exfig_download", arguments: nil, containing: "resource_type")
     }
 
     @Test("download returns error for invalid resource_type")
     func downloadInvalidResourceType() async {
-        let params = CallTool.Parameters(
-            name: "exfig_download",
-            arguments: ["resource_type": .string("invalid")]
+        await expectError(
+            tool: "exfig_download",
+            arguments: ["resource_type": .string("invalid")],
+            containing: "Invalid resource_type"
         )
-
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("Invalid resource_type"))
-        }
     }
 
     @Test("download returns error for missing config")
     func downloadMissingConfig() async {
-        let params = CallTool.Parameters(
-            name: "exfig_download",
+        await expectError(
+            tool: "exfig_download",
             arguments: [
                 "resource_type": .string("colors"),
                 "config_path": .string("/nonexistent/path.pkl"),
-            ]
+            ],
+            containing: "not found"
         )
+    }
 
-        let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
-
-        #expect(result.isError == true)
-        if case let .text(text) = result.content.first {
-            #expect(text.contains("not found"))
-        }
+    @Test("download returns error for invalid format")
+    func downloadInvalidFormat() async {
+        let configPath = Self.fixturesPath.appendingPathComponent("valid-config.pkl").path
+        await expectError(
+            tool: "exfig_download",
+            arguments: [
+                "resource_type": .string("colors"),
+                "config_path": .string(configPath),
+                "format": .string("csv"),
+            ],
+            containing: "Invalid format"
+        )
     }
 }

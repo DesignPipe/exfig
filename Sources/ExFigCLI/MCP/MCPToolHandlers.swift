@@ -33,7 +33,7 @@ enum MCPToolHandlers {
                 isError: true
             )
         } catch {
-            return .init(content: [.text("Error: \(error.localizedDescription)")], isError: true)
+            return .init(content: [.text("Error: \(error)")], isError: true)
         }
     }
 
@@ -55,7 +55,7 @@ enum MCPToolHandlers {
             figmaFileIds: fileIDs.isEmpty ? nil : fileIDs
         )
 
-        return .init(content: [.text(encodeJSON(summary))])
+        return try .init(content: [.text(encodeJSON(summary))])
     }
 
     private static func buildPlatformSummary(config: PKLConfig) -> [String: EntrySummary] {
@@ -128,7 +128,7 @@ enum MCPToolHandlers {
             warnings: source.warnings.isEmpty ? nil : source.warnings
         )
 
-        return .init(content: [.text(encodeJSON(result))])
+        return try .init(content: [.text(encodeJSON(result))])
     }
 
     // MARK: - Inspect
@@ -168,7 +168,7 @@ enum MCPToolHandlers {
             }
         }
 
-        return .init(content: [.text(encodeJSON(results))])
+        return try .init(content: [.text(encodeJSON(results))])
     }
 
     // MARK: - Inspect Helpers
@@ -284,35 +284,44 @@ enum MCPToolHandlers {
     }
 
     /// Encodes a Codable value as pretty-printed JSON with sorted keys.
-    private static func encodeJSON(_ value: some Encodable) -> String {
-        guard let data = try? JSONCodec.encodePrettySorted(value) else {
-            return "\(value)"
+    private static func encodeJSON(_ value: some Encodable) throws -> String {
+        let data = try JSONCodec.encodePrettySorted(value)
+        guard let string = String(data: data, encoding: .utf8) else {
+            throw ExFigError.custom(errorString: "JSON encoding produced non-UTF-8 data")
         }
-        return String(data: data, encoding: .utf8) ?? "\(value)"
+        return string
     }
 }
 
 // MARK: - Export & Download Handlers
 
 extension MCPToolHandlers {
-    static func handleExport(params: CallTool.Parameters) async throws -> CallTool.Result {
+    private static func requireResourceType(
+        from params: CallTool.Parameters,
+        validTypes: Set<String>
+    ) throws -> String {
         guard let resourceType = params.arguments?["resource_type"]?.stringValue else {
-            return .init(content: [.text("Missing required parameter: resource_type")], isError: true)
+            throw ExFigError.custom(errorString: "Missing required parameter: resource_type")
         }
-
-        let validTypes: Set<String> = ["colors", "icons", "images", "typography", "all"]
         guard validTypes.contains(resourceType) else {
             let valid = validTypes.sorted().joined(separator: ", ")
-            return .init(
-                content: [.text("Invalid resource_type: \(resourceType). Must be one of: \(valid)")],
-                isError: true
+            throw ExFigError.custom(
+                errorString: "Invalid resource_type: \(resourceType). Must be one of: \(valid)"
             )
         }
+        return resourceType
+    }
+
+    private static func handleExport(params: CallTool.Parameters) async throws -> CallTool.Result {
+        let resourceType = try requireResourceType(
+            from: params, validTypes: ["colors", "icons", "images", "typography", "all"]
+        )
 
         let configPath = try resolveConfigPath(from: params.arguments?["config_path"]?.stringValue)
 
         let reportPath = FileManager.default.temporaryDirectory
             .appendingPathComponent("exfig-report-\(UUID().uuidString).json").path
+        defer { try? FileManager.default.removeItem(atPath: reportPath) }
 
         let exportParams = ExportParams(
             resourceType: resourceType,
@@ -327,8 +336,6 @@ extension MCPToolHandlers {
         )
 
         let result = try await runSubprocess(arguments: exportParams.cliArgs)
-
-        defer { try? FileManager.default.removeItem(atPath: reportPath) }
 
         if FileManager.default.fileExists(atPath: reportPath),
            let reportData = FileManager.default.contents(atPath: reportPath),
@@ -347,30 +354,28 @@ extension MCPToolHandlers {
         return .init(content: [.text("{\"success\": true}")])
     }
 
-    static func handleDownload(
+    private static func handleDownload(
         params: CallTool.Parameters,
         state: MCPServerState
     ) async throws -> CallTool.Result {
-        guard let resourceType = params.arguments?["resource_type"]?.stringValue else {
-            return .init(content: [.text("Missing required parameter: resource_type")], isError: true)
-        }
+        let resourceType = try requireResourceType(
+            from: params, validTypes: ["colors", "typography", "tokens"]
+        )
 
-        let validTypes: Set<String> = ["colors", "typography", "tokens"]
-        guard validTypes.contains(resourceType) else {
-            let valid = validTypes.sorted().joined(separator: ", ")
-            return .init(
-                content: [.text("Invalid resource_type: \(resourceType). Must be one of: \(valid)")],
-                isError: true
+        // Validate cheap parameters before expensive PKL eval / API client creation
+        let format = params.arguments?["format"]?.stringValue ?? "w3c"
+        let validFormats: Set<String> = ["w3c", "raw"]
+        guard validFormats.contains(format) else {
+            throw ExFigError.custom(
+                errorString: "Invalid format: \(format). Must be one of: w3c, raw"
             )
         }
+        let filter = params.arguments?["filter"]?.stringValue
 
         let configPath = try resolveConfigPath(from: params.arguments?["config_path"]?.stringValue)
         let configURL = URL(fileURLWithPath: configPath)
         let config = try await PKLEvaluator.evaluate(configPath: configURL)
         let client = try await state.getClient()
-
-        let format = params.arguments?["format"]?.stringValue ?? "w3c"
-        let filter = params.arguments?["filter"]?.stringValue
 
         switch resourceType {
         case "colors":
@@ -416,15 +421,25 @@ private struct ExportParams {
     }
 }
 
-struct SubprocessResult {
+private struct SubprocessResult {
     let exitCode: Int
     let stderr: String
 }
 
+private let subprocessTimeout: Duration = .seconds(300)
+
 extension MCPToolHandlers {
-    static func runSubprocess(arguments: [String]) async throws -> SubprocessResult {
+    private static func runSubprocess(arguments: [String]) async throws -> SubprocessResult {
+        let executablePath = ProcessInfo.processInfo.arguments[0]
+        let executableURL = URL(fileURLWithPath: executablePath)
+        guard FileManager.default.isExecutableFile(atPath: executablePath) else {
+            throw ExFigError.custom(
+                errorString: "Cannot find exfig executable at \(executablePath) for subprocess export"
+            )
+        }
+
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: ProcessInfo.processInfo.arguments[0])
+        process.executableURL = executableURL
         process.arguments = arguments
         process.environment = ProcessInfo.processInfo.environment
 
@@ -432,16 +447,37 @@ extension MCPToolHandlers {
         process.standardError = stderrPipe
         process.standardOutput = FileHandle.nullDevice
 
-        try process.run()
-
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            process.terminationHandler = { _ in continuation.resume() }
+        // Read stderr concurrently to avoid pipe buffer deadlock.
+        // Must start reading BEFORE waiting for termination.
+        let stderrTask = Task {
+            stderrPipe.fileHandleForReading.readDataToEndOfFile()
         }
 
-        let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
-        let stderr = String(data: stderrData, encoding: .utf8) ?? ""
-
-        return SubprocessResult(exitCode: Int(process.terminationStatus), stderr: stderr)
+        // Set termination handler BEFORE run() to avoid race condition
+        // where process exits before handler is installed.
+        return try await withThrowingTaskGroup(of: SubprocessResult.self) { group in
+            group.addTask {
+                await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                    process.terminationHandler = { _ in continuation.resume() }
+                    do { try process.run() } catch {
+                        continuation.resume()
+                    }
+                }
+                let stderrData = await stderrTask.value
+                let stderr = String(data: stderrData, encoding: .utf8) ?? ""
+                return SubprocessResult(exitCode: Int(process.terminationStatus), stderr: stderr)
+            }
+            group.addTask {
+                try await Task.sleep(for: subprocessTimeout)
+                process.terminate()
+                throw ExFigError.custom(
+                    errorString: "Export subprocess timed out after \(subprocessTimeout)"
+                )
+            }
+            let result = try await group.next()!
+            group.cancelAll()
+            return result
+        }
     }
 }
 
@@ -477,7 +513,16 @@ extension MCPToolHandlers {
         let warnings = result.warnings.map { ExFigWarningFormatter().format($0) }
 
         if format == "raw" {
-            return .init(content: [.text(encodeRawColors(result.output))])
+            var content: [Tool.Content] = []
+            if !warnings.isEmpty {
+                let meta = DownloadMeta(
+                    resourceType: "colors", format: "raw",
+                    tokenCount: result.output.light.count, warnings: warnings
+                )
+                try content.append(.text(encodeJSON(meta)))
+            }
+            try content.append(.text(encodeRawColors(result.output)))
+            return .init(content: content)
         }
 
         let colorsByMode = ColorExportHelper.buildColorsByMode(from: result.output)
@@ -496,7 +541,7 @@ extension MCPToolHandlers {
             tokenCount: tokenCount,
             warnings: warnings.isEmpty ? nil : warnings
         )
-        return buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
+        return try buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
     }
 
     private static func downloadTypography(
@@ -510,7 +555,7 @@ extension MCPToolHandlers {
         let textStyles = try await loader.load()
 
         if format == "raw" {
-            return .init(content: [.text(encodeJSON(textStyles.map { RawTextStyle(from: $0) }))])
+            return try .init(content: [.text(encodeJSON(textStyles.map { RawTextStyle(from: $0) }))])
         }
 
         let exporter = W3CTokensExporter(version: .v2025)
@@ -520,7 +565,7 @@ extension MCPToolHandlers {
             resourceType: "typography", format: format,
             tokenCount: textStyles.count, warnings: nil
         )
-        return buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
+        return try buildDownloadResponse(tokens: tokens, exporter: exporter, meta: meta)
     }
 
     private static func downloadUnifiedTokens(
@@ -531,13 +576,17 @@ extension MCPToolHandlers {
         var warnings: [String] = []
         var tokenCount = 0
 
-        if let variableParams = config.common?.variablesColors {
+        let variableParams = config.common?.variablesColors
+
+        if let variableParams {
             let (tokens, count, w) = try await downloadAndMergeColors(
                 client: client, variableParams: variableParams, exporter: exporter
             )
             W3CTokensExporter.mergeTokens(from: tokens, into: &allTokens)
             tokenCount += count
             warnings += w
+        } else {
+            warnings.append("Skipped colors and numbers: no variablesColors configured")
         }
 
         if let figmaParams = config.figma {
@@ -546,9 +595,11 @@ extension MCPToolHandlers {
             )
             W3CTokensExporter.mergeTokens(from: tokens, into: &allTokens)
             tokenCount += count
+        } else {
+            warnings.append("Skipped typography: no figma section configured")
         }
 
-        if let variableParams = config.common?.variablesColors {
+        if let variableParams {
             let (tokens, count, w) = try await downloadAndMergeNumbers(
                 client: client, variableParams: variableParams, exporter: exporter
             )
@@ -571,7 +622,7 @@ extension MCPToolHandlers {
             tokenCount: tokenCount,
             warnings: warnings.isEmpty ? nil : warnings
         )
-        return buildDownloadResponse(tokens: allTokens, exporter: exporter, meta: meta)
+        return try buildDownloadResponse(tokens: allTokens, exporter: exporter, meta: meta)
     }
 
     private static func downloadAndMergeColors(
@@ -633,32 +684,33 @@ extension MCPToolHandlers {
     private static func buildDownloadResponse(
         tokens: [String: Any], exporter: W3CTokensExporter,
         meta: DownloadMeta
-    ) -> CallTool.Result {
-        guard let tokensData = try? exporter.serializeToJSON(tokens, compact: false),
-              let tokensJSON = String(data: tokensData, encoding: .utf8)
-        else {
-            return .init(content: [.text("Failed to serialize tokens to JSON")], isError: true)
+    ) throws -> CallTool.Result {
+        let tokensData = try exporter.serializeToJSON(tokens, compact: false)
+        guard let tokensJSON = String(data: tokensData, encoding: .utf8) else {
+            throw ExFigError.custom(errorString: "Token JSON serialization produced non-UTF-8 data")
         }
 
-        return .init(content: [
+        return try .init(content: [
             .text(encodeJSON(meta)),
             .text(tokensJSON),
         ])
     }
 
-    private static func encodeRawColors(_ output: ColorsLoaderOutput) -> String {
-        func colorToRaw(_ color: Color) -> RawColor {
+    private static func encodeRawColors(_ output: ColorsLoaderOutput) throws -> String {
+        let toRaw: (Color) -> RawColor = { color in
             RawColor(
                 name: color.name,
                 red: color.red, green: color.green,
                 blue: color.blue, alpha: color.alpha
             )
         }
-        var raw = RawColorsOutput(light: output.light.map(colorToRaw))
-        raw.dark = output.dark.map { $0.map(colorToRaw) }
-        raw.lightHC = output.lightHC.map { $0.map(colorToRaw) }
-        raw.darkHC = output.darkHC.map { $0.map(colorToRaw) }
-        return encodeJSON(raw)
+        let raw = RawColorsOutput(
+            light: output.light.map(toRaw),
+            dark: output.dark.map { $0.map(toRaw) },
+            lightHC: output.lightHC.map { $0.map(toRaw) },
+            darkHC: output.darkHC.map { $0.map(toRaw) }
+        )
+        return try encodeJSON(raw)
     }
 }
 
@@ -813,9 +865,9 @@ private struct DownloadMeta: Codable, Sendable {
 
 private struct RawColorsOutput: Codable, Sendable {
     let light: [RawColor]
-    var dark: [RawColor]?
-    var lightHC: [RawColor]?
-    var darkHC: [RawColor]?
+    let dark: [RawColor]?
+    let lightHC: [RawColor]?
+    let darkHC: [RawColor]?
 }
 
 private struct RawColor: Codable, Sendable {
