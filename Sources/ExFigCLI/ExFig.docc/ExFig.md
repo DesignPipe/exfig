@@ -35,7 +35,7 @@ and Figma Variables integration.
 **Export Formats**
 PNG, SVG, PDF, JPEG, WebP, HEIC output formats with quality control.
 W3C Design Tokens (DTCG v2025) for token pipelines.
-Quick fetch mode for one-off downloads without a config file.
+Quick fetch mode with interactive wizard for one-off downloads without a config file.
 
 **Performance and Reliability**
 Parallel downloads and writes, batch processing with shared rate limiting,

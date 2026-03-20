@@ -141,15 +141,22 @@ exfig icons --resume
 
 ## Quick Fetch
 
-Download images without a configuration file:
+Download images without a configuration file. Run `exfig fetch` with no arguments for an
+interactive wizard that guides you through file ID, platform, format, and output options:
 
 ```bash
-# Download PNG images at 3x scale
+# Interactive wizard — asks platform, format, output step by step
+exfig fetch
+
+# Or pass all options directly
 exfig fetch --file-id YOUR_FILE_ID --frame "Illustrations" --output ./images
 
 # Using short options
 exfig fetch -f YOUR_FILE_ID -r "Icons" -o ./icons
 ```
+
+The wizard provides smart defaults per platform (e.g., SVG + camelCase for iOS icons,
+WebP + snake_case for Android illustrations) and only runs in interactive terminals.
 
 ### Format Options
 

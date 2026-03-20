@@ -282,6 +282,10 @@ See `ExFigCore/CLAUDE.md` (Modification Checklist) and platform module CLAUDE.md
 | Terminal output | `TerminalUI` facade                   | Direct `print()` calls                |
 | README.md       | Keep compact (~80 lines, pain-driven) | Detailed docs (use CONFIG.md / DocC)  |
 
+**Documentation structure:** README is a short pain-driven intro (~80 lines). Detailed docs live in DocC articles
+(`Sources/ExFigCLI/ExFig.docc/`). When adding new features, mention briefly in README Quick Start AND update
+relevant DocC articles (`Usage.md` for CLI, `ExFig.md` landing page for capabilities).
+
 **JSONCodec usage:**
 
 ```swift
