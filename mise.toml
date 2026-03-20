@@ -134,7 +134,7 @@ swift package --allow-writing-to-directory docs \
     generate-documentation --target ExFigCLI \
     --disable-indexing \
     --transform-for-static-hosting \
-    --hosting-base-path ExFig \
+    --hosting-base-path exfig \
     --output-path docs
 echo '<script>window.location.href += "/documentation/exfigcli"</script>' > docs/index.html
 """
