@@ -100,23 +100,25 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 Fourteen modules in `Sources/`:
 
-| Module          | Purpose                                                   |
-| --------------- | --------------------------------------------------------- |
-| `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI              |
-| `ExFigCore`     | Domain models (Color, Image, TextStyle), processors       |
-| `ExFigConfig`   | PKL config parsing, evaluation, type bridging             |
-| `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.) |
-| `ExFig-Android` | Android platform plugin                                   |
-| `ExFig-Flutter` | Flutter platform plugin                                   |
-| `ExFig-Web`     | Web platform plugin                                       |
-| `XcodeExport`   | iOS export (.xcassets, Swift extensions)                  |
-| `AndroidExport` | Android export (XML resources, Compose, Vector Drawables) |
-| `FlutterExport` | Flutter export (Dart code, SVG/PNG assets)                |
-| `WebExport`     | Web/React export (CSS variables, JSX icons)               |
-| `JinjaSupport`  | Shared Jinja2 template rendering across Export modules    |
+| Module          | Purpose                                                     |
+| --------------- | ----------------------------------------------------------- |
+| `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI                |
+| `ExFigCore`     | Domain models (Color, Image, TextStyle), processors         |
+| `ExFigConfig`   | PKL config parsing, evaluation, type bridging               |
+| `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.)   |
+| `ExFig-Android` | Android platform plugin                                     |
+| `ExFig-Flutter` | Flutter platform plugin                                     |
+| `ExFig-Web`     | Web platform plugin                                         |
+| `XcodeExport`   | iOS export (.xcassets, Swift extensions)                    |
+| `AndroidExport` | Android export (XML resources, Compose, Vector Drawables)   |
+| `FlutterExport` | Flutter export (Dart code, SVG/PNG assets)                  |
+| `WebExport`     | Web/React export (CSS variables, JSX icons)                 |
+| `JinjaSupport`  | Shared Jinja2 template rendering across Export modules      |
+| `PenpotAPI`     | Penpot RPC API client (standalone, no ExFigCore dependency) |
 
 **Data flow:** CLI -> PKL config parsing -> FigmaAPI (external) fetch -> ExFigCore processing -> Platform plugin -> Export module -> File write
 **Alt data flow (tokens):** CLI -> local .tokens.json file -> TokensFileSource -> ExFigCore models -> W3C JSON export
+**Alt data flow (penpot):** CLI -> PenpotAPI fetch -> Penpot*Source -> ExFigCore models -> Platform plugin -> Export module -> File write
 
 **MCP data flow:** `exfig mcp` → StdioTransport (JSON-RPC on stdin/stdout) → tool handlers → PKLEvaluator / TokensFileSource / FigmaAPI
 **MCP stdout safety:** `OutputMode.mcp` + `TerminalOutputManager.setStderrMode(true)` — all CLI output goes to stderr
@@ -295,6 +297,12 @@ FigmaAPI is now an external package (`swift-figma-api`). See its repository for 
 This enables per-entry `sourceKind` — different entries in one config can use different sources.
 Do NOT inject `colorsSource` at context construction time — it breaks multi-source configs.
 
+### Entry Bridge Source Kind Resolution
+
+Entry bridge methods (`iconsSourceInput()`, `imagesSourceInput()`) use `resolvedSourceKind` (computed property on `Common_FrameSource`)
+instead of `sourceKind?.coreSourceKind ?? .figma`. This auto-detects Penpot when `penpotSource` is set.
+`Common_VariablesSource` has its own `resolvedSourceKind` in `VariablesSourceValidation.swift` (includes tokensFile + penpot detection).
+
 ### Adding a Platform Plugin Exporter
 
 See `ExFigCore/CLAUDE.md` (Modification Checklist) and platform module CLAUDE.md files.
@@ -421,6 +429,8 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `nil` in switch expression          | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                              |
 | PKL↔Swift enum rawValue             | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                            |
 | `unsupportedSourceKind` compile err | Changed to `.unsupportedSourceKind(kind, assetType:)` — add asset type string ("colors", "icons/images", "typography")                                                                 |
+| `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — standalone modules (PenpotAPI) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                           |
+| `function_body_length` after branch | Split into private extension helper methods (e.g., `penpotColorsSourceInput()`, `tokensFileColorsSourceInput()`)                                                                       |
 
 ## Additional Rules
 
