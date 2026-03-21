@@ -11,6 +11,14 @@ struct TokensFileColorsSource: ColorsSource {
             )
         }
 
+        // Warn about Figma-specific mode fields that are ignored by tokens-file source
+        if !config.ignoredModeNames.isEmpty {
+            let fields = config.ignoredModeNames.joined(separator: ", ")
+            ui.warning(
+                "Local tokens file provides single-mode colors only — \(fields) will be ignored"
+            )
+        }
+
         var source = try TokensFileSource.parse(fileAt: config.filePath)
         try source.resolveAliases()
 

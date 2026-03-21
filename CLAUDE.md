@@ -289,6 +289,12 @@ Noora's `multipleChoicePrompt` uses `MultipleChoiceLimit` — `.unlimited` or `.
 
 FigmaAPI is now an external package (`swift-figma-api`). See its repository for endpoint patterns.
 
+### Source Dispatch (ColorsExportContextImpl)
+
+`ColorsExportContextImpl.loadColors()` uses `SourceFactory` per-call dispatch (NOT injected source).
+This enables per-entry `sourceKind` — different entries in one config can use different sources.
+Do NOT inject `colorsSource` at context construction time — it breaks multi-source configs.
+
 ### Adding a Platform Plugin Exporter
 
 See `ExFigCore/CLAUDE.md` (Modification Checklist) and platform module CLAUDE.md files.
@@ -377,43 +383,44 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 
 ## Troubleshooting
 
-| Problem                       | Solution                                                                                                                                                                               |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| codegen:pkl gen.pkl error     | gen.pkl `read?` bug: needs `--generator-settings` + `--project-dir` flags (see mise.toml)                                                                                              |
-| xcsift "signal code 5"        | False positive when piping `swift test` through xcsift; run `swift test` directly to verify                                                                                            |
-| PKL tests need Pkl 0.31+      | Schemas use `isNotEmpty`; run tests via `./bin/mise exec -- swift test` to get correct Pkl in PATH                                                                                     |
-| PKL FrameSource change        | Update ALL entry init calls in tests (EnumBridgingTests, IconsLoaderConfigTests)                                                                                                       |
-| Build fails                   | `swift package clean && swift build`                                                                                                                                                   |
-| Tests fail                    | Check `FIGMA_PERSONAL_TOKEN` is set                                                                                                                                                    |
-| Formatting fails              | Run `./bin/mise run setup` to install tools                                                                                                                                            |
-| test:filter no matches        | SPM converts hyphens→underscores: use `ExFig_FlutterTests` not `ExFig-FlutterTests`                                                                                                    |
-| Template errors               | Check Jinja2 syntax and context variables                                                                                                                                              |
-| Linux test hangs              | Build first: `swift build --build-tests`, then `swift test --skip-build --parallel`                                                                                                    |
-| Android pathData long         | Simplify in Figma or use `--strict-path-validation`                                                                                                                                    |
-| PKL parse error 1             | Check `PklError.message` — actual error is in `.message`, not `.localizedDescription`                                                                                                  |
-| Test target won't compile     | Broken test files block entire target; use `swift test --filter Target.Class` after `build`                                                                                            |
-| Test helper JSON decode       | `ContainingFrame` uses default Codable (camelCase: `nodeId`, `pageName`), NOT snake_case                                                                                               |
-| Web entry test fails          | Web entry types use `outputDirectory` field, while Android/Flutter use `output`                                                                                                        |
-| Logger concatenation err      | `Logger.Message` (swift-log) requires interpolation `"\(a) \(b)"`, not concatenation `a + b`                                                                                           |
-| Deleted variables in output   | Filter `VariableValue.deletedButReferenced != true` in variable loaders AND `CodeSyntaxSyncer`                                                                                         |
-| mise "sources up-to-date"     | mise caches tasks with `sources`/`outputs` — run script directly via `bash` when debugging                                                                                             |
-| Jinja trailing `\n`           | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results                                                                             |
-| `Bundle.module` in tests      | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle                                                                              |
-| SwiftLint trailing closure    | When function takes 2+ closures, use explicit label for last closure (`export: { ... }`) not trailing syntax                                                                           |
-| CLI flag default vs absent    | swift-argument-parser can't distinguish explicit `--flag default_value` from omitted. Use `Optional` + computed `effectiveX` property for flags that wizard may override               |
-| MCP `Client` ambiguous        | `FigmaAPI.Client` vs `MCP.Client` — always use `FigmaAPI.Client` in MCP/ files                                                                                                         |
-| MCP `FigmaConfig` fields      | No `colorsFileId` — use `config.getFileIds()` or `figma.lightFileId`/`darkFileId`                                                                                                      |
-| `distantFuture` on clock      | `ContinuousClock.Instant` has no `distantFuture`; use `withCheckedContinuation { _ in }` for infinite suspend                                                                          |
-| MCP stderr duplication        | `TerminalOutputManager.setStderrMode(true)` handles all output routing — don't duplicate in `ExFigLogHandler`                                                                          |
-| MCP `Process` race condition  | Set `terminationHandler` BEFORE `process.run()` — process may exit before handler is installed, hanging the continuation forever                                                       |
-| MCP pipe deadlock             | Read stderr via concurrent `Task` BEFORE waiting for termination — pipe buffer (~64KB) can fill and block the subprocess                                                               |
-| MCP `encodeJSON` errors       | Use `throws` not `try?` — silently returning `"\(value)"` (Swift debug dump) breaks JSON consumers; top-level `do/catch` in `handle()` catches automatically                           |
-| `VariablesColors` vs `Colors` | `ColorsVariablesLoader` takes `Common.VariablesColors?`, not `Common.Colors?` — different PKL types                                                                                    |
-| PKL template word search      | Template comments on `lightFileId` contain cross-refs (`variablesColors`, `typography`); test section removal by matching full markers (`colors = new Common.Colors {`) not bare words |
-| CI llms-full.txt stale        | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result               |
-| Release build .pcm warnings   | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                    |
-| `nil` in switch expression    | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                              |
-| PKL↔Swift enum rawValue       | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                            |
+| Problem                             | Solution                                                                                                                                                                               |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| codegen:pkl gen.pkl error           | gen.pkl `read?` bug: needs `--generator-settings` + `--project-dir` flags (see mise.toml)                                                                                              |
+| xcsift "signal code 5"              | False positive when piping `swift test` through xcsift; run `swift test` directly to verify                                                                                            |
+| PKL tests need Pkl 0.31+            | Schemas use `isNotEmpty`; run tests via `./bin/mise exec -- swift test` to get correct Pkl in PATH                                                                                     |
+| PKL FrameSource change              | Update ALL entry init calls in tests (EnumBridgingTests, IconsLoaderConfigTests)                                                                                                       |
+| Build fails                         | `swift package clean && swift build`                                                                                                                                                   |
+| Tests fail                          | Check `FIGMA_PERSONAL_TOKEN` is set                                                                                                                                                    |
+| Formatting fails                    | Run `./bin/mise run setup` to install tools                                                                                                                                            |
+| test:filter no matches              | SPM converts hyphens→underscores: use `ExFig_FlutterTests` not `ExFig-FlutterTests`                                                                                                    |
+| Template errors                     | Check Jinja2 syntax and context variables                                                                                                                                              |
+| Linux test hangs                    | Build first: `swift build --build-tests`, then `swift test --skip-build --parallel`                                                                                                    |
+| Android pathData long               | Simplify in Figma or use `--strict-path-validation`                                                                                                                                    |
+| PKL parse error 1                   | Check `PklError.message` — actual error is in `.message`, not `.localizedDescription`                                                                                                  |
+| Test target won't compile           | Broken test files block entire target; use `swift test --filter Target.Class` after `build`                                                                                            |
+| Test helper JSON decode             | `ContainingFrame` uses default Codable (camelCase: `nodeId`, `pageName`), NOT snake_case                                                                                               |
+| Web entry test fails                | Web entry types use `outputDirectory` field, while Android/Flutter use `output`                                                                                                        |
+| Logger concatenation err            | `Logger.Message` (swift-log) requires interpolation `"\(a) \(b)"`, not concatenation `a + b`                                                                                           |
+| Deleted variables in output         | Filter `VariableValue.deletedButReferenced != true` in variable loaders AND `CodeSyntaxSyncer`                                                                                         |
+| mise "sources up-to-date"           | mise caches tasks with `sources`/`outputs` — run script directly via `bash` when debugging                                                                                             |
+| Jinja trailing `\n`                 | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results                                                                             |
+| `Bundle.module` in tests            | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle                                                                              |
+| SwiftLint trailing closure          | When function takes 2+ closures, use explicit label for last closure (`export: { ... }`) not trailing syntax                                                                           |
+| CLI flag default vs absent          | swift-argument-parser can't distinguish explicit `--flag default_value` from omitted. Use `Optional` + computed `effectiveX` property for flags that wizard may override               |
+| MCP `Client` ambiguous              | `FigmaAPI.Client` vs `MCP.Client` — always use `FigmaAPI.Client` in MCP/ files                                                                                                         |
+| MCP `FigmaConfig` fields            | No `colorsFileId` — use `config.getFileIds()` or `figma.lightFileId`/`darkFileId`                                                                                                      |
+| `distantFuture` on clock            | `ContinuousClock.Instant` has no `distantFuture`; use `withCheckedContinuation { _ in }` for infinite suspend                                                                          |
+| MCP stderr duplication              | `TerminalOutputManager.setStderrMode(true)` handles all output routing — don't duplicate in `ExFigLogHandler`                                                                          |
+| MCP `Process` race condition        | Set `terminationHandler` BEFORE `process.run()` — process may exit before handler is installed, hanging the continuation forever                                                       |
+| MCP pipe deadlock                   | Read stderr via concurrent `Task` BEFORE waiting for termination — pipe buffer (~64KB) can fill and block the subprocess                                                               |
+| MCP `encodeJSON` errors             | Use `throws` not `try?` — silently returning `"\(value)"` (Swift debug dump) breaks JSON consumers; top-level `do/catch` in `handle()` catches automatically                           |
+| `VariablesColors` vs `Colors`       | `ColorsVariablesLoader` takes `Common.VariablesColors?`, not `Common.Colors?` — different PKL types                                                                                    |
+| PKL template word search            | Template comments on `lightFileId` contain cross-refs (`variablesColors`, `typography`); test section removal by matching full markers (`colors = new Common.Colors {`) not bare words |
+| CI llms-full.txt stale              | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result               |
+| Release build .pcm warnings         | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                    |
+| `nil` in switch expression          | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                              |
+| PKL↔Swift enum rawValue             | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                            |
+| `unsupportedSourceKind` compile err | Changed to `.unsupportedSourceKind(kind, assetType:)` — add asset type string ("colors", "icons/images", "typography")                                                                 |
 
 ## Additional Rules
 

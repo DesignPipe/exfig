@@ -30,12 +30,10 @@ extension ExFigCommand.ExportColors {
     ) async throws -> Int {
         let platformConfig = ios.platformConfig()
 
-        // Create context
+        // Create context (SourceFactory dispatches per-entry based on sourceKind)
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
-        let colorsSource = FigmaColorsSource(client: client, ui: ui, filter: filter)
         let context = ColorsExportContextImpl(
             client: client,
-            colorsSource: colorsSource,
             ui: ui,
             filter: filter,
             isBatchMode: batchMode
@@ -127,10 +125,8 @@ extension ExFigCommand.ExportColors {
         let platformConfig = android.platformConfig()
 
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
-        let colorsSource = FigmaColorsSource(client: client, ui: ui, filter: filter)
         let context = ColorsExportContextImpl(
             client: client,
-            colorsSource: colorsSource,
             ui: ui,
             filter: filter,
             isBatchMode: batchMode
@@ -165,10 +161,8 @@ extension ExFigCommand.ExportColors {
         let platformConfig = flutter.platformConfig()
 
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
-        let colorsSource = FigmaColorsSource(client: client, ui: ui, filter: filter)
         let context = ColorsExportContextImpl(
             client: client,
-            colorsSource: colorsSource,
             ui: ui,
             filter: filter,
             isBatchMode: batchMode
@@ -203,10 +197,8 @@ extension ExFigCommand.ExportColors {
         let platformConfig = web.platformConfig()
 
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
-        let colorsSource = FigmaColorsSource(client: client, ui: ui, filter: filter)
         let context = ColorsExportContextImpl(
             client: client,
-            colorsSource: colorsSource,
             ui: ui,
             filter: filter,
             isBatchMode: batchMode

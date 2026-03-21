@@ -5,26 +5,23 @@ import Foundation
 /// Concrete implementation of `ColorsExportContext` for the ExFig CLI.
 ///
 /// Bridges between the plugin system and ExFig's internal services:
-/// - Uses injected `ColorsSource` for design data loading
+/// - Uses `SourceFactory` for per-entry source dispatch based on `sourceKind`
 /// - Uses `ColorsProcessor` for platform-specific processing
 /// - Uses `ExFigCommand.fileWriter` for file output
 /// - Uses `TerminalUI` for progress and logging
 struct ColorsExportContextImpl: ColorsExportContext {
     let client: Client
-    let colorsSource: any ColorsSource
     let ui: TerminalUI
     let filter: String?
     let isBatchMode: Bool
 
     init(
         client: Client,
-        colorsSource: any ColorsSource,
         ui: TerminalUI,
         filter: String? = nil,
         isBatchMode: Bool = false
     ) {
         self.client = client
-        self.colorsSource = colorsSource
         self.ui = ui
         self.filter = filter
         self.isBatchMode = isBatchMode
@@ -58,7 +55,10 @@ struct ColorsExportContextImpl: ColorsExportContext {
     // MARK: - ColorsExportContext
 
     func loadColors(from source: ColorsSourceInput) async throws -> ColorsLoadOutput {
-        try await colorsSource.loadColors(from: source)
+        let colorsSource = try SourceFactory.createColorsSource(
+            for: source, client: client, ui: ui, filter: filter
+        )
+        return try await colorsSource.loadColors(from: source)
     }
 
     func processColors(

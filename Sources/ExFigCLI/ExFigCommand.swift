@@ -12,7 +12,7 @@ enum ExFigError: LocalizedError {
     case colorsAssetsFolderNotSpecified
     case configurationError(String)
     case custom(errorString: String)
-    case unsupportedSourceKind(DesignSourceKind)
+    case unsupportedSourceKind(DesignSourceKind, assetType: String)
 
     var errorDescription: String? {
         switch self {
@@ -36,8 +36,8 @@ enum ExFigError: LocalizedError {
             "Config error: \(message)"
         case let .custom(errorString):
             errorString
-        case let .unsupportedSourceKind(kind):
-            "Unsupported design source: \(kind.rawValue)"
+        case let .unsupportedSourceKind(kind, assetType):
+            "Unsupported design source '\(kind.rawValue)' for \(assetType)"
         }
     }
 
@@ -60,8 +60,13 @@ enum ExFigError: LocalizedError {
             "Add ios.colors.assetsFolder to your config file"
         case .configurationError, .custom:
             nil as String?
-        case .unsupportedSourceKind:
-            "Currently supported sources: figma, tokensFile"
+        case let .unsupportedSourceKind(_, assetType):
+            switch assetType {
+            case "colors":
+                "Supported sources for colors: figma, tokensFile"
+            default:
+                "Supported sources for \(assetType): figma"
+            }
         }
     }
 }

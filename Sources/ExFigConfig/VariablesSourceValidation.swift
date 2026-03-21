@@ -24,9 +24,16 @@ public extension Common_VariablesSource {
             guard let tokensFile else {
                 throw ColorsConfigError.missingTokensFileId
             }
+            // Collect Figma-specific mode fields that will be ignored by tokens-file source
+            var ignoredModes: [String] = []
+            if darkModeName != nil { ignoredModes.append("darkModeName") }
+            if lightHCModeName != nil { ignoredModes.append("lightHCModeName") }
+            if darkHCModeName != nil { ignoredModes.append("darkHCModeName") }
+
             let config = TokensFileColorsConfig(
                 filePath: tokensFile.path,
-                groupFilter: tokensFile.groupFilter
+                groupFilter: tokensFile.groupFilter,
+                ignoredModeNames: ignoredModes
             )
             return ColorsSourceInput(
                 sourceKind: .tokensFile,

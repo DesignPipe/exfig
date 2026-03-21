@@ -74,12 +74,17 @@ public struct FigmaColorsConfig: ColorsSourceConfig {
 public struct TokensFileColorsConfig: ColorsSourceConfig {
     public let filePath: String
     public let groupFilter: String?
+    /// Mode names from PKL config that will be ignored (tokens file is single-mode).
+    /// Populated by validation when user sets darkModeName/lightHCModeName/darkHCModeName.
+    public let ignoredModeNames: [String]
 
     public init(
         filePath: String,
-        groupFilter: String? = nil
+        groupFilter: String? = nil,
+        ignoredModeNames: [String] = []
     ) {
         self.filePath = filePath
         self.groupFilter = groupFilter
+        self.ignoredModeNames = ignoredModeNames
     }
 }

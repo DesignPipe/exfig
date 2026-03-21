@@ -17,7 +17,7 @@ enum SourceFactory {
         case .tokensFile:
             TokensFileColorsSource(ui: ui)
         case .penpot, .tokensStudio, .sketchFile:
-            throw ExFigError.unsupportedSourceKind(input.sourceKind)
+            throw ExFigError.unsupportedSourceKind(input.sourceKind, assetType: "colors")
         }
     }
 
@@ -40,7 +40,7 @@ enum SourceFactory {
                 filter: filter
             )
         case .penpot, .tokensFile, .tokensStudio, .sketchFile:
-            throw ExFigError.unsupportedSourceKind(sourceKind)
+            throw ExFigError.unsupportedSourceKind(sourceKind, assetType: "icons/images")
         }
     }
 
@@ -52,7 +52,7 @@ enum SourceFactory {
         case .figma:
             FigmaTypographySource(client: client)
         case .penpot, .tokensFile, .tokensStudio, .sketchFile:
-            throw ExFigError.unsupportedSourceKind(sourceKind)
+            throw ExFigError.unsupportedSourceKind(sourceKind, assetType: "typography")
         }
     }
 }

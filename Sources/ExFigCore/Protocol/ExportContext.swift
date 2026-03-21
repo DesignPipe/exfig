@@ -113,6 +113,24 @@ public struct ColorsSourceInput: Sendable {
         self.nameValidateRegexp = nameValidateRegexp
         self.nameReplaceRegexp = nameReplaceRegexp
     }
+
+    /// Human-readable label for spinner messages (e.g., "Figma Variables (Brand Colors)").
+    public var spinnerLabel: String {
+        switch sourceKind {
+        case .figma:
+            if let config = sourceConfig as? FigmaColorsConfig {
+                return "Figma Variables (\(config.tokensCollectionName))"
+            }
+            return "Figma"
+        case .tokensFile:
+            if let config = sourceConfig as? TokensFileColorsConfig {
+                return URL(fileURLWithPath: config.filePath).lastPathComponent
+            }
+            return "tokens file"
+        case .penpot, .tokensStudio, .sketchFile:
+            return sourceKind.rawValue
+        }
+    }
 }
 
 /// Error thrown when required colors configuration fields are missing.

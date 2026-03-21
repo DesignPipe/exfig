@@ -31,7 +31,10 @@ Exporter.export*(entries, platformConfig, context)
 - `DesignSourceKind` enum — dispatch discriminator (.figma, .penpot, .tokensFile, .tokensStudio, .sketchFile)
 - `ColorsSourceConfig` protocol + `FigmaColorsConfig` / `TokensFileColorsConfig` — type-erased source-specific config
 - `ColorsSourceInput` uses `sourceKind` + `sourceConfig: any ColorsSourceConfig` instead of flat fields
+- `ColorsSourceInput.spinnerLabel`: computed property for user-facing spinner messages (dispatches on `sourceConfig` type)
+- `TokensFileColorsConfig.ignoredModeNames`: carries Figma-specific mode field names set by user for warning
 - `IconsSourceInput`, `ImagesSourceInput`, `TypographySourceInput` have `sourceKind` field (default `.figma`)
+- When adding a new `ColorsSourceConfig` subtype: update `spinnerLabel` switch in `ExportContext.swift`
 
 Implementations live in `Sources/ExFigCLI/Source/` — `FigmaColorsSource`, `TokensFileColorsSource`, `FigmaComponentsSource`, `FigmaTypographySource`, `SourceFactory`.
 

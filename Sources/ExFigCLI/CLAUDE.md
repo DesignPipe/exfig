@@ -206,6 +206,13 @@ reserved for MCP JSON-RPC protocol.
 
 ## Modification Patterns
 
+### Source Dispatch Pattern
+
+`ColorsExportContextImpl.loadColors()` creates source via `SourceFactory.createColorsSource(for:...)` per call.
+`IconsExportContextImpl` / `ImagesExportContextImpl` still use injected `componentsSource` (only Figma supported).
+`PluginColorsExport` does NOT create sources — context handles dispatch internally.
+When adding a new source kind: update `SourceFactory`, add source impl in `Source/`, update error `assetType`.
+
 ### Adding a New Subcommand
 
 1. Create `Subcommands/NewCommand.swift` implementing `AsyncParsableCommand`
