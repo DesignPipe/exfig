@@ -98,7 +98,7 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Architecture
 
-Fourteen modules in `Sources/`:
+Fifteen modules in `Sources/`:
 
 | Module          | Purpose                                                     |
 | --------------- | ----------------------------------------------------------- |

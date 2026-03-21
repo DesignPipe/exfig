@@ -174,6 +174,7 @@ Converter factories (`WebpConverterFactory`, `HeicConverterFactory`) handle plat
 | `MCP/MCPServerState.swift`               | MCP server shared state                                             |
 | `Source/SourceFactory.swift`             | Centralized factory creating source instances by `DesignSourceKind` |
 | `Source/Figma*Source.swift`              | Figma source implementations wrapping existing loaders              |
+| `Source/Penpot*Source.swift`             | Penpot source implementations (colors, components, typography)      |
 | `Source/TokensFileColorsSource.swift`    | Local .tokens.json source (extracted from ColorsExportContextImpl)  |
 
 ### MCP Server Architecture
@@ -209,9 +210,10 @@ reserved for MCP JSON-RPC protocol.
 ### Source Dispatch Pattern
 
 `ColorsExportContextImpl.loadColors()` creates source via `SourceFactory.createColorsSource(for:...)` per call.
-`IconsExportContextImpl` / `ImagesExportContextImpl` still use injected `componentsSource` (only Figma supported).
+`IconsExportContextImpl` / `ImagesExportContextImpl` use injected `componentsSource` (Figma and Penpot supported via `SourceFactory`).
 `PluginColorsExport` does NOT create sources — context handles dispatch internally.
 When adding a new source kind: update `SourceFactory`, add source impl in `Source/`, update error `assetType`.
+Penpot sources create `BasePenpotClient` internally from `PENPOT_ACCESS_TOKEN` env var (like TokensFileSource reads local files — no injected client).
 
 ### Adding a New Subcommand
 
