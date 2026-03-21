@@ -144,6 +144,7 @@ public enum ColorsConfigError: LocalizedError {
     case missingTokensFileId
     case missingTokensCollectionName
     case missingLightModeName
+    case missingPenpotSource
 
     public var errorDescription: String? {
         switch self {
@@ -153,6 +154,8 @@ public enum ColorsConfigError: LocalizedError {
             "tokensCollectionName is required for colors export"
         case .missingLightModeName:
             "lightModeName is required for colors export"
+        case .missingPenpotSource:
+            "penpotSource configuration is required when sourceKind is 'penpot'"
         }
     }
 
@@ -164,6 +167,8 @@ public enum ColorsConfigError: LocalizedError {
             "Add 'tokensCollectionName' to your colors entry, or set common.variablesColors"
         case .missingLightModeName:
             "Add 'lightModeName' to your colors entry, or set common.variablesColors"
+        case .missingPenpotSource:
+            "Add 'penpotSource { fileId = \"...\" }' to your colors entry"
         }
     }
 }

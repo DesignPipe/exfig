@@ -14,7 +14,7 @@ public extension iOS.ImagesEntry {
     func imagesSourceInput(darkFileId: String? = nil) -> ImagesSourceInput {
         ImagesSourceInput(
             sourceKind: resolvedSourceKind,
-            figmaFileId: figmaFileId,
+            figmaFileId: resolvedFileId,
             darkFileId: darkFileId,
             frameName: figmaFrameName ?? "Images",
             pageName: figmaPageName,
@@ -24,7 +24,8 @@ public extension iOS.ImagesEntry {
             darkModeSuffix: "_dark",
             rtlProperty: rtlProperty,
             nameValidateRegexp: nameValidateRegexp,
-            nameReplaceRegexp: nameReplaceRegexp
+            nameReplaceRegexp: nameReplaceRegexp,
+            penpotBaseURL: resolvedPenpotBaseURL
         )
     }
 

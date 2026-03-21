@@ -303,6 +303,9 @@ Entry bridge methods (`iconsSourceInput()`, `imagesSourceInput()`) use `resolved
 instead of `sourceKind?.coreSourceKind ?? .figma`. This auto-detects Penpot when `penpotSource` is set.
 `Common_VariablesSource` has its own `resolvedSourceKind` in `VariablesSourceValidation.swift` (includes tokensFile + penpot detection).
 
+Entry bridge methods also use `resolvedFileId` (`penpotSource?.fileId ?? figmaFileId`) and `resolvedPenpotBaseURL`
+(`penpotSource?.baseUrl`) from `SourceKindBridging.swift` to pass source-specific values through flat SourceInput fields.
+
 ### Adding a Platform Plugin Exporter
 
 See `ExFigCore/CLAUDE.md` (Modification Checklist) and platform module CLAUDE.md files.
@@ -427,6 +430,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | CI llms-full.txt stale              | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result               |
 | Release build .pcm warnings         | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                    |
 | `nil` in switch expression          | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                              |
+| `ColorsConfigError` new case        | Has TWO switch blocks (`errorDescription` + `recoverySuggestion`) — adding a case to one without the other causes exhaustive switch error                                              |
 | PKL↔Swift enum rawValue             | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                            |
 | `unsupportedSourceKind` compile err | Changed to `.unsupportedSourceKind(kind, assetType:)` — add asset type string ("colors", "icons/images", "typography")                                                                 |
 | `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — standalone modules (PenpotAPI) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                           |

@@ -100,6 +100,9 @@ public struct IconsSourceInput: Sendable {
     /// Name replacement regex.
     public let nameReplaceRegexp: String?
 
+    /// Penpot instance base URL (used when sourceKind == .penpot).
+    public let penpotBaseURL: String?
+
     public init(
         sourceKind: DesignSourceKind = .figma,
         figmaFileId: String? = nil,
@@ -115,7 +118,8 @@ public struct IconsSourceInput: Sendable {
         renderModeTemplateSuffix: String? = nil,
         rtlProperty: String? = "RTL",
         nameValidateRegexp: String? = nil,
-        nameReplaceRegexp: String? = nil
+        nameReplaceRegexp: String? = nil,
+        penpotBaseURL: String? = nil
     ) {
         self.sourceKind = sourceKind
         self.figmaFileId = figmaFileId
@@ -132,6 +136,7 @@ public struct IconsSourceInput: Sendable {
         self.rtlProperty = rtlProperty
         self.nameValidateRegexp = nameValidateRegexp
         self.nameReplaceRegexp = nameReplaceRegexp
+        self.penpotBaseURL = penpotBaseURL
     }
 }
 

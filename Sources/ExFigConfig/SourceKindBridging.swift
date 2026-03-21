@@ -29,4 +29,14 @@ public extension Common_FrameSource {
         }
         return .figma
     }
+
+    /// Resolves the file ID: Penpot source takes priority, then Figma file ID.
+    var resolvedFileId: String? {
+        penpotSource?.fileId ?? figmaFileId
+    }
+
+    /// Resolves the Penpot base URL from penpotSource config.
+    var resolvedPenpotBaseURL: String? {
+        penpotSource?.baseUrl
+    }
 }

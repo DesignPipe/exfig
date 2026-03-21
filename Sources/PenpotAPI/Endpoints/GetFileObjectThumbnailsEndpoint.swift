@@ -18,13 +18,19 @@ public struct GetFileObjectThumbnailsEndpoint: PenpotEndpoint {
         self.objectIds = objectIds
     }
 
+    /// Penpot RPC uses kebab-case keys — CodingKeys map camelCase to kebab-case.
+    private struct Body: Encodable {
+        let fileId: String
+        let objectIds: [String]
+
+        enum CodingKeys: String, CodingKey {
+            case fileId = "file-id"
+            case objectIds = "object-ids"
+        }
+    }
+
     public func body() throws -> Data? {
-        // Penpot RPC uses kebab-case keys in request bodies
-        let bodyDict: [String: Any] = [
-            "file-id": fileId,
-            "object-ids": objectIds,
-        ]
-        return try JSONSerialization.data(withJSONObject: bodyDict)
+        try YYJSONEncoder().encode(Body(fileId: fileId, objectIds: objectIds))
     }
 
     public func content(from data: Data) throws -> [String: String] {

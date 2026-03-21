@@ -57,6 +57,8 @@ ExFigCore domain types (NameStyle, ColorsSourceInput, etc.)
 | `Common_VariablesSource.resolvedSourceKind`             | Resolution priority: explicit `sourceKind` > auto-detect (penpotSource > tokensFile) > default `.figma`                                    |
 | `Common_VariablesSource.validatedColorsSourceInput()`   | Validates required fields, returns `ColorsSourceInput`. Uses `resolvedSourceKind` for dispatch                                             |
 | `Common_FrameSource.resolvedSourceKind`                 | Resolution priority: explicit `sourceKind` > auto-detect (penpotSource presence) > default `.figma`. Defined in `SourceKindBridging.swift` |
+| `Common_FrameSource.resolvedFileId`                     | `penpotSource?.fileId ?? figmaFileId` — auto-resolves file ID for any source. Defined in `SourceKindBridging.swift`                        |
+| `Common_FrameSource.resolvedPenpotBaseURL`              | `penpotSource?.baseUrl` — passes Penpot base URL through entry bridges. Defined in `SourceKindBridging.swift`                              |
 
 ### PklError Workaround
 

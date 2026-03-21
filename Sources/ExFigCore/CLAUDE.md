@@ -34,6 +34,7 @@ Exporter.export*(entries, platformConfig, context)
 - `ColorsSourceInput.spinnerLabel`: computed property for user-facing spinner messages (dispatches on `sourceConfig` type)
 - `TokensFileColorsConfig.ignoredModeNames`: carries Figma-specific mode field names set by user for warning
 - `IconsSourceInput`, `ImagesSourceInput`, `TypographySourceInput` have `sourceKind` field (default `.figma`)
+- `IconsSourceInput`, `ImagesSourceInput`, `TypographySourceInput` have `penpotBaseURL: String?` field for Penpot base URL
 - When adding a new `ColorsSourceConfig` subtype: update `spinnerLabel` switch in `ExportContext.swift`
 
 Implementations live in `Sources/ExFigCLI/Source/` — `FigmaColorsSource`, `TokensFileColorsSource`, `PenpotColorsSource`, `PenpotComponentsSource`, `PenpotTypographySource`, `FigmaComponentsSource`, `FigmaTypographySource`, `SourceFactory`.

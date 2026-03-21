@@ -15,7 +15,8 @@ struct PenpotComponentsSource: ComponentsSource {
         }
 
         let packs = try await loadComponents(
-            fileId: input.figmaFileId ?? "",
+            fileId: input.figmaFileId,
+            baseURL: input.penpotBaseURL,
             pathFilter: input.frameName,
             sourceKind: input.sourceKind
         )
@@ -25,7 +26,8 @@ struct PenpotComponentsSource: ComponentsSource {
 
     func loadImages(from input: ImagesSourceInput) async throws -> ImagesLoadOutput {
         let packs = try await loadComponents(
-            fileId: input.figmaFileId ?? "",
+            fileId: input.figmaFileId,
+            baseURL: input.penpotBaseURL,
             pathFilter: input.frameName,
             sourceKind: input.sourceKind
         )
@@ -36,13 +38,19 @@ struct PenpotComponentsSource: ComponentsSource {
     // MARK: - Private
 
     private func loadComponents(
-        fileId: String,
+        fileId: String?,
+        baseURL: String?,
         pathFilter: String,
         sourceKind: DesignSourceKind
     ) async throws -> [ImagePack] {
-        let client = try PenpotColorsSource.makeClient(
-            baseURL: BasePenpotClient.defaultBaseURL
-        )
+        guard let fileId, !fileId.isEmpty else {
+            throw ExFigError.configurationError(
+                "Penpot file ID is required for components export — set penpotSource.fileId in your config"
+            )
+        }
+
+        let effectiveBaseURL = baseURL ?? BasePenpotClient.defaultBaseURL
+        let client = try PenpotColorsSource.makeClient(baseURL: effectiveBaseURL)
 
         let fileResponse = try await client.request(GetFileEndpoint(fileId: fileId))
 
@@ -75,11 +83,13 @@ struct PenpotComponentsSource: ComponentsSource {
             }
 
             // Build download URL for the thumbnail
-            let downloadPath = thumbnailRef.hasPrefix("http") ? thumbnailRef : "assets/by-file-media-id/\(thumbnailRef)"
+            let fullURL: String = if thumbnailRef.hasPrefix("http") {
+                thumbnailRef
+            } else {
+                "\(effectiveBaseURL)assets/by-file-media-id/\(thumbnailRef)"
+            }
 
-            guard let url = URL(string: downloadPath
-                .hasPrefix("http") ? downloadPath : "https://design.penpot.app/\(downloadPath)")
-            else {
+            guard let url = URL(string: fullURL) else {
                 ui.warning("Component '\(component.name)' has invalid thumbnail URL — skipping")
                 continue
             }

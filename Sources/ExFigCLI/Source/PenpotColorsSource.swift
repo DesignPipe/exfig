@@ -32,7 +32,10 @@ struct PenpotColorsSource: ColorsSource {
                 }
             }
 
-            let rgba = Self.hexToRGBA(hex: hex, opacity: penpotColor.opacity ?? 1.0)
+            guard let rgba = Self.hexToRGBA(hex: hex, opacity: penpotColor.opacity ?? 1.0) else {
+                ui.warning("Color '\(penpotColor.name)' has invalid hex value '\(hex)' — skipping")
+                continue
+            }
 
             let name = if let path = penpotColor.path {
                 path + "/" + penpotColor.name
@@ -54,7 +57,7 @@ struct PenpotColorsSource: ColorsSource {
         return ColorsLoadOutput(light: colors)
     }
 
-    // MARK: - Private
+    // MARK: - Internal
 
     static func makeClient(baseURL: String) throws -> BasePenpotClient {
         guard let token = ProcessInfo.processInfo.environment["PENPOT_ACCESS_TOKEN"], !token.isEmpty else {
@@ -65,14 +68,16 @@ struct PenpotColorsSource: ColorsSource {
         return BasePenpotClient(accessToken: token, baseURL: baseURL)
     }
 
-    static func hexToRGBA(hex: String, opacity: Double) -> (red: Double, green: Double, blue: Double, alpha: Double) {
+    static func hexToRGBA(hex: String, opacity: Double)
+        -> (red: Double, green: Double, blue: Double, alpha: Double)?
+    {
         var hexString = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         if hexString.hasPrefix("#") {
             hexString.removeFirst()
         }
 
         guard hexString.count == 6, let hexValue = UInt64(hexString, radix: 16) else {
-            return (red: 0, green: 0, blue: 0, alpha: opacity)
+            return nil
         }
 
         let red = Double((hexValue >> 16) & 0xFF) / 255.0

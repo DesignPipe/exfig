@@ -45,14 +45,19 @@ public struct TypographySourceInput: Sendable {
     /// Optional timeout for Figma API requests.
     public let timeout: TimeInterval?
 
+    /// Penpot instance base URL (used when sourceKind == .penpot).
+    public let penpotBaseURL: String?
+
     public init(
         sourceKind: DesignSourceKind = .figma,
         fileId: String,
-        timeout: TimeInterval? = nil
+        timeout: TimeInterval? = nil,
+        penpotBaseURL: String? = nil
     ) {
         self.sourceKind = sourceKind
         self.fileId = fileId
         self.timeout = timeout
+        self.penpotBaseURL = penpotBaseURL
     }
 }
 

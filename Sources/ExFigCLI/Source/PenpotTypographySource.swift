@@ -6,9 +6,8 @@ struct PenpotTypographySource: TypographySource {
     let ui: TerminalUI
 
     func loadTypography(from input: TypographySourceInput) async throws -> TypographyLoadOutput {
-        let client = try PenpotColorsSource.makeClient(
-            baseURL: BasePenpotClient.defaultBaseURL
-        )
+        let effectiveBaseURL = input.penpotBaseURL ?? BasePenpotClient.defaultBaseURL
+        let client = try PenpotColorsSource.makeClient(baseURL: effectiveBaseURL)
 
         let fileResponse = try await client.request(GetFileEndpoint(fileId: input.fileId))
 

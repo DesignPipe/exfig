@@ -29,6 +29,9 @@ public struct BasePenpotClient: PenpotClient {
         timeout: TimeInterval = 60,
         maxRetries: Int = 3
     ) {
+        precondition(maxRetries >= 1, "maxRetries must be at least 1")
+        precondition(!accessToken.isEmpty, "accessToken must not be empty")
+
         self.accessToken = accessToken
         self.baseURL = baseURL.hasSuffix("/") ? baseURL : baseURL + "/"
         self.maxRetries = maxRetries
@@ -83,7 +86,8 @@ public struct BasePenpotClient: PenpotClient {
               (200 ..< 300).contains(httpResponse.statusCode)
         else {
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            throw PenpotAPIError(statusCode: statusCode, message: "Download failed", endpoint: "download")
+            let message = String(data: data, encoding: .utf8) ?? "Download failed"
+            throw PenpotAPIError(statusCode: statusCode, message: message, endpoint: "download")
         }
 
         return data
@@ -110,6 +114,8 @@ public struct BasePenpotClient: PenpotClient {
 
         for attempt in 0 ..< maxRetries {
             do {
+                try Task.checkCancellation()
+
                 let (data, response) = try await session.data(for: request)
 
                 if let httpResponse = response as? HTTPURLResponse {
@@ -132,6 +138,8 @@ public struct BasePenpotClient: PenpotClient {
                 }
 
                 return (data, response)
+            } catch is CancellationError {
+                throw CancellationError()
             } catch let error as PenpotAPIError {
                 throw error
             } catch {

@@ -17,3 +17,11 @@ Only external dependency: swift-yyjson for JSON parsing.
 - `Authorization: Token <accessToken>` header
 - Simple retry (3 attempts, exponential backoff) for 429/5xx
 - Typography numeric fields may be String OR Number — custom init(from:) handles both
+
+## Conventions
+
+- All model fields are `let` (immutable) — no post-construction mutation needed
+- Kebab-case request keys: use `Codable` struct with `CodingKeys` + `YYJSONEncoder`, NOT `JSONSerialization`
+- `BasePenpotClient` validates `maxRetries >= 1` and `!accessToken.isEmpty` via preconditions
+- Retry loop respects `CancellationError` — rethrows immediately instead of retrying
+- `download()` includes response body in error message for diagnostics

@@ -25,16 +25,16 @@ public struct PenpotTypography: Sendable {
     public let textTransform: String?
 
     /// Font size in points.
-    public var fontSize: Double?
+    public let fontSize: Double?
 
     /// Font weight (e.g., 400, 700).
-    public var fontWeight: Double?
+    public let fontWeight: Double?
 
     /// Line height multiplier.
-    public var lineHeight: Double?
+    public let lineHeight: Double?
 
     /// Letter spacing in em.
-    public var letterSpacing: Double?
+    public let letterSpacing: Double?
 
     public init(
         id: String,

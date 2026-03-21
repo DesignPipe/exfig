@@ -14,7 +14,7 @@ public extension iOS.IconsEntry {
     func iconsSourceInput(darkFileId: String? = nil) -> IconsSourceInput {
         IconsSourceInput(
             sourceKind: resolvedSourceKind,
-            figmaFileId: figmaFileId,
+            figmaFileId: resolvedFileId,
             darkFileId: darkFileId,
             frameName: figmaFrameName ?? "Icons",
             pageName: figmaPageName,
@@ -27,7 +27,8 @@ public extension iOS.IconsEntry {
             renderModeTemplateSuffix: renderModeTemplateSuffix,
             rtlProperty: rtlProperty,
             nameValidateRegexp: nameValidateRegexp,
-            nameReplaceRegexp: nameReplaceRegexp
+            nameReplaceRegexp: nameReplaceRegexp,
+            penpotBaseURL: resolvedPenpotBaseURL
         )
     }
 

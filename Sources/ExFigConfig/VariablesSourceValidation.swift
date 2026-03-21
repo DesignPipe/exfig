@@ -37,7 +37,7 @@ public extension Common_VariablesSource {
 private extension Common_VariablesSource {
     func penpotColorsSourceInput() throws -> ColorsSourceInput {
         guard let penpotSource else {
-            throw ColorsConfigError.missingTokensFileId
+            throw ColorsConfigError.missingPenpotSource
         }
         let config = PenpotColorsConfig(
             fileId: penpotSource.fileId,
