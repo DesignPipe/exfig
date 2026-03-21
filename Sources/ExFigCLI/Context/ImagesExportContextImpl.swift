@@ -19,6 +19,7 @@ import Foundation
 /// - Supports granular cache for incremental exports
 struct ImagesExportContextImpl: ImagesExportContextWithGranularCache {
     let client: Client
+    let componentsSource: any ComponentsSource
     let ui: TerminalUI
     let params: PKLConfig
     let filter: String?
@@ -30,6 +31,7 @@ struct ImagesExportContextImpl: ImagesExportContextWithGranularCache {
 
     init(
         client: Client,
+        componentsSource: any ComponentsSource,
         ui: TerminalUI,
         params: PKLConfig,
         filter: String? = nil,
@@ -40,6 +42,7 @@ struct ImagesExportContextImpl: ImagesExportContextWithGranularCache {
         platform: Platform
     ) {
         self.client = client
+        self.componentsSource = componentsSource
         self.ui = ui
         self.params = params
         self.filter = filter
@@ -82,34 +85,7 @@ struct ImagesExportContextImpl: ImagesExportContextWithGranularCache {
     // MARK: - ImagesExportContext
 
     func loadImages(from source: ImagesSourceInput) async throws -> ImagesLoadOutput {
-        // Convert source format
-        let loaderSourceFormat: ImagesSourceFormat = source.sourceFormat == .svg ? .svg : .png
-
-        // Create loader config from source input
-        let config = ImagesLoaderConfig(
-            entryFileId: source.figmaFileId,
-            frameName: source.frameName,
-            pageName: source.pageName,
-            scales: source.scales,
-            format: nil, // Format is determined by platform exporter
-            sourceFormat: loaderSourceFormat,
-            rtlProperty: source.rtlProperty
-        )
-
-        let loader = ImagesLoader(
-            client: client,
-            params: params,
-            platform: platform,
-            logger: ExFigCommand.logger,
-            config: config
-        )
-
-        let result = try await loader.load(filter: filter)
-
-        return ImagesLoadOutput(
-            light: result.light,
-            dark: result.dark ?? []
-        )
+        try await componentsSource.loadImages(from: source)
     }
 
     func processImages(

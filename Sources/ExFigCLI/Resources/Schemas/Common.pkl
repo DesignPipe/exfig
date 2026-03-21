@@ -16,6 +16,9 @@ typealias VectorFormat = "pdf"|"svg"
 /// - `svg`: Download SVG and rasterize locally with resvg (higher quality)
 typealias SourceFormat = "png"|"svg"
 
+/// Design source kind — identifies the tool or data source for asset loading.
+typealias SourceKind = "figma"|"penpot"|"tokens-file"|"tokens-studio"|"sketch-file"
+
 // MARK: - WebP Options
 
 /// WebP encoding mode.
@@ -70,6 +73,11 @@ open class NameProcessing {
 /// Used for colors that come from Figma Variables API.
 /// All fields are optional to support legacy format where source comes from common.variablesColors.
 open class VariablesSource extends NameProcessing {
+  /// Design source kind override. When null, auto-detected:
+  /// - If `tokensFile` is set → "tokens-file"
+  /// - Otherwise → "figma"
+  sourceKind: SourceKind?
+
   /// Local .tokens.json file source (bypasses Figma API when set).
   tokensFile: TokensFile?
 
@@ -98,6 +106,9 @@ open class VariablesSource extends NameProcessing {
 /// Figma Frame source configuration.
 /// Used for icons and images that come from Figma frames.
 open class FrameSource extends NameProcessing {
+  /// Design source kind override. When null, defaults to "figma".
+  sourceKind: SourceKind?
+
   /// Figma frame name to export from.
   figmaFrameName: String?
 

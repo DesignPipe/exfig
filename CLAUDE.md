@@ -142,6 +142,7 @@ Sources/ExFigCLI/
 ├── Sync/            # Figma sync functionality (state tracking, diff detection)
 ├── Plugin/          # Plugin registry
 ├── Context/         # Export context implementations (ColorsExportContextImpl, etc.)
+├── Source/          # Design source implementations (FigmaColorsSource, SourceFactory, etc.)
 ├── MCP/             # Model Context Protocol server (tools, resources, prompts)
 └── Shared/          # Cross-cutting helpers (PlatformExportResult, HashMerger)
 
@@ -296,6 +297,15 @@ See `ExFigCore/CLAUDE.md` (Modification Checklist) and platform module CLAUDE.md
 
 `URL(fileURLWithPath:)` → `lastPathComponent` (iOS/Android/Web). `URL(string:)` → preserves subdirectories (Flutter). See `ExFigCore/CLAUDE.md`.
 
+### Refactoring *SourceInput Types
+
+When changing fields on `ColorsSourceInput` / `IconsSourceInput` / `ImagesSourceInput`:
+
+1. Construction sites: `validatedColorsSourceInput()` in `VariablesSourceValidation.swift`, entry bridge methods in `Sources/ExFig-*/Config/*Entry.swift`
+2. **Read sites in platform exporters**: `Sources/ExFig-*/Export/*Exporter.swift` — spinner messages may reference SourceInput fields
+3. Download commands (`DownloadColors`, `DownloadAll`) use loaders directly, NOT `*SourceInput` — typically unaffected
+4. `BatchConfigRunner` delegates via `performExportWithResult()` — typically unaffected
+
 ## Code Conventions
 
 | Area            | Use                                   | Instead of                            |
@@ -402,6 +412,8 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | PKL template word search      | Template comments on `lightFileId` contain cross-refs (`variablesColors`, `typography`); test section removal by matching full markers (`colors = new Common.Colors {`) not bare words |
 | CI llms-full.txt stale        | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result               |
 | Release build .pcm warnings   | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                    |
+| `nil` in switch expression    | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                              |
+| PKL↔Swift enum rawValue       | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                            |
 
 ## Additional Rules
 

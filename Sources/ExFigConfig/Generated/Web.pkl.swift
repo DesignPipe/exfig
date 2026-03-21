@@ -35,6 +35,11 @@ extension Web {
         /// JSON filename for color data. Default: colors.json
         public var jsonFileName: String?
 
+        /// Design source kind override. When null, auto-detected:
+        /// - If `tokensFile` is set → "tokens-file"
+        /// - Otherwise → "figma"
+        public var sourceKind: Common.SourceKind?
+
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: Common.TokensFile?
 
@@ -72,6 +77,7 @@ extension Web {
             cssFileName: String?,
             tsFileName: String?,
             jsonFileName: String?,
+            sourceKind: Common.SourceKind?,
             tokensFile: Common.TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -89,6 +95,7 @@ extension Web {
             self.cssFileName = cssFileName
             self.tsFileName = tsFileName
             self.jsonFileName = jsonFileName
+            self.sourceKind = sourceKind
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -125,6 +132,9 @@ extension Web {
         /// Naming style for icon names.
         public var nameStyle: Common.NameStyle?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -158,6 +168,7 @@ extension Web {
             generateReactComponents: Bool?,
             iconSize: Int?,
             nameStyle: Common.NameStyle?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -171,6 +182,7 @@ extension Web {
             self.generateReactComponents = generateReactComponents
             self.iconSize = iconSize
             self.nameStyle = nameStyle
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId
@@ -199,6 +211,9 @@ extension Web {
 
         /// Naming style for generated image names.
         public var nameStyle: Common.NameStyle?
+
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
 
         /// Figma frame name to export from.
         public var figmaFrameName: String?
@@ -232,6 +247,7 @@ extension Web {
             assetsDirectory: String?,
             generateReactComponents: Bool?,
             nameStyle: Common.NameStyle?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -244,6 +260,7 @@ extension Web {
             self.assetsDirectory = assetsDirectory
             self.generateReactComponents = generateReactComponents
             self.nameStyle = nameStyle
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId

@@ -148,30 +148,33 @@ Converter factories (`WebpConverterFactory`, `HeicConverterFactory`) handle plat
 
 ## Key Files
 
-| File                                     | Role                                                               |
-| ---------------------------------------- | ------------------------------------------------------------------ |
-| `ExFigCommand.swift`                     | Entry point, version, shared instances, subcommand registration    |
-| `Input/ExFigOptions.swift`               | PKL config loading, token validation, auto-detection               |
-| `Batch/BatchContext.swift`               | `BatchContext`, `ConfigExecutionContext`, `BatchSharedState` actor |
-| `Batch/BatchExecutor.swift`              | Parallel config execution with rate limiting                       |
-| `Plugin/PluginRegistry.swift`            | Platform plugin routing (config key → plugin → exporters)          |
-| `TerminalUI/TerminalUI.swift`            | Output facade (info/success/warning/error, spinners, progress)     |
-| `TerminalUI/TerminalOutputManager.swift` | Thread-safe output synchronization, animation coordination         |
-| `TerminalUI/BatchProgressView.swift`     | Multi-config progress display with log queuing                     |
-| `Cache/GranularCacheManager.swift`       | Per-node change detection with FNV-1a hashing                      |
-| `Pipeline/SharedDownloadQueue.swift`     | Cross-config download pipelining actor                             |
-| `Output/FileWriter.swift`                | Sequential and parallel file writing with directory creation       |
-| `Shared/ComponentPreFetcher.swift`       | Pre-fetch components for multi-entry exports                       |
-| `Input/TokensFileSource.swift`           | W3C DTCG .tokens.json parser (local file → ExFigCore models)       |
-| `Output/W3CTokensExporter.swift`         | W3C design token JSON exporter (v1/v2025 formats)                  |
-| `Loaders/NumberVariablesLoader.swift`    | Figma number variables → dimension/number tokens                   |
-| `Subcommands/DownloadTokens.swift`       | Unified `download tokens` subcommand                               |
-| `MCP/ExFigMCPServer.swift`               | MCP server setup and lifecycle (stdio transport)                   |
-| `MCP/MCPToolDefinitions.swift`           | MCP tool schemas (export colors, icons, images, etc.)              |
-| `MCP/MCPToolHandlers.swift`              | MCP tool request handlers                                          |
-| `MCP/MCPResources.swift`                 | MCP resource providers (config, schemas)                           |
-| `MCP/MCPPrompts.swift`                   | MCP prompt templates                                               |
-| `MCP/MCPServerState.swift`               | MCP server shared state                                            |
+| File                                     | Role                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------- |
+| `ExFigCommand.swift`                     | Entry point, version, shared instances, subcommand registration     |
+| `Input/ExFigOptions.swift`               | PKL config loading, token validation, auto-detection                |
+| `Batch/BatchContext.swift`               | `BatchContext`, `ConfigExecutionContext`, `BatchSharedState` actor  |
+| `Batch/BatchExecutor.swift`              | Parallel config execution with rate limiting                        |
+| `Plugin/PluginRegistry.swift`            | Platform plugin routing (config key → plugin → exporters)           |
+| `TerminalUI/TerminalUI.swift`            | Output facade (info/success/warning/error, spinners, progress)      |
+| `TerminalUI/TerminalOutputManager.swift` | Thread-safe output synchronization, animation coordination          |
+| `TerminalUI/BatchProgressView.swift`     | Multi-config progress display with log queuing                      |
+| `Cache/GranularCacheManager.swift`       | Per-node change detection with FNV-1a hashing                       |
+| `Pipeline/SharedDownloadQueue.swift`     | Cross-config download pipelining actor                              |
+| `Output/FileWriter.swift`                | Sequential and parallel file writing with directory creation        |
+| `Shared/ComponentPreFetcher.swift`       | Pre-fetch components for multi-entry exports                        |
+| `Input/TokensFileSource.swift`           | W3C DTCG .tokens.json parser (local file → ExFigCore models)        |
+| `Output/W3CTokensExporter.swift`         | W3C design token JSON exporter (v1/v2025 formats)                   |
+| `Loaders/NumberVariablesLoader.swift`    | Figma number variables → dimension/number tokens                    |
+| `Subcommands/DownloadTokens.swift`       | Unified `download tokens` subcommand                                |
+| `MCP/ExFigMCPServer.swift`               | MCP server setup and lifecycle (stdio transport)                    |
+| `MCP/MCPToolDefinitions.swift`           | MCP tool schemas (export colors, icons, images, etc.)               |
+| `MCP/MCPToolHandlers.swift`              | MCP tool request handlers                                           |
+| `MCP/MCPResources.swift`                 | MCP resource providers (config, schemas)                            |
+| `MCP/MCPPrompts.swift`                   | MCP prompt templates                                                |
+| `MCP/MCPServerState.swift`               | MCP server shared state                                             |
+| `Source/SourceFactory.swift`             | Centralized factory creating source instances by `DesignSourceKind` |
+| `Source/Figma*Source.swift`              | Figma source implementations wrapping existing loaders              |
+| `Source/TokensFileColorsSource.swift`    | Local .tokens.json source (extracted from ColorsExportContextImpl)  |
 
 ### MCP Server Architecture
 

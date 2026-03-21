@@ -48,12 +48,14 @@ ExFigCore domain types (NameStyle, ColorsSourceInput, etc.)
 
 ### Key Public API
 
-| Symbol                                                  | Purpose                                                                                                                                          |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `PKLEvaluator.evaluate(configPath:)`                    | Async evaluation of .pkl → `ExFig.ModuleImpl`                                                                                                    |
-| `PKLError.configNotFound` / `.evaluationDidNotComplete` | Error cases                                                                                                                                      |
-| `Common.NameStyle.coreNameStyle`                        | Bridge to `ExFigCore.NameStyle` via rawValue match                                                                                               |
-| `Common_VariablesSource.validatedColorsSourceInput()`   | Validates required fields, returns `ColorsSourceInput`. When `tokensFile` is set, bypasses Figma field validation and returns local source input |
+| Symbol                                                  | Purpose                                                                                                 |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `PKLEvaluator.evaluate(configPath:)`                    | Async evaluation of .pkl → `ExFig.ModuleImpl`                                                           |
+| `PKLError.configNotFound` / `.evaluationDidNotComplete` | Error cases                                                                                             |
+| `Common.NameStyle.coreNameStyle`                        | Bridge to `ExFigCore.NameStyle` via rawValue match                                                      |
+| `Common.SourceKind.coreSourceKind`                      | Bridge to `ExFigCore.DesignSourceKind` via explicit switch (NOT rawValue — kebab vs camelCase mismatch) |
+| `Common_VariablesSource.resolvedSourceKind`             | Resolution priority: explicit `sourceKind` > auto-detect (tokensFile presence) > default `.figma`       |
+| `Common_VariablesSource.validatedColorsSourceInput()`   | Validates required fields, returns `ColorsSourceInput`. Uses `resolvedSourceKind` for dispatch          |
 
 ### PklError Workaround
 

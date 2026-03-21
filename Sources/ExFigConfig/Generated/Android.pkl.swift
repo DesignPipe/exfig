@@ -131,6 +131,11 @@ extension Android {
         /// Theme attributes configuration.
         public var themeAttributes: ThemeAttributes?
 
+        /// Design source kind override. When null, auto-detected:
+        /// - If `tokensFile` is set → "tokens-file"
+        /// - Otherwise → "figma"
+        public var sourceKind: Common.SourceKind?
+
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: Common.TokensFile?
 
@@ -170,6 +175,7 @@ extension Android {
             composePackageName: String?,
             colorKotlin: String?,
             themeAttributes: ThemeAttributes?,
+            sourceKind: Common.SourceKind?,
             tokensFile: Common.TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -189,6 +195,7 @@ extension Android {
             self.composePackageName = composePackageName
             self.colorKotlin = colorKotlin
             self.themeAttributes = themeAttributes
+            self.sourceKind = sourceKind
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -243,6 +250,9 @@ extension Android {
         /// Path to generate Figma Code Connect Kotlin file for Jetpack Compose.
         public var codeConnectKotlin: String?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -281,6 +291,7 @@ extension Android {
             strictPathValidation: Bool?,
             codeConnectPackageName: String?,
             codeConnectKotlin: String?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -299,6 +310,7 @@ extension Android {
             self.strictPathValidation = strictPathValidation
             self.codeConnectPackageName = codeConnectPackageName
             self.codeConnectKotlin = codeConnectKotlin
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId
@@ -341,6 +353,9 @@ extension Android {
         /// Path to generate Figma Code Connect Kotlin file for Jetpack Compose.
         public var codeConnectKotlin: String?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -377,6 +392,7 @@ extension Android {
             sourceFormat: Common.SourceFormat?,
             nameStyle: Common.NameStyle?,
             codeConnectKotlin: String?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -393,6 +409,7 @@ extension Android {
             self.sourceFormat = sourceFormat
             self.nameStyle = nameStyle
             self.codeConnectKotlin = codeConnectKotlin
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId

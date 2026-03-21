@@ -14,6 +14,7 @@ import Foundation
 /// - Supports granular cache for incremental exports
 struct IconsExportContextImpl: IconsExportContextWithGranularCache {
     let client: Client
+    let componentsSource: any ComponentsSource
     let ui: TerminalUI
     let params: PKLConfig
     let filter: String?
@@ -25,6 +26,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
 
     init(
         client: Client,
+        componentsSource: any ComponentsSource,
         ui: TerminalUI,
         params: PKLConfig,
         filter: String? = nil,
@@ -35,6 +37,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
         platform: Platform
     ) {
         self.client = client
+        self.componentsSource = componentsSource
         self.ui = ui
         self.params = params
         self.filter = filter
@@ -77,33 +80,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
     // MARK: - IconsExportContext
 
     func loadIcons(from source: IconsSourceInput) async throws -> IconsLoadOutput {
-        // Create loader config from source input
-        let config = IconsLoaderConfig(
-            entryFileId: source.figmaFileId,
-            frameName: source.frameName,
-            pageName: source.pageName,
-            format: source.format,
-            renderMode: source.renderMode,
-            renderModeDefaultSuffix: source.renderModeDefaultSuffix,
-            renderModeOriginalSuffix: source.renderModeOriginalSuffix,
-            renderModeTemplateSuffix: source.renderModeTemplateSuffix,
-            rtlProperty: source.rtlProperty
-        )
-
-        let loader = IconsLoader(
-            client: client,
-            params: params,
-            platform: platform,
-            logger: ExFigCommand.logger,
-            config: config
-        )
-
-        let result = try await loader.load(filter: filter)
-
-        return IconsLoadOutput(
-            light: result.light,
-            dark: result.dark ?? []
-        )
+        try await componentsSource.loadIcons(from: source)
     }
 
     func processIcons(

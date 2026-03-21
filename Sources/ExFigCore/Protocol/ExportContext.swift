@@ -91,51 +91,25 @@ public protocol ColorsExportContext: ExportContext {
     ) throws -> ColorsProcessResult
 }
 
-/// Input for loading colors — either from Figma Variables API or a local .tokens.json file.
+/// Input for loading colors from any design source.
 ///
-/// When `tokensFilePath` is set, the export pipeline reads colors from the local file
-/// (bypassing Figma API). Otherwise, `tokensFileId` + `tokensCollectionName` + `lightModeName`
-/// are used to fetch from Figma Variables.
+/// Source-specific fields live in `sourceConfig` (see `ColorsSourceConfig`).
+/// Shared fields (`nameValidateRegexp`, `nameReplaceRegexp`) apply to all sources.
+/// Dispatch is handled by `SourceFactory` using `sourceKind`.
 public struct ColorsSourceInput: Sendable {
-    public let tokensFilePath: String?
-    public let tokensFileGroupFilter: String?
-    public let tokensFileId: String
-    public let tokensCollectionName: String
-    public let lightModeName: String
-    public let darkModeName: String?
-    public let lightHCModeName: String?
-    public let darkHCModeName: String?
-    public let primitivesModeName: String?
+    public let sourceKind: DesignSourceKind
+    public let sourceConfig: any ColorsSourceConfig
     public let nameValidateRegexp: String?
     public let nameReplaceRegexp: String?
 
-    /// Whether this source input uses a local tokens file.
-    public var isLocalTokensFile: Bool {
-        tokensFilePath != nil
-    }
-
     public init(
-        tokensFilePath: String? = nil,
-        tokensFileGroupFilter: String? = nil,
-        tokensFileId: String,
-        tokensCollectionName: String,
-        lightModeName: String,
-        darkModeName: String? = nil,
-        lightHCModeName: String? = nil,
-        darkHCModeName: String? = nil,
-        primitivesModeName: String? = nil,
+        sourceKind: DesignSourceKind,
+        sourceConfig: any ColorsSourceConfig,
         nameValidateRegexp: String? = nil,
         nameReplaceRegexp: String? = nil
     ) {
-        self.tokensFilePath = tokensFilePath
-        self.tokensFileGroupFilter = tokensFileGroupFilter
-        self.tokensFileId = tokensFileId
-        self.tokensCollectionName = tokensCollectionName
-        self.lightModeName = lightModeName
-        self.darkModeName = darkModeName
-        self.lightHCModeName = lightHCModeName
-        self.darkHCModeName = darkHCModeName
-        self.primitivesModeName = primitivesModeName
+        self.sourceKind = sourceKind
+        self.sourceConfig = sourceConfig
         self.nameValidateRegexp = nameValidateRegexp
         self.nameReplaceRegexp = nameReplaceRegexp
     }

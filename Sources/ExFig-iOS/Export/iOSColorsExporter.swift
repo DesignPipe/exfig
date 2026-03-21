@@ -65,7 +65,7 @@ public struct iOSColorsExporter: ColorsExporter {
         // 1. Load colors from Figma
         let sourceInput = try entry.validatedColorsSourceInput()
         let colors = try await context.withSpinner(
-            "Fetching colors from Figma (\(sourceInput.tokensCollectionName))..."
+            "Fetching colors (\(sourceInput.sourceKind.rawValue))..."
         ) {
             try await context.loadColors(from: sourceInput)
         }

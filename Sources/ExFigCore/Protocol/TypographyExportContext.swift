@@ -36,6 +36,9 @@ public protocol TypographyExportContext: ExportContext {
 
 /// Input for loading typography from Figma.
 public struct TypographySourceInput: Sendable {
+    /// Design source kind (default: `.figma`).
+    public let sourceKind: DesignSourceKind
+
     /// Figma file ID containing text styles.
     public let fileId: String
 
@@ -43,9 +46,11 @@ public struct TypographySourceInput: Sendable {
     public let timeout: TimeInterval?
 
     public init(
+        sourceKind: DesignSourceKind = .figma,
         fileId: String,
         timeout: TimeInterval? = nil
     ) {
+        self.sourceKind = sourceKind
         self.fileId = fileId
         self.timeout = timeout
     }

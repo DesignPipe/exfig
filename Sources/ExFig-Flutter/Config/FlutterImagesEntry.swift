@@ -14,6 +14,7 @@ public extension Flutter.ImagesEntry {
     /// Returns an ImagesSourceInput for use with ImagesExportContext.
     func imagesSourceInput(darkFileId: String? = nil) -> ImagesSourceInput {
         ImagesSourceInput(
+            sourceKind: sourceKind?.coreSourceKind ?? .figma,
             figmaFileId: figmaFileId,
             darkFileId: darkFileId,
             frameName: figmaFrameName ?? "Images",
@@ -43,6 +44,7 @@ public extension Flutter.ImagesEntry {
     /// Returns an ImagesSourceInput configured for SVG source.
     func svgSourceInput(darkFileId: String? = nil) -> ImagesSourceInput {
         ImagesSourceInput(
+            sourceKind: sourceKind?.coreSourceKind ?? .figma,
             figmaFileId: figmaFileId,
             darkFileId: darkFileId,
             frameName: figmaFrameName ?? "Images",

@@ -32,6 +32,11 @@ extension Flutter {
         /// Class name for generated colors.
         public var className: String?
 
+        /// Design source kind override. When null, auto-detected:
+        /// - If `tokensFile` is set → "tokens-file"
+        /// - Otherwise → "figma"
+        public var sourceKind: Common.SourceKind?
+
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: Common.TokensFile?
 
@@ -66,6 +71,7 @@ extension Flutter {
             templatesPath: String?,
             output: String?,
             className: String?,
+            sourceKind: Common.SourceKind?,
             tokensFile: Common.TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -80,6 +86,7 @@ extension Flutter {
             self.templatesPath = templatesPath
             self.output = output
             self.className = className
+            self.sourceKind = sourceKind
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -113,6 +120,9 @@ extension Flutter {
         /// Naming style for icon names.
         public var nameStyle: Common.NameStyle?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -145,6 +155,7 @@ extension Flutter {
             dartFile: String?,
             className: String?,
             nameStyle: Common.NameStyle?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -157,6 +168,7 @@ extension Flutter {
             self.dartFile = dartFile
             self.className = className
             self.nameStyle = nameStyle
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId
@@ -198,6 +210,9 @@ extension Flutter {
         /// Naming style for generated assets.
         public var nameStyle: Common.NameStyle?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -234,6 +249,7 @@ extension Flutter {
             webpOptions: Common.WebpOptions?,
             sourceFormat: Common.SourceFormat?,
             nameStyle: Common.NameStyle?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -250,6 +266,7 @@ extension Flutter {
             self.webpOptions = webpOptions
             self.sourceFormat = sourceFormat
             self.nameStyle = nameStyle
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId

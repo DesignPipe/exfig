@@ -67,6 +67,7 @@ final class EnumBridgingTests: XCTestCase {
                 templatesPath: nil,
                 syncCodeSyntax: nil,
                 codeSyntaxTemplate: nil,
+                sourceKind: nil,
                 tokensFile: nil,
                 tokensFileId: nil,
                 tokensCollectionName: nil,
@@ -112,6 +113,7 @@ final class EnumBridgingTests: XCTestCase {
                 renderModeDefaultSuffix: nil,
                 renderModeOriginalSuffix: nil,
                 renderModeTemplateSuffix: nil,
+                sourceKind: nil,
                 figmaFrameName: nil,
                 figmaPageName: nil,
                 figmaFileId: nil,
@@ -155,6 +157,7 @@ final class EnumBridgingTests: XCTestCase {
                 renderModeDefaultSuffix: nil,
                 renderModeOriginalSuffix: nil,
                 renderModeTemplateSuffix: nil,
+                sourceKind: nil,
                 figmaFrameName: nil,
                 figmaPageName: nil,
                 figmaFileId: nil,
@@ -194,6 +197,7 @@ final class EnumBridgingTests: XCTestCase {
                 strictPathValidation: nil,
                 codeConnectPackageName: nil,
                 codeConnectKotlin: nil,
+                sourceKind: nil,
                 figmaFrameName: nil,
                 figmaPageName: nil,
                 figmaFileId: nil,
@@ -221,6 +225,7 @@ final class EnumBridgingTests: XCTestCase {
             strictPathValidation: nil,
             codeConnectPackageName: nil,
             codeConnectKotlin: nil,
+            sourceKind: nil,
             figmaFrameName: nil,
             figmaPageName: nil,
             figmaFileId: nil,
@@ -254,6 +259,7 @@ final class EnumBridgingTests: XCTestCase {
                 sourceFormat: nil,
                 nameStyle: pklStyle,
                 codeConnectKotlin: nil,
+                sourceKind: nil,
                 figmaFrameName: nil,
                 figmaPageName: nil,
                 figmaFileId: nil,
@@ -279,6 +285,7 @@ final class EnumBridgingTests: XCTestCase {
             sourceFormat: nil,
             nameStyle: nil,
             codeConnectKotlin: nil,
+            sourceKind: nil,
             figmaFrameName: nil,
             figmaPageName: nil,
             figmaFileId: nil,
@@ -341,6 +348,7 @@ final class EnumBridgingTests: XCTestCase {
                 renderModeDefaultSuffix: nil,
                 renderModeOriginalSuffix: nil,
                 renderModeTemplateSuffix: nil,
+                sourceKind: nil,
                 figmaFrameName: nil,
                 figmaPageName: nil,
                 figmaFileId: nil,
@@ -373,6 +381,7 @@ final class EnumBridgingTests: XCTestCase {
                 renderModeDefaultSuffix: nil,
                 renderModeOriginalSuffix: nil,
                 renderModeTemplateSuffix: nil,
+                sourceKind: nil,
                 figmaFrameName: nil,
                 figmaPageName: nil,
                 figmaFileId: nil,
@@ -435,6 +444,7 @@ final class EnumBridgingTests: XCTestCase {
             templatesPath: nil,
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
+            sourceKind: nil,
             tokensFile: nil, tokensFileId: nil,
             tokensCollectionName: "Collection",
             lightModeName: "Light",
@@ -463,6 +473,7 @@ final class EnumBridgingTests: XCTestCase {
             templatesPath: nil,
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
+            sourceKind: nil,
             tokensFile: nil, tokensFileId: "",
             tokensCollectionName: "Collection",
             lightModeName: "Light",
@@ -491,6 +502,7 @@ final class EnumBridgingTests: XCTestCase {
             templatesPath: nil,
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
+            sourceKind: nil,
             tokensFile: nil, tokensFileId: "file123",
             tokensCollectionName: "Collection",
             lightModeName: "Light",
@@ -502,10 +514,12 @@ final class EnumBridgingTests: XCTestCase {
             nameReplaceRegexp: nil
         )
         let sourceInput = try entry.validatedColorsSourceInput()
-        XCTAssertEqual(sourceInput.tokensFileId, "file123")
-        XCTAssertEqual(sourceInput.tokensCollectionName, "Collection")
-        XCTAssertEqual(sourceInput.lightModeName, "Light")
-        XCTAssertEqual(sourceInput.darkModeName, "Dark")
+        XCTAssertEqual(sourceInput.sourceKind, .figma)
+        let figmaConfig = try XCTUnwrap(sourceInput.sourceConfig as? FigmaColorsConfig)
+        XCTAssertEqual(figmaConfig.tokensFileId, "file123")
+        XCTAssertEqual(figmaConfig.tokensCollectionName, "Collection")
+        XCTAssertEqual(figmaConfig.lightModeName, "Light")
+        XCTAssertEqual(figmaConfig.darkModeName, "Dark")
     }
 
     // MARK: - TokensFile Source Validation
@@ -523,6 +537,7 @@ final class EnumBridgingTests: XCTestCase {
             templatesPath: nil,
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
+            sourceKind: nil,
             tokensFile: Common.TokensFile(path: "tokens.json", groupFilter: nil),
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -535,9 +550,10 @@ final class EnumBridgingTests: XCTestCase {
             nameReplaceRegexp: nil
         )
         let sourceInput = try entry.validatedColorsSourceInput()
-        XCTAssertTrue(sourceInput.isLocalTokensFile)
-        XCTAssertEqual(sourceInput.tokensFilePath, "tokens.json")
-        XCTAssertNil(sourceInput.tokensFileGroupFilter)
+        XCTAssertEqual(sourceInput.sourceKind, .tokensFile)
+        let tokensConfig = try XCTUnwrap(sourceInput.sourceConfig as? TokensFileColorsConfig)
+        XCTAssertEqual(tokensConfig.filePath, "tokens.json")
+        XCTAssertNil(tokensConfig.groupFilter)
     }
 
     func testTokensFileSourceWithGroupFilter() throws {
@@ -553,6 +569,7 @@ final class EnumBridgingTests: XCTestCase {
             templatesPath: nil,
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
+            sourceKind: nil,
             tokensFile: Common.TokensFile(path: "design-tokens.json", groupFilter: "Brand.Colors"),
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -565,9 +582,10 @@ final class EnumBridgingTests: XCTestCase {
             nameReplaceRegexp: nil
         )
         let sourceInput = try entry.validatedColorsSourceInput()
-        XCTAssertTrue(sourceInput.isLocalTokensFile)
-        XCTAssertEqual(sourceInput.tokensFilePath, "design-tokens.json")
-        XCTAssertEqual(sourceInput.tokensFileGroupFilter, "Brand.Colors")
+        XCTAssertEqual(sourceInput.sourceKind, .tokensFile)
+        let tokensConfig = try XCTUnwrap(sourceInput.sourceConfig as? TokensFileColorsConfig)
+        XCTAssertEqual(tokensConfig.filePath, "design-tokens.json")
+        XCTAssertEqual(tokensConfig.groupFilter, "Brand.Colors")
     }
 
     func testWithoutTokensFileFallsBackToFigmaValidation() {
@@ -583,6 +601,7 @@ final class EnumBridgingTests: XCTestCase {
             templatesPath: nil,
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
+            sourceKind: nil,
             tokensFile: nil,
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -611,6 +630,7 @@ final class EnumBridgingTests: XCTestCase {
             composePackageName: nil,
             colorKotlin: nil,
             themeAttributes: nil,
+            sourceKind: nil,
             tokensFile: nil, tokensFileId: nil,
             tokensCollectionName: "Collection",
             lightModeName: "Light",
@@ -636,6 +656,7 @@ final class EnumBridgingTests: XCTestCase {
             composePackageName: nil,
             colorKotlin: nil,
             themeAttributes: nil,
+            sourceKind: nil,
             tokensFile: nil, tokensFileId: "",
             tokensCollectionName: "Collection",
             lightModeName: "Light",
@@ -661,6 +682,7 @@ final class EnumBridgingTests: XCTestCase {
             composePackageName: nil,
             colorKotlin: nil,
             themeAttributes: nil,
+            sourceKind: nil,
             tokensFile: nil, tokensFileId: "file456",
             tokensCollectionName: "Colors",
             lightModeName: "Light",
@@ -672,10 +694,12 @@ final class EnumBridgingTests: XCTestCase {
             nameReplaceRegexp: nil
         )
         let sourceInput = try entry.validatedColorsSourceInput()
-        XCTAssertEqual(sourceInput.tokensFileId, "file456")
-        XCTAssertEqual(sourceInput.tokensCollectionName, "Colors")
-        XCTAssertEqual(sourceInput.lightModeName, "Light")
-        XCTAssertEqual(sourceInput.darkModeName, "Dark")
+        XCTAssertEqual(sourceInput.sourceKind, .figma)
+        let figmaConfig = try XCTUnwrap(sourceInput.sourceConfig as? FigmaColorsConfig)
+        XCTAssertEqual(figmaConfig.tokensFileId, "file456")
+        XCTAssertEqual(figmaConfig.tokensCollectionName, "Colors")
+        XCTAssertEqual(figmaConfig.lightModeName, "Light")
+        XCTAssertEqual(figmaConfig.darkModeName, "Dark")
     }
 
     // MARK: - iOS Missing tokensCollectionName / lightModeName
@@ -686,7 +710,8 @@ final class EnumBridgingTests: XCTestCase {
             groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
-            tokensFile: nil, tokensFileId: "file123", tokensCollectionName: nil, lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file123", tokensCollectionName: nil,
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -701,7 +726,7 @@ final class EnumBridgingTests: XCTestCase {
             groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
-            tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "", lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -716,7 +741,8 @@ final class EnumBridgingTests: XCTestCase {
             groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
-            tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "Collection", lightModeName: nil,
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "Collection",
+            lightModeName: nil,
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -731,7 +757,8 @@ final class EnumBridgingTests: XCTestCase {
             groupUsingNamespace: nil, assetsFolderProvidesNamespace: nil, colorSwift: nil, swiftuiColorSwift: nil,
             xcassetsPath: nil, templatesPath: nil,
             syncCodeSyntax: nil, codeSyntaxTemplate: nil,
-            tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "Collection", lightModeName: "",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file123", tokensCollectionName: "Collection",
+            lightModeName: "",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -747,7 +774,8 @@ final class EnumBridgingTests: XCTestCase {
             mainRes: nil, mainSrc: nil, templatesPath: nil,
             xmlOutputFileName: nil, xmlDisabled: nil, composePackageName: nil,
             colorKotlin: nil, themeAttributes: nil,
-            tokensFile: nil, tokensFileId: "file456", tokensCollectionName: nil, lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file456", tokensCollectionName: nil,
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -761,7 +789,7 @@ final class EnumBridgingTests: XCTestCase {
             mainRes: nil, mainSrc: nil, templatesPath: nil,
             xmlOutputFileName: nil, xmlDisabled: nil, composePackageName: nil,
             colorKotlin: nil, themeAttributes: nil,
-            tokensFile: nil, tokensFileId: "file456", tokensCollectionName: "", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file456", tokensCollectionName: "", lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -775,7 +803,8 @@ final class EnumBridgingTests: XCTestCase {
             mainRes: nil, mainSrc: nil, templatesPath: nil,
             xmlOutputFileName: nil, xmlDisabled: nil, composePackageName: nil,
             colorKotlin: nil, themeAttributes: nil,
-            tokensFile: nil, tokensFileId: "file456", tokensCollectionName: "Colors", lightModeName: nil,
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file456", tokensCollectionName: "Colors",
+            lightModeName: nil,
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -789,7 +818,8 @@ final class EnumBridgingTests: XCTestCase {
             mainRes: nil, mainSrc: nil, templatesPath: nil,
             xmlOutputFileName: nil, xmlDisabled: nil, composePackageName: nil,
             colorKotlin: nil, themeAttributes: nil,
-            tokensFile: nil, tokensFileId: "file456", tokensCollectionName: "Colors", lightModeName: "",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file456", tokensCollectionName: "Colors",
+            lightModeName: "",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -803,7 +833,8 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryThrowsOnMissingTokensFileId() {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: nil, tokensCollectionName: "Collection", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: nil, tokensCollectionName: "Collection",
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -815,7 +846,8 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryThrowsOnEmptyTokensFileId() {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: "", tokensCollectionName: "Collection", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "", tokensCollectionName: "Collection",
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -827,7 +859,8 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryThrowsOnMissingTokensCollectionName() {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: "file789", tokensCollectionName: nil, lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file789", tokensCollectionName: nil,
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -839,7 +872,7 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryThrowsOnEmptyTokensCollectionName() {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "", lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -851,7 +884,8 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryThrowsOnMissingLightModeName() {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "Collection", lightModeName: nil,
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "Collection",
+            lightModeName: nil,
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -863,7 +897,8 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryThrowsOnEmptyLightModeName() {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "Collection", lightModeName: "",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "Collection",
+            lightModeName: "",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -875,15 +910,18 @@ final class EnumBridgingTests: XCTestCase {
     func testFlutterColorsEntryValidatesSuccessfully() throws {
         let entry = Flutter.ColorsEntry(
             templatesPath: nil, output: nil, className: nil,
-            tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "Colors", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "file789", tokensCollectionName: "Colors",
+            lightModeName: "Light",
             darkModeName: "Dark", lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
         let sourceInput = try entry.validatedColorsSourceInput()
-        XCTAssertEqual(sourceInput.tokensFileId, "file789")
-        XCTAssertEqual(sourceInput.tokensCollectionName, "Colors")
-        XCTAssertEqual(sourceInput.lightModeName, "Light")
-        XCTAssertEqual(sourceInput.darkModeName, "Dark")
+        XCTAssertEqual(sourceInput.sourceKind, .figma)
+        let figmaConfig = try XCTUnwrap(sourceInput.sourceConfig as? FigmaColorsConfig)
+        XCTAssertEqual(figmaConfig.tokensFileId, "file789")
+        XCTAssertEqual(figmaConfig.tokensCollectionName, "Colors")
+        XCTAssertEqual(figmaConfig.lightModeName, "Light")
+        XCTAssertEqual(figmaConfig.darkModeName, "Dark")
     }
 
     // MARK: - Web ColorsSourceInput Validation
@@ -892,7 +930,8 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: nil, tokensCollectionName: "Collection", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: nil, tokensCollectionName: "Collection",
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -905,7 +944,8 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: "", tokensCollectionName: "Collection", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "", tokensCollectionName: "Collection",
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -918,7 +958,8 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: nil, lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: nil,
+            lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -931,7 +972,7 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "", lightModeName: "Light",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -944,7 +985,8 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "Collection", lightModeName: nil,
+            sourceKind: nil, tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "Collection",
+            lightModeName: nil,
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -957,7 +999,8 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "Collection", lightModeName: "",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "Collection",
+            lightModeName: "",
             darkModeName: nil, lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
@@ -970,14 +1013,17 @@ final class EnumBridgingTests: XCTestCase {
         let entry = Web.ColorsEntry(
             output: nil, templatesPath: nil,
             outputDirectory: nil, cssFileName: nil, tsFileName: nil, jsonFileName: nil,
-            tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "Colors", lightModeName: "Light",
+            sourceKind: nil, tokensFile: nil, tokensFileId: "fileABC", tokensCollectionName: "Colors",
+            lightModeName: "Light",
             darkModeName: "Dark", lightHCModeName: nil, darkHCModeName: nil,
             primitivesModeName: nil, nameValidateRegexp: nil, nameReplaceRegexp: nil
         )
         let sourceInput = try entry.validatedColorsSourceInput()
-        XCTAssertEqual(sourceInput.tokensFileId, "fileABC")
-        XCTAssertEqual(sourceInput.tokensCollectionName, "Colors")
-        XCTAssertEqual(sourceInput.lightModeName, "Light")
-        XCTAssertEqual(sourceInput.darkModeName, "Dark")
+        XCTAssertEqual(sourceInput.sourceKind, .figma)
+        let figmaConfig = try XCTUnwrap(sourceInput.sourceConfig as? FigmaColorsConfig)
+        XCTAssertEqual(figmaConfig.tokensFileId, "fileABC")
+        XCTAssertEqual(figmaConfig.tokensCollectionName, "Colors")
+        XCTAssertEqual(figmaConfig.lightModeName, "Light")
+        XCTAssertEqual(figmaConfig.darkModeName, "Dark")
     }
 }

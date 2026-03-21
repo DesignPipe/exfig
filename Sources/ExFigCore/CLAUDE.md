@@ -23,7 +23,17 @@ Exporter.export*(entries, platformConfig, context)
 
 **Context protocols** (`ColorsExportContext`, `IconsExportContext`, etc.) inject all I/O dependencies — Figma loading, downloading, format conversion — so exporters stay pure transform logic.
 
-**Local tokens file support:** `ColorsSourceInput` has optional `tokensFilePath` and `tokensFileGroupFilter` fields. When `tokensFilePath` is set, colors are loaded from a local `.tokens.json` file (W3C Design Tokens v2 format) instead of the Figma API.
+### Design Source Abstraction
+
+`Protocol/DesignSource.swift` defines per-asset-type source protocols:
+
+- `ColorsSource`, `ComponentsSource`, `TypographySource` — no `sourceKind` in protocols (clean contract)
+- `DesignSourceKind` enum — dispatch discriminator (.figma, .penpot, .tokensFile, .tokensStudio, .sketchFile)
+- `ColorsSourceConfig` protocol + `FigmaColorsConfig` / `TokensFileColorsConfig` — type-erased source-specific config
+- `ColorsSourceInput` uses `sourceKind` + `sourceConfig: any ColorsSourceConfig` instead of flat fields
+- `IconsSourceInput`, `ImagesSourceInput`, `TypographySourceInput` have `sourceKind` field (default `.figma`)
+
+Implementations live in `Sources/ExFigCLI/Source/` — `FigmaColorsSource`, `TokensFileColorsSource`, `FigmaComponentsSource`, `FigmaTypographySource`, `SourceFactory`.
 
 ### Domain Models
 

@@ -162,6 +162,9 @@ public extension ImagesExportContext {
 
 /// Input for loading images from Figma.
 public struct ImagesSourceInput: Sendable {
+    /// Design source kind (default: `.figma`).
+    public let sourceKind: DesignSourceKind
+
     /// Optional entry-level Figma file ID override.
     public let figmaFileId: String?
 
@@ -197,6 +200,7 @@ public struct ImagesSourceInput: Sendable {
     public let nameReplaceRegexp: String?
 
     public init(
+        sourceKind: DesignSourceKind = .figma,
         figmaFileId: String? = nil,
         darkFileId: String? = nil,
         frameName: String,
@@ -209,6 +213,7 @@ public struct ImagesSourceInput: Sendable {
         nameValidateRegexp: String? = nil,
         nameReplaceRegexp: String? = nil
     ) {
+        self.sourceKind = sourceKind
         self.figmaFileId = figmaFileId
         self.darkFileId = darkFileId
         self.frameName = frameName

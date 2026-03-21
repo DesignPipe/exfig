@@ -1,4 +1,5 @@
 import ArgumentParser
+import ExFigCore
 import Foundation
 import Logging
 import SVGKit
@@ -11,6 +12,7 @@ enum ExFigError: LocalizedError {
     case colorsAssetsFolderNotSpecified
     case configurationError(String)
     case custom(errorString: String)
+    case unsupportedSourceKind(DesignSourceKind)
 
     var errorDescription: String? {
         switch self {
@@ -34,6 +36,8 @@ enum ExFigError: LocalizedError {
             "Config error: \(message)"
         case let .custom(errorString):
             errorString
+        case let .unsupportedSourceKind(kind):
+            "Unsupported design source: \(kind.rawValue)"
         }
     }
 
@@ -55,7 +59,9 @@ enum ExFigError: LocalizedError {
         case .colorsAssetsFolderNotSpecified:
             "Add ios.colors.assetsFolder to your config file"
         case .configurationError, .custom:
-            nil
+            nil as String?
+        case .unsupportedSourceKind:
+            "Currently supported sources: figma, tokensFile"
         }
     }
 }

@@ -1,4 +1,3 @@
-import ExFigConfig
 import ExFigCore
 import FigmaAPI
 import Foundation
@@ -6,23 +5,26 @@ import Foundation
 /// Concrete implementation of `ColorsExportContext` for the ExFig CLI.
 ///
 /// Bridges between the plugin system and ExFig's internal services:
-/// - Uses `ColorsVariablesLoader` for Figma data loading
+/// - Uses injected `ColorsSource` for design data loading
 /// - Uses `ColorsProcessor` for platform-specific processing
 /// - Uses `ExFigCommand.fileWriter` for file output
 /// - Uses `TerminalUI` for progress and logging
 struct ColorsExportContextImpl: ColorsExportContext {
     let client: Client
+    let colorsSource: any ColorsSource
     let ui: TerminalUI
     let filter: String?
     let isBatchMode: Bool
 
     init(
         client: Client,
+        colorsSource: any ColorsSource,
         ui: TerminalUI,
         filter: String? = nil,
         isBatchMode: Bool = false
     ) {
         self.client = client
+        self.colorsSource = colorsSource
         self.ui = ui
         self.filter = filter
         self.isBatchMode = isBatchMode
@@ -56,68 +58,7 @@ struct ColorsExportContextImpl: ColorsExportContext {
     // MARK: - ColorsExportContext
 
     func loadColors(from source: ColorsSourceInput) async throws -> ColorsLoadOutput {
-        if let tokensFilePath = source.tokensFilePath {
-            // Warn if mode-related fields are configured but will be ignored
-            if source.darkModeName != nil || source.lightHCModeName != nil || source.darkHCModeName != nil {
-                ui.warning(
-                    "Local tokens file provides single-mode colors only"
-                        + " — darkModeName/lightHCModeName/darkHCModeName will be ignored"
-                )
-            }
-            return try loadColorsFromTokensFile(path: tokensFilePath, groupFilter: source.tokensFileGroupFilter)
-        }
-        return try await loadColorsFromFigma(source: source)
-    }
-
-    private func loadColorsFromTokensFile(path: String, groupFilter: String?) throws -> ColorsLoadOutput {
-        var source = try TokensFileSource.parse(fileAt: path)
-        try source.resolveAliases()
-
-        for warning in source.warnings {
-            ui.warning(warning)
-        }
-
-        var colors = source.toColors()
-
-        if let groupFilter {
-            let prefix = groupFilter.replacingOccurrences(of: ".", with: "/") + "/"
-            colors = colors.filter { $0.name.hasPrefix(prefix) }
-        }
-
-        return ColorsLoadOutput(light: colors)
-    }
-
-    private func loadColorsFromFigma(source: ColorsSourceInput) async throws -> ColorsLoadOutput {
-        let variableParams = Common.VariablesColors(
-            tokensFileId: source.tokensFileId,
-            tokensCollectionName: source.tokensCollectionName,
-            lightModeName: source.lightModeName,
-            darkModeName: source.darkModeName,
-            lightHCModeName: source.lightHCModeName,
-            darkHCModeName: source.darkHCModeName,
-            primitivesModeName: source.primitivesModeName,
-            nameValidateRegexp: source.nameValidateRegexp,
-            nameReplaceRegexp: source.nameReplaceRegexp
-        )
-
-        let loader = ColorsVariablesLoader(
-            client: client,
-            variableParams: variableParams,
-            filter: filter
-        )
-
-        let result = try await loader.load()
-
-        for warning in result.warnings {
-            ui.warning(warning)
-        }
-
-        return ColorsLoadOutput(
-            light: result.output.light,
-            dark: result.output.dark ?? [],
-            lightHC: result.output.lightHC ?? [],
-            darkHC: result.output.darkHC ?? []
-        )
+        try await colorsSource.loadColors(from: source)
     }
 
     func processColors(

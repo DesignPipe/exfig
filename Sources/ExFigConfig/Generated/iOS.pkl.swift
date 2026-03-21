@@ -90,6 +90,11 @@ extension iOS {
         /// Example: "Color.{name}" → "Color.backgroundAccent"
         public var codeSyntaxTemplate: String?
 
+        /// Design source kind override. When null, auto-detected:
+        /// - If `tokensFile` is set → "tokens-file"
+        /// - Otherwise → "figma"
+        public var sourceKind: Common.SourceKind?
+
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: Common.TokensFile?
 
@@ -132,6 +137,7 @@ extension iOS {
             templatesPath: String?,
             syncCodeSyntax: Bool?,
             codeSyntaxTemplate: String?,
+            sourceKind: Common.SourceKind?,
             tokensFile: Common.TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -154,6 +160,7 @@ extension iOS {
             self.templatesPath = templatesPath
             self.syncCodeSyntax = syncCodeSyntax
             self.codeSyntaxTemplate = codeSyntaxTemplate
+            self.sourceKind = sourceKind
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -212,6 +219,9 @@ extension iOS {
         /// Suffix for assets using template render mode.
         public var renderModeTemplateSuffix: String?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -252,6 +262,7 @@ extension iOS {
             renderModeDefaultSuffix: String?,
             renderModeOriginalSuffix: String?,
             renderModeTemplateSuffix: String?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -272,6 +283,7 @@ extension iOS {
             self.renderModeDefaultSuffix = renderModeDefaultSuffix
             self.renderModeOriginalSuffix = renderModeOriginalSuffix
             self.renderModeTemplateSuffix = renderModeTemplateSuffix
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId
@@ -332,6 +344,9 @@ extension iOS {
         /// Suffix for assets using template render mode.
         public var renderModeTemplateSuffix: String?
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: Common.SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -374,6 +389,7 @@ extension iOS {
             renderModeDefaultSuffix: String?,
             renderModeOriginalSuffix: String?,
             renderModeTemplateSuffix: String?,
+            sourceKind: Common.SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -396,6 +412,7 @@ extension iOS {
             self.renderModeDefaultSuffix = renderModeDefaultSuffix
             self.renderModeOriginalSuffix = renderModeOriginalSuffix
             self.renderModeTemplateSuffix = renderModeTemplateSuffix
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId

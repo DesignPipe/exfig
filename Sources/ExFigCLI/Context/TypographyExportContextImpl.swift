@@ -11,17 +11,20 @@ import Foundation
 /// - Uses `TerminalUI` for progress and logging
 struct TypographyExportContextImpl: TypographyExportContext {
     let client: Client
+    let typographySource: any TypographySource
     let ui: TerminalUI
     let filter: String?
     let isBatchMode: Bool
 
     init(
         client: Client,
+        typographySource: any TypographySource,
         ui: TerminalUI,
         filter: String? = nil,
         isBatchMode: Bool = false
     ) {
         self.client = client
+        self.typographySource = typographySource
         self.ui = ui
         self.filter = filter
         self.isBatchMode = isBatchMode
@@ -55,10 +58,7 @@ struct TypographyExportContextImpl: TypographyExportContext {
     // MARK: - TypographyExportContext
 
     func loadTypography(from source: TypographySourceInput) async throws -> TypographyLoadOutput {
-        let loader = TextStylesLoader(client: client, fileId: source.fileId)
-        let textStyles = try await loader.load()
-
-        return TypographyLoadOutput(textStyles: textStyles)
+        try await typographySource.loadTypography(from: source)
     }
 
     func processTypography(

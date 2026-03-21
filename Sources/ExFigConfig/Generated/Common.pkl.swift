@@ -4,6 +4,8 @@ import PklSwift
 public enum Common {}
 
 public protocol Common_VariablesSource: Common_NameProcessing {
+    var sourceKind: Common.SourceKind? { get }
+
     var tokensFile: Common.TokensFile? { get }
 
     var tokensFileId: String? { get }
@@ -28,6 +30,8 @@ public protocol Common_NameProcessing: PklRegisteredType, DynamicallyEquatable, 
 }
 
 public protocol Common_FrameSource: Common_NameProcessing {
+    var sourceKind: Common.SourceKind? { get }
+
     var figmaFrameName: String? { get }
 
     var figmaPageName: String? { get }
@@ -38,6 +42,15 @@ public protocol Common_FrameSource: Common_NameProcessing {
 }
 
 extension Common {
+    /// Design source kind — identifies the tool or data source for asset loading.
+    public enum SourceKind: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
+        case figma = "figma"
+        case penpot = "penpot"
+        case tokensFile = "tokens-file"
+        case tokensStudio = "tokens-studio"
+        case sketchFile = "sketch-file"
+    }
+
     /// WebP encoding mode.
     public enum WebpEncoding: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case lossy = "lossy"
@@ -76,6 +89,11 @@ extension Common {
     public struct VariablesSourceImpl: VariablesSource {
         public static let registeredIdentifier: String = "Common#VariablesSource"
 
+        /// Design source kind override. When null, auto-detected:
+        /// - If `tokensFile` is set → "tokens-file"
+        /// - Otherwise → "figma"
+        public var sourceKind: SourceKind?
+
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: TokensFile?
 
@@ -107,6 +125,7 @@ extension Common {
         public var nameReplaceRegexp: String?
 
         public init(
+            sourceKind: SourceKind?,
             tokensFile: TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -118,6 +137,7 @@ extension Common {
             nameValidateRegexp: String?,
             nameReplaceRegexp: String?
         ) {
+            self.sourceKind = sourceKind
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -128,23 +148,6 @@ extension Common {
             self.primitivesModeName = primitivesModeName
             self.nameValidateRegexp = nameValidateRegexp
             self.nameReplaceRegexp = nameReplaceRegexp
-        }
-    }
-
-    /// Local W3C DTCG .tokens.json file source.
-    /// When set on a colors entry, bypasses Figma API and reads tokens from a local file.
-    public struct TokensFile: PklRegisteredType, Decodable, Hashable, Sendable {
-        public static let registeredIdentifier: String = "Common#TokensFile"
-
-        /// Path to the .tokens.json file.
-        public var path: String
-
-        /// Optional dot-path prefix to filter tokens (e.g., "Brand.Colors").
-        public var groupFilter: String?
-
-        public init(path: String, groupFilter: String?) {
-            self.path = path
-            self.groupFilter = groupFilter
         }
     }
 
@@ -168,6 +171,23 @@ extension Common {
         public init(encoding: WebpEncoding, quality: Int?) {
             self.encoding = encoding
             self.quality = quality
+        }
+    }
+
+    /// Local W3C DTCG .tokens.json file source.
+    /// When set on a colors entry, bypasses Figma API and reads tokens from a local file.
+    public struct TokensFile: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "Common#TokensFile"
+
+        /// Path to the .tokens.json file.
+        public var path: String
+
+        /// Optional dot-path prefix to filter tokens (e.g., "Brand.Colors").
+        public var groupFilter: String?
+
+        public init(path: String, groupFilter: String?) {
+            self.path = path
+            self.groupFilter = groupFilter
         }
     }
 
@@ -212,6 +232,9 @@ extension Common {
     public struct FrameSourceImpl: FrameSource {
         public static let registeredIdentifier: String = "Common#FrameSource"
 
+        /// Design source kind override. When null, defaults to "figma".
+        public var sourceKind: SourceKind?
+
         /// Figma frame name to export from.
         public var figmaFrameName: String?
 
@@ -239,6 +262,7 @@ extension Common {
         public var nameReplaceRegexp: String?
 
         public init(
+            sourceKind: SourceKind?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -246,6 +270,7 @@ extension Common {
             nameValidateRegexp: String?,
             nameReplaceRegexp: String?
         ) {
+            self.sourceKind = sourceKind
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId

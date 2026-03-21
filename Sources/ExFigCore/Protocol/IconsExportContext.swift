@@ -60,6 +60,9 @@ public protocol IconsExportContext: ExportContext {
 
 /// Input for loading icons from Figma.
 public struct IconsSourceInput: Sendable {
+    /// Design source kind (default: `.figma`).
+    public let sourceKind: DesignSourceKind
+
     /// Optional entry-level Figma file ID override.
     public let figmaFileId: String?
 
@@ -98,6 +101,7 @@ public struct IconsSourceInput: Sendable {
     public let nameReplaceRegexp: String?
 
     public init(
+        sourceKind: DesignSourceKind = .figma,
         figmaFileId: String? = nil,
         darkFileId: String? = nil,
         frameName: String,
@@ -113,6 +117,7 @@ public struct IconsSourceInput: Sendable {
         nameValidateRegexp: String? = nil,
         nameReplaceRegexp: String? = nil
     ) {
+        self.sourceKind = sourceKind
         self.figmaFileId = figmaFileId
         self.darkFileId = darkFileId
         self.frameName = frameName

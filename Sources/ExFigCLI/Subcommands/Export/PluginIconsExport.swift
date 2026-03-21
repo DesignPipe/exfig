@@ -39,8 +39,17 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        let componentsSource = FigmaComponentsSource(
+            client: client,
+            params: params,
+            platform: .ios,
+            logger: ExFigCommand.logger,
+            filter: filter
+        )
+
         let context = IconsExportContextImpl(
             client: client,
+            componentsSource: componentsSource,
             ui: ui,
             params: params,
             filter: filter,
@@ -107,8 +116,17 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        let componentsSource = FigmaComponentsSource(
+            client: client,
+            params: params,
+            platform: .android,
+            logger: ExFigCommand.logger,
+            filter: filter
+        )
+
         let context = IconsExportContextImpl(
             client: client,
+            componentsSource: componentsSource,
             ui: ui,
             params: params,
             filter: filter,
@@ -151,8 +169,17 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        let componentsSource = FigmaComponentsSource(
+            client: client,
+            params: params,
+            platform: .flutter,
+            logger: ExFigCommand.logger,
+            filter: filter
+        )
+
         let context = IconsExportContextImpl(
             client: client,
+            componentsSource: componentsSource,
             ui: ui,
             params: params,
             filter: filter,
@@ -195,8 +222,17 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        let componentsSource = FigmaComponentsSource(
+            client: client,
+            params: params,
+            platform: .web,
+            logger: ExFigCommand.logger,
+            filter: filter
+        )
+
         let context = IconsExportContextImpl(
             client: client,
+            componentsSource: componentsSource,
             ui: ui,
             params: params,
             filter: filter,

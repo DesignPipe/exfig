@@ -40,8 +40,10 @@ extension ExFigCommand.ExportTypography {
 
         // Create context
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
+        let typographySource = FigmaTypographySource(client: input.client)
         let context = TypographyExportContextImpl(
             client: input.client,
+            typographySource: typographySource,
             ui: input.ui,
             filter: nil,
             isBatchMode: batchMode
@@ -96,8 +98,10 @@ extension ExFigCommand.ExportTypography {
         let platformConfig = android.platformConfig(figma: input.figma)
 
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
+        let typographySource = FigmaTypographySource(client: input.client)
         let context = TypographyExportContextImpl(
             client: input.client,
+            typographySource: typographySource,
             ui: input.ui,
             filter: nil,
             isBatchMode: batchMode
