@@ -17,6 +17,17 @@ Only external dependency: swift-yyjson for JSON parsing.
 - `Authorization: Token <accessToken>` header
 - Simple retry (3 attempts, exponential backoff) for 429/5xx
 - Typography numeric fields may be String OR Number — custom init(from:) handles both
+- `GetProfileEndpoint` sends `{}` body (not nil) — Penpot returns 400 "malformed-json" for empty body
+
+## API Path
+
+Two equivalent paths exist:
+
+- `/api/main/methods/<name>` — **used by this module**; works with URLSession against design.penpot.app
+- `/api/rpc/command/<name>` — official docs path; blocked by Cloudflare JS challenge on design.penpot.app for programmatic clients
+
+Self-hosted Penpot instances (without Cloudflare) accept both paths.
+If switching to `/api/rpc/command/`, update `BasePenpotClient.buildURL(for:)`.
 
 ## Conventions
 

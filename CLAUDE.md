@@ -435,6 +435,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `unsupportedSourceKind` compile err | Changed to `.unsupportedSourceKind(kind, assetType:)` — add asset type string ("colors", "icons/images", "typography")                                                                 |
 | `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — standalone modules (PenpotAPI) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                           |
 | `function_body_length` after branch | Split into private extension helper methods (e.g., `penpotColorsSourceInput()`, `tokensFileColorsSourceInput()`)                                                                       |
+| `ExFigCommand.terminalUI` in tests  | Implicitly unwrapped — must init in `setUp()`: `ExFigCommand.terminalUI = TerminalUI(outputMode: .quiet)` before testing code that uses it (SourceFactory, Penpot sources)             |
 
 ## Additional Rules
 

@@ -13,7 +13,7 @@ public struct GetProfileEndpoint: PenpotEndpoint {
     public init() {}
 
     public func body() throws -> Data? {
-        nil
+        Data("{}".utf8)
     }
 
     public func content(from data: Data) throws -> PenpotProfile {

@@ -49,8 +49,33 @@ extension ExFigCommand {
         @OptionGroup
         var downloadOptions: DownloadOptions
 
-        @OptionGroup
-        var faultToleranceOptions: HeavyFaultToleranceOptions
+        @Option(name: .long, help: "Maximum retry attempts for failed API requests")
+        var maxRetries: Int = 4
+
+        @Option(name: .long, help: "Maximum API requests per minute")
+        var rateLimit: Int = 10
+
+        @Flag(name: .long, help: "Stop on first error without retrying")
+        var failFast: Bool = false
+
+        @Flag(name: .long, help: "Continue from checkpoint after interruption")
+        var resume: Bool = false
+
+        @Option(name: .long, help: "Maximum concurrent CDN downloads")
+        var concurrentDownloads: Int = FileDownloader.defaultMaxConcurrentDownloads
+
+        /// Constructs `HeavyFaultToleranceOptions` from locally declared options,
+        /// using `DownloadOptions.timeout` to avoid duplicate `--timeout` flags.
+        var faultToleranceOptions: HeavyFaultToleranceOptions {
+            var opts = HeavyFaultToleranceOptions()
+            opts.maxRetries = maxRetries
+            opts.rateLimit = rateLimit
+            opts.timeout = downloadOptions.timeout
+            opts.failFast = failFast
+            opts.resume = resume
+            opts.concurrentDownloads = concurrentDownloads
+            return opts
+        }
 
         // swiftlint:disable function_body_length cyclomatic_complexity
 

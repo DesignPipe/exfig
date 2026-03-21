@@ -19,12 +19,13 @@ struct PenpotEndpointTests {
         #expect(json?["id"] == "abc-123")
     }
 
-    @Test("GetProfileEndpoint has no body")
-    func getProfileNoBody() throws {
+    @Test("GetProfileEndpoint sends empty JSON body")
+    func getProfileBody() throws {
         let endpoint = GetProfileEndpoint()
         #expect(endpoint.commandName == "get-profile")
-        let body = try endpoint.body()
-        #expect(body == nil)
+        let body = try #require(try endpoint.body())
+        let json = try JSONSerialization.jsonObject(with: body) as? [String: Any]
+        #expect(json?.isEmpty == true)
     }
 
     @Test("GetFileObjectThumbnailsEndpoint body has kebab-case keys")

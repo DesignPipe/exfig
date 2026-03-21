@@ -263,6 +263,7 @@ let package = Package(
                 "PenpotAPI",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ],
+            exclude: ["README.md"],
             resources: [
                 .copy("Fixtures/"),
             ]
