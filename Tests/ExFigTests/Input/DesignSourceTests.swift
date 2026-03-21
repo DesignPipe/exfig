@@ -62,6 +62,7 @@ final class ExplicitSourceKindTests: XCTestCase {
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
             sourceKind: .figma,
+            penpotSource: nil,
             tokensFile: Common.TokensFile(path: "tokens.json", groupFilter: nil),
             tokensFileId: "file123",
             tokensCollectionName: "Collection",
@@ -92,6 +93,7 @@ final class ExplicitSourceKindTests: XCTestCase {
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
             sourceKind: .tokensFile,
+            penpotSource: nil,
             tokensFile: Common.TokensFile(path: "design.json", groupFilter: "Brand"),
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -125,6 +127,7 @@ final class ExplicitSourceKindTests: XCTestCase {
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
             sourceKind: .tokensFile,
+            penpotSource: nil,
             tokensFile: nil,
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -159,6 +162,7 @@ final class IgnoredModeNamesTests: XCTestCase {
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
             sourceKind: nil,
+            penpotSource: nil,
             tokensFile: Common.TokensFile(path: "tokens.json", groupFilter: nil),
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -189,6 +193,7 @@ final class IgnoredModeNamesTests: XCTestCase {
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
             sourceKind: nil,
+            penpotSource: nil,
             tokensFile: Common.TokensFile(path: "tokens.json", groupFilter: nil),
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -219,6 +224,7 @@ final class IgnoredModeNamesTests: XCTestCase {
             syncCodeSyntax: nil,
             codeSyntaxTemplate: nil,
             sourceKind: nil,
+            penpotSource: nil,
             tokensFile: Common.TokensFile(path: "tokens.json", groupFilter: nil),
             tokensFileId: nil,
             tokensCollectionName: nil,
@@ -259,14 +265,14 @@ final class SpinnerLabelTests: XCTestCase {
         XCTAssertEqual(input.spinnerLabel, "design-tokens.json")
     }
 
-    func testUnsupportedSourceKindSpinnerLabelShowsRawValue() {
+    func testPenpotSpinnerLabelShowsTruncatedFileId() {
         let input = ColorsSourceInput(
             sourceKind: .penpot,
-            sourceConfig: FigmaColorsConfig(
-                tokensFileId: "", tokensCollectionName: "", lightModeName: ""
+            sourceConfig: PenpotColorsConfig(
+                fileId: "abc12345-def6-7890", baseURL: "https://design.penpot.app", pathFilter: nil
             )
         )
-        XCTAssertEqual(input.spinnerLabel, "penpot")
+        XCTAssertEqual(input.spinnerLabel, "Penpot colors (abc12345…)")
     }
 }
 

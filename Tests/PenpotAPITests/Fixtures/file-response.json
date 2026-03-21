@@ -1,0 +1,70 @@
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "Test Design System",
+  "data": {
+    "colors": {
+      "color-uuid-1": {
+        "id": "color-uuid-1",
+        "name": "Blue",
+        "path": "Brand/Primary",
+        "color": "#3366FF",
+        "opacity": 1.0
+      },
+      "color-uuid-2": {
+        "id": "color-uuid-2",
+        "name": "Red",
+        "path": "Brand/Secondary",
+        "color": "#FF3366",
+        "opacity": 0.8
+      },
+      "color-uuid-3": {
+        "id": "color-uuid-3",
+        "name": "Gradient",
+        "path": "Effects",
+        "opacity": 1.0
+      }
+    },
+    "typographies": {
+      "typo-uuid-1": {
+        "id": "typo-uuid-1",
+        "name": "Heading",
+        "path": "Styles",
+        "fontFamily": "Roboto",
+        "fontStyle": "normal",
+        "textTransform": "uppercase",
+        "fontSize": "24",
+        "fontWeight": "700",
+        "lineHeight": "1.5",
+        "letterSpacing": "0.02"
+      },
+      "typo-uuid-2": {
+        "id": "typo-uuid-2",
+        "name": "Body",
+        "fontFamily": "Inter",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "lineHeight": 1.6,
+        "letterSpacing": 0
+      }
+    },
+    "components": {
+      "comp-uuid-1": {
+        "id": "comp-uuid-1",
+        "name": "arrow-right",
+        "path": "Icons/Navigation",
+        "mainInstanceId": "instance-123",
+        "mainInstancePage": "page-456"
+      },
+      "comp-uuid-2": {
+        "id": "comp-uuid-2",
+        "name": "star",
+        "path": "Icons/Actions"
+      },
+      "comp-uuid-3": {
+        "id": "comp-uuid-3",
+        "name": "hero-banner",
+        "path": "Illustrations"
+      }
+    }
+  }
+}

@@ -45,6 +45,21 @@ class TokensFile {
   groupFilter: String?
 }
 
+// MARK: - Penpot Source
+
+/// Penpot design source configuration.
+/// When set on a colors/icons/images entry, loads assets from Penpot API instead of Figma.
+class PenpotSource {
+  /// Penpot file UUID.
+  fileId: String(isNotEmpty)
+
+  /// Penpot instance base URL (default: Penpot cloud).
+  baseUrl: String = "https://design.penpot.app/"
+
+  /// Optional path prefix to filter assets (e.g., "Brand/Primary").
+  pathFilter: String?
+}
+
 // MARK: - Cache
 
 /// Cache configuration for tracking Figma file versions.
@@ -74,9 +89,13 @@ open class NameProcessing {
 /// All fields are optional to support legacy format where source comes from common.variablesColors.
 open class VariablesSource extends NameProcessing {
   /// Design source kind override. When null, auto-detected:
+  /// - If `penpotSource` is set → "penpot"
   /// - If `tokensFile` is set → "tokens-file"
   /// - Otherwise → "figma"
   sourceKind: SourceKind?
+
+  /// Penpot source configuration (bypasses Figma API when set).
+  penpotSource: PenpotSource?
 
   /// Local .tokens.json file source (bypasses Figma API when set).
   tokensFile: TokensFile?
@@ -106,8 +125,13 @@ open class VariablesSource extends NameProcessing {
 /// Figma Frame source configuration.
 /// Used for icons and images that come from Figma frames.
 open class FrameSource extends NameProcessing {
-  /// Design source kind override. When null, defaults to "figma".
+  /// Design source kind override. When null, auto-detected:
+  /// - If `penpotSource` is set → "penpot"
+  /// - Otherwise → "figma"
   sourceKind: SourceKind?
+
+  /// Penpot source configuration (bypasses Figma API when set).
+  penpotSource: PenpotSource?
 
   /// Figma frame name to export from.
   figmaFrameName: String?

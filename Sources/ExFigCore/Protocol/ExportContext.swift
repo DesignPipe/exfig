@@ -127,7 +127,13 @@ public struct ColorsSourceInput: Sendable {
                 return URL(fileURLWithPath: config.filePath).lastPathComponent
             }
             return "tokens file"
-        case .penpot, .tokensStudio, .sketchFile:
+        case .penpot:
+            if let config = sourceConfig as? PenpotColorsConfig {
+                let shortId = String(config.fileId.prefix(8))
+                return "Penpot colors (\(shortId)…)"
+            }
+            return "Penpot"
+        case .tokensStudio, .sketchFile:
             return sourceKind.rawValue
         }
     }

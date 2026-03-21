@@ -33,9 +33,13 @@ extension Flutter {
         public var className: String?
 
         /// Design source kind override. When null, auto-detected:
+        /// - If `penpotSource` is set → "penpot"
         /// - If `tokensFile` is set → "tokens-file"
         /// - Otherwise → "figma"
         public var sourceKind: Common.SourceKind?
+
+        /// Penpot source configuration (bypasses Figma API when set).
+        public var penpotSource: Common.PenpotSource?
 
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: Common.TokensFile?
@@ -72,6 +76,7 @@ extension Flutter {
             output: String?,
             className: String?,
             sourceKind: Common.SourceKind?,
+            penpotSource: Common.PenpotSource?,
             tokensFile: Common.TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -87,6 +92,7 @@ extension Flutter {
             self.output = output
             self.className = className
             self.sourceKind = sourceKind
+            self.penpotSource = penpotSource
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -120,8 +126,13 @@ extension Flutter {
         /// Naming style for icon names.
         public var nameStyle: Common.NameStyle?
 
-        /// Design source kind override. When null, defaults to "figma".
+        /// Design source kind override. When null, auto-detected:
+        /// - If `penpotSource` is set → "penpot"
+        /// - Otherwise → "figma"
         public var sourceKind: Common.SourceKind?
+
+        /// Penpot source configuration (bypasses Figma API when set).
+        public var penpotSource: Common.PenpotSource?
 
         /// Figma frame name to export from.
         public var figmaFrameName: String?
@@ -156,6 +167,7 @@ extension Flutter {
             className: String?,
             nameStyle: Common.NameStyle?,
             sourceKind: Common.SourceKind?,
+            penpotSource: Common.PenpotSource?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -169,6 +181,7 @@ extension Flutter {
             self.className = className
             self.nameStyle = nameStyle
             self.sourceKind = sourceKind
+            self.penpotSource = penpotSource
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId
@@ -210,8 +223,13 @@ extension Flutter {
         /// Naming style for generated assets.
         public var nameStyle: Common.NameStyle?
 
-        /// Design source kind override. When null, defaults to "figma".
+        /// Design source kind override. When null, auto-detected:
+        /// - If `penpotSource` is set → "penpot"
+        /// - Otherwise → "figma"
         public var sourceKind: Common.SourceKind?
+
+        /// Penpot source configuration (bypasses Figma API when set).
+        public var penpotSource: Common.PenpotSource?
 
         /// Figma frame name to export from.
         public var figmaFrameName: String?
@@ -250,6 +268,7 @@ extension Flutter {
             sourceFormat: Common.SourceFormat?,
             nameStyle: Common.NameStyle?,
             sourceKind: Common.SourceKind?,
+            penpotSource: Common.PenpotSource?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -267,6 +286,7 @@ extension Flutter {
             self.sourceFormat = sourceFormat
             self.nameStyle = nameStyle
             self.sourceKind = sourceKind
+            self.penpotSource = penpotSource
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId

@@ -11,7 +11,7 @@ public extension Web.IconsEntry {
     /// Returns an IconsSourceInput for use with IconsExportContext.
     func iconsSourceInput(darkFileId: String? = nil) -> IconsSourceInput {
         IconsSourceInput(
-            sourceKind: sourceKind?.coreSourceKind ?? .figma,
+            sourceKind: resolvedSourceKind,
             figmaFileId: figmaFileId,
             darkFileId: darkFileId,
             frameName: figmaFrameName ?? "Icons",

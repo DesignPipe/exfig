@@ -15,3 +15,18 @@ public extension Common.SourceKind {
         }
     }
 }
+
+public extension Common_FrameSource {
+    /// Resolves the design source kind with priority: explicit > auto-detect > default (.figma).
+    ///
+    /// Auto-detection: `penpotSource` set → `.penpot`, otherwise `.figma`.
+    var resolvedSourceKind: DesignSourceKind {
+        if let explicit = sourceKind {
+            return explicit.coreSourceKind
+        }
+        if penpotSource != nil {
+            return .penpot
+        }
+        return .figma
+    }
+}

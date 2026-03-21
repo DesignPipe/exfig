@@ -1,15 +1,13 @@
 import ExFigCore
 
 public extension Common_VariablesSource {
-    /// Returns a validated `ColorsSourceInput` for use with `ColorsExportContext`.
-    ///
-    /// When `tokensFile` is set, bypasses Figma API validation and returns a local-file source.
-    /// Otherwise, throws if required Figma fields (`tokensFileId`, `tokensCollectionName`,
-    /// `lightModeName`) are nil or empty.
     /// Resolves the design source kind with priority: explicit > auto-detect > default (.figma).
     var resolvedSourceKind: DesignSourceKind {
         if let explicit = sourceKind {
             return explicit.coreSourceKind
+        }
+        if penpotSource != nil {
+            return .penpot
         }
         if tokensFile != nil {
             return .tokensFile
@@ -17,33 +15,66 @@ public extension Common_VariablesSource {
         return .figma
     }
 
+    /// Returns a validated `ColorsSourceInput` for use with `ColorsExportContext`.
+    ///
+    /// Dispatches by `resolvedSourceKind`: Penpot, tokens-file, or Figma Variables.
     func validatedColorsSourceInput() throws -> ColorsSourceInput {
         let kind = resolvedSourceKind
 
-        if kind == .tokensFile {
-            guard let tokensFile else {
-                throw ColorsConfigError.missingTokensFileId
-            }
-            // Collect Figma-specific mode fields that will be ignored by tokens-file source
-            var ignoredModes: [String] = []
-            if darkModeName != nil { ignoredModes.append("darkModeName") }
-            if lightHCModeName != nil { ignoredModes.append("lightHCModeName") }
-            if darkHCModeName != nil { ignoredModes.append("darkHCModeName") }
-
-            let config = TokensFileColorsConfig(
-                filePath: tokensFile.path,
-                groupFilter: tokensFile.groupFilter,
-                ignoredModeNames: ignoredModes
-            )
-            return ColorsSourceInput(
-                sourceKind: .tokensFile,
-                sourceConfig: config,
-                nameValidateRegexp: nameValidateRegexp,
-                nameReplaceRegexp: nameReplaceRegexp
-            )
+        switch kind {
+        case .penpot:
+            return try penpotColorsSourceInput()
+        case .tokensFile:
+            return try tokensFileColorsSourceInput()
+        default:
+            return try figmaColorsSourceInput(kind: kind)
         }
+    }
+}
 
-        // Figma Variables source — require all fields
+// MARK: - Private Helpers
+
+private extension Common_VariablesSource {
+    func penpotColorsSourceInput() throws -> ColorsSourceInput {
+        guard let penpotSource else {
+            throw ColorsConfigError.missingTokensFileId
+        }
+        let config = PenpotColorsConfig(
+            fileId: penpotSource.fileId,
+            baseURL: penpotSource.baseUrl,
+            pathFilter: penpotSource.pathFilter
+        )
+        return ColorsSourceInput(
+            sourceKind: .penpot,
+            sourceConfig: config,
+            nameValidateRegexp: nameValidateRegexp,
+            nameReplaceRegexp: nameReplaceRegexp
+        )
+    }
+
+    func tokensFileColorsSourceInput() throws -> ColorsSourceInput {
+        guard let tokensFile else {
+            throw ColorsConfigError.missingTokensFileId
+        }
+        var ignoredModes: [String] = []
+        if darkModeName != nil { ignoredModes.append("darkModeName") }
+        if lightHCModeName != nil { ignoredModes.append("lightHCModeName") }
+        if darkHCModeName != nil { ignoredModes.append("darkHCModeName") }
+
+        let config = TokensFileColorsConfig(
+            filePath: tokensFile.path,
+            groupFilter: tokensFile.groupFilter,
+            ignoredModeNames: ignoredModes
+        )
+        return ColorsSourceInput(
+            sourceKind: .tokensFile,
+            sourceConfig: config,
+            nameValidateRegexp: nameValidateRegexp,
+            nameReplaceRegexp: nameReplaceRegexp
+        )
+    }
+
+    func figmaColorsSourceInput(kind: DesignSourceKind) throws -> ColorsSourceInput {
         guard let tokensFileId, !tokensFileId.isEmpty else {
             throw ColorsConfigError.missingTokensFileId
         }

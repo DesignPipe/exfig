@@ -44,6 +44,7 @@ public enum PKLEvaluator {
             Common.NameProcessingImpl.self,
             Common.FrameSourceImpl.self,
             Common.TokensFile.self,
+            Common.PenpotSource.self,
             Common.WebpOptions.self,
             Common.Cache.self,
             Common.Colors.self,

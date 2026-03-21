@@ -36,6 +36,7 @@ let package = Package(
             name: "ExFigCLI",
             dependencies: [
                 .product(name: "FigmaAPI", package: "swift-figma-api"),
+                "PenpotAPI",
                 "ExFigCore",
                 "ExFigConfig",
                 "XcodeExport",
@@ -145,6 +146,15 @@ let package = Package(
             ]
         ),
 
+        // Penpot API client
+        .target(
+            name: "PenpotAPI",
+            dependencies: [
+                .product(name: "YYJSON", package: "swift-yyjson"),
+            ],
+            exclude: ["CLAUDE.md"]
+        ),
+
         // MARK: - Platform Plugins
 
         // iOS platform plugin
@@ -244,6 +254,17 @@ let package = Package(
             name: "WebExportTests",
             dependencies: [
                 "WebExport", .product(name: "CustomDump", package: "swift-custom-dump"),
+            ]
+        ),
+
+        .testTarget(
+            name: "PenpotAPITests",
+            dependencies: [
+                "PenpotAPI",
+                .product(name: "CustomDump", package: "swift-custom-dump"),
+            ],
+            resources: [
+                .copy("Fixtures/"),
             ]
         ),
 

@@ -70,6 +70,23 @@ public struct FigmaColorsConfig: ColorsSourceConfig {
     }
 }
 
+/// Penpot-specific colors configuration — file ID, base URL, and path filter.
+public struct PenpotColorsConfig: ColorsSourceConfig {
+    public let fileId: String
+    public let baseURL: String
+    public let pathFilter: String?
+
+    public init(
+        fileId: String,
+        baseURL: String = "https://design.penpot.app/",
+        pathFilter: String? = nil
+    ) {
+        self.fileId = fileId
+        self.baseURL = baseURL
+        self.pathFilter = pathFilter
+    }
+}
+
 /// Tokens-file-specific colors configuration — local .tokens.json path + optional group filter.
 public struct TokensFileColorsConfig: ColorsSourceConfig {
     public let filePath: String

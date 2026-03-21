@@ -11,7 +11,7 @@ public extension Web.ImagesEntry {
     /// Returns an ImagesSourceInput for use with ImagesExportContext.
     func imagesSourceInput(darkFileId: String? = nil) -> ImagesSourceInput {
         ImagesSourceInput(
-            sourceKind: sourceKind?.coreSourceKind ?? .figma,
+            sourceKind: resolvedSourceKind,
             figmaFileId: figmaFileId,
             darkFileId: darkFileId,
             frameName: figmaFrameName ?? "Images",

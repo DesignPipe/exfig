@@ -6,6 +6,8 @@ public enum Common {}
 public protocol Common_VariablesSource: Common_NameProcessing {
     var sourceKind: Common.SourceKind? { get }
 
+    var penpotSource: Common.PenpotSource? { get }
+
     var tokensFile: Common.TokensFile? { get }
 
     var tokensFileId: String? { get }
@@ -31,6 +33,8 @@ public protocol Common_NameProcessing: PklRegisteredType, DynamicallyEquatable, 
 
 public protocol Common_FrameSource: Common_NameProcessing {
     var sourceKind: Common.SourceKind? { get }
+
+    var penpotSource: Common.PenpotSource? { get }
 
     var figmaFrameName: String? { get }
 
@@ -90,9 +94,13 @@ extension Common {
         public static let registeredIdentifier: String = "Common#VariablesSource"
 
         /// Design source kind override. When null, auto-detected:
+        /// - If `penpotSource` is set → "penpot"
         /// - If `tokensFile` is set → "tokens-file"
         /// - Otherwise → "figma"
         public var sourceKind: SourceKind?
+
+        /// Penpot source configuration (bypasses Figma API when set).
+        public var penpotSource: PenpotSource?
 
         /// Local .tokens.json file source (bypasses Figma API when set).
         public var tokensFile: TokensFile?
@@ -126,6 +134,7 @@ extension Common {
 
         public init(
             sourceKind: SourceKind?,
+            penpotSource: PenpotSource?,
             tokensFile: TokensFile?,
             tokensFileId: String?,
             tokensCollectionName: String?,
@@ -138,6 +147,7 @@ extension Common {
             nameReplaceRegexp: String?
         ) {
             self.sourceKind = sourceKind
+            self.penpotSource = penpotSource
             self.tokensFile = tokensFile
             self.tokensFileId = tokensFileId
             self.tokensCollectionName = tokensCollectionName
@@ -191,6 +201,27 @@ extension Common {
         }
     }
 
+    /// Penpot design source configuration.
+    /// When set on a colors/icons/images entry, loads assets from Penpot API instead of Figma.
+    public struct PenpotSource: PklRegisteredType, Decodable, Hashable, Sendable {
+        public static let registeredIdentifier: String = "Common#PenpotSource"
+
+        /// Penpot file UUID.
+        public var fileId: String
+
+        /// Penpot instance base URL (default: Penpot cloud).
+        public var baseUrl: String
+
+        /// Optional path prefix to filter assets (e.g., "Brand/Primary").
+        public var pathFilter: String?
+
+        public init(fileId: String, baseUrl: String, pathFilter: String?) {
+            self.fileId = fileId
+            self.baseUrl = baseUrl
+            self.pathFilter = pathFilter
+        }
+    }
+
     /// Cache configuration for tracking Figma file versions.
     public struct Cache: PklRegisteredType, Decodable, Hashable, Sendable {
         public static let registeredIdentifier: String = "Common#Cache"
@@ -232,8 +263,13 @@ extension Common {
     public struct FrameSourceImpl: FrameSource {
         public static let registeredIdentifier: String = "Common#FrameSource"
 
-        /// Design source kind override. When null, defaults to "figma".
+        /// Design source kind override. When null, auto-detected:
+        /// - If `penpotSource` is set → "penpot"
+        /// - Otherwise → "figma"
         public var sourceKind: SourceKind?
+
+        /// Penpot source configuration (bypasses Figma API when set).
+        public var penpotSource: PenpotSource?
 
         /// Figma frame name to export from.
         public var figmaFrameName: String?
@@ -263,6 +299,7 @@ extension Common {
 
         public init(
             sourceKind: SourceKind?,
+            penpotSource: PenpotSource?,
             figmaFrameName: String?,
             figmaPageName: String?,
             figmaFileId: String?,
@@ -271,6 +308,7 @@ extension Common {
             nameReplaceRegexp: String?
         ) {
             self.sourceKind = sourceKind
+            self.penpotSource = penpotSource
             self.figmaFrameName = figmaFrameName
             self.figmaPageName = figmaPageName
             self.figmaFileId = figmaFileId
