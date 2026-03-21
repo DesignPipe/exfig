@@ -6,11 +6,12 @@
 ![Coverage](https://img.shields.io/badge/coverage-50.65%25-yellow)
 [![License](https://img.shields.io/github/license/DesignPipe/exfig.svg)](LICENSE)
 
-Export colors, typography, icons, and images from Figma to Xcode, Android Studio, Flutter, and Web projects — automatically.
+Export colors, typography, icons, and images from Figma and Penpot to Xcode, Android Studio, Flutter, and Web projects — automatically.
 
 ## The Problem
 
 - Figma has no "Export to Xcode" button. You copy hex codes by hand, one by one.
+- Switching from Figma to Penpot? Your export pipeline shouldn't break.
 - Every color change means updating files across 3 platforms manually.
 - Dark mode variant? An afternoon spent on light/dark pairs and @1x/@2x/@3x PNGs.
 - Android gets XML. iOS gets xcassets. Flutter gets Dart. Someone maintains all three.
@@ -24,7 +25,7 @@ Export colors, typography, icons, and images from Figma to Xcode, Android Studio
 
 **Flutter developer** — You need dark mode icon variants and `@2x`/`@3x` image scales. ExFig exports SVG icons with dark suffixes, raster images with scale directories, and Dart constants.
 
-**Design Systems lead** — One Figma file feeds four platforms. ExFig's unified PKL config exports everything from a single `exfig batch` run. One CI pipeline, one source of truth.
+**Design Systems lead** — One Figma or Penpot file feeds four platforms. ExFig's unified PKL config exports everything from a single `exfig batch` run. One CI pipeline, one source of truth.
 
 **CI/CD engineer** — Quiet mode, JSON reports, exit codes, version tracking, and checkpoint/resume. The [GitHub Action](https://github.com/DesignPipe/exfig-action) handles installation and caching.
 
@@ -34,7 +35,7 @@ Export colors, typography, icons, and images from Figma to Xcode, Android Studio
 # 1. Install
 brew install designpipe/tap/exfig
 
-# 2. Set Figma token
+# 2. Set Figma token (or PENPOT_ACCESS_TOKEN for Penpot)
 export FIGMA_PERSONAL_TOKEN=your_token_here
 
 # 3a. Quick one-off export (interactive wizard)

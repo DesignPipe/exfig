@@ -103,6 +103,41 @@ common = new Common.CommonConfig {
 }
 ```
 
+### Penpot Source
+
+Use a Penpot project instead of Figma as the design source:
+
+```pkl
+import ".exfig/schemas/Common.pkl"
+import ".exfig/schemas/iOS.pkl"
+
+ios = new iOS.iOSConfig {
+  colors = new iOS.ColorsEntry {
+    // Load colors from a Penpot file
+    penpotSource = new Common.PenpotSource {
+      // Penpot file UUID
+      fileId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+      // Optional: custom Penpot instance URL (default: https://design.penpot.app/)
+      baseUrl = "https://penpot.mycompany.com/"
+
+      // Optional: filter by path prefix
+      pathFilter = "Brand"
+    }
+
+    assetsFolder = "Colors"
+    nameStyle = "camelCase"
+  }
+}
+```
+
+> When `penpotSource` is set, `sourceKind` auto-detects as `"penpot"`. ExFig reads colors from
+> the Penpot API and does not require `FIGMA_PERSONAL_TOKEN`. Set `PENPOT_ACCESS_TOKEN` instead.
+>
+> **v1 limitation:** Penpot icons/images are exported as raster thumbnails (the Penpot API has
+> no public SVG/PNG render endpoint). SVG reconstruction from the shape tree is planned for a
+> future version.
+
 ### Tokens File Source
 
 Use a local W3C DTCG `.tokens.json` file instead of the Figma Variables API:

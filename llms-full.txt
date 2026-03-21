@@ -12,11 +12,12 @@
 # ExFig
 
 
-Export colors, typography, icons, and images from Figma to Xcode, Android Studio, Flutter, and Web projects — automatically.
+Export colors, typography, icons, and images from Figma and Penpot to Xcode, Android Studio, Flutter, and Web projects — automatically.
 
 ## The Problem
 
 - Figma has no "Export to Xcode" button. You copy hex codes by hand, one by one.
+- Switching from Figma to Penpot? Your export pipeline shouldn't break.
 - Every color change means updating files across 3 platforms manually.
 - Dark mode variant? An afternoon spent on light/dark pairs and @1x/@2x/@3x PNGs.
 - Android gets XML. iOS gets xcassets. Flutter gets Dart. Someone maintains all three.
@@ -30,7 +31,7 @@ Export colors, typography, icons, and images from Figma to Xcode, Android Studio
 
 **Flutter developer** — You need dark mode icon variants and `@2x`/`@3x` image scales. ExFig exports SVG icons with dark suffixes, raster images with scale directories, and Dart constants.
 
-**Design Systems lead** — One Figma file feeds four platforms. ExFig's unified PKL config exports everything from a single `exfig batch` run. One CI pipeline, one source of truth.
+**Design Systems lead** — One Figma or Penpot file feeds four platforms. ExFig's unified PKL config exports everything from a single `exfig batch` run. One CI pipeline, one source of truth.
 
 **CI/CD engineer** — Quiet mode, JSON reports, exit codes, version tracking, and checkpoint/resume. The [GitHub Action](https://github.com/DesignPipe/exfig-action) handles installation and caching.
 
@@ -40,7 +41,7 @@ Export colors, typography, icons, and images from Figma to Xcode, Android Studio
 # 1. Install
 brew install designpipe/tap/exfig
 
-# 2. Set Figma token
+# 2. Set Figma token (or PENPOT_ACCESS_TOKEN for Penpot)
 export FIGMA_PERSONAL_TOKEN=your_token_here
 
 # 3a. Quick one-off export (interactive wizard)
@@ -99,13 +100,13 @@ Install ExFig and configure your first export.
 
 ## Overview
 
-ExFig is a command-line tool that exports design resources from Figma to iOS, Android, and Flutter projects.
+ExFig is a command-line tool that exports design resources from Figma and Penpot to iOS, Android, Flutter, and Web projects.
 
 ## Requirements
 
 - macOS 13.0 or later (or Linux Ubuntu 22.04)
-- Figma account with file access
-- Figma Personal Access Token
+- Figma account with file access, **or** Penpot account
+- Figma Personal Access Token (for Figma sources) or Penpot Access Token (for Penpot sources)
 
 ## Installation
 
@@ -140,7 +141,9 @@ cp .build/release/exfig /usr/local/bin/
 
 Download the latest release from [GitHub Releases](https://github.com/DesignPipe/exfig/releases).
 
-## Figma Access Token
+## Authentication
+
+### Figma Access Token
 
 ExFig requires a Figma Personal Access Token to access the Figma API.
 
@@ -166,6 +169,20 @@ Or pass it directly to commands:
 ```bash
 FIGMA_PERSONAL_TOKEN="your-token" exfig colors
 ```
+
+### Penpot Access Token
+
+For Penpot sources, set the `PENPOT_ACCESS_TOKEN` environment variable:
+
+1. Open your Penpot instance → Settings → Access Tokens
+2. Create a new token
+3. Set it:
+
+```bash
+export PENPOT_ACCESS_TOKEN="your-penpot-token-here"
+```
+
+> Note: `PENPOT_ACCESS_TOKEN` is only required when using `sourceKind: "penpot"` or `penpotSource` in config.
 
 ## Quick Start
 
@@ -250,7 +267,7 @@ Command-line interface reference and common usage patterns.
 
 ## Overview
 
-ExFig provides commands for exporting colors, icons, images, and typography from Figma to native platform resources.
+ExFig provides commands for exporting colors, icons, images, and typography from Figma and Penpot to native platform resources.
 
 ## Basic Commands
 
@@ -607,6 +624,41 @@ common = new Common.CommonConfig {
   }
 }
 ```
+
+### Penpot Source
+
+Use a Penpot project instead of Figma as the design source:
+
+```pkl
+import ".exfig/schemas/Common.pkl"
+import ".exfig/schemas/iOS.pkl"
+
+ios = new iOS.iOSConfig {
+  colors = new iOS.ColorsEntry {
+    // Load colors from a Penpot file
+    penpotSource = new Common.PenpotSource {
+      // Penpot file UUID
+      fileId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+      // Optional: custom Penpot instance URL (default: https://design.penpot.app/)
+      baseUrl = "https://penpot.mycompany.com/"
+
+      // Optional: filter by path prefix
+      pathFilter = "Brand"
+    }
+
+    assetsFolder = "Colors"
+    nameStyle = "camelCase"
+  }
+}
+```
+
+> When `penpotSource` is set, `sourceKind` auto-detects as `"penpot"`. ExFig reads colors from
+> the Penpot API and does not require `FIGMA_PERSONAL_TOKEN`. Set `PENPOT_ACCESS_TOKEN` instead.
+>
+> **v1 limitation:** Penpot icons/images are exported as raster thumbnails (the Penpot API has
+> no public SVG/PNG render endpoint). SVG reconstruction from the shape tree is planned for a
+> future version.
 
 ### Tokens File Source
 

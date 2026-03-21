@@ -4,8 +4,9 @@ Understand the problems ExFig solves and how it fits into your workflow.
 
 ## Overview
 
-Design-to-code handoff is broken. Every team that ships a mobile or web app with a Figma-based
-design system eventually hits the same pain points — and ExFig was built to eliminate them.
+Design-to-code handoff is broken. Every team that ships a mobile or web app with a Figma or
+Penpot-based design system eventually hits the same pain points — and ExFig was built to
+eliminate them.
 
 ## The Problem
 
@@ -53,9 +54,11 @@ scale directories, plus Dart constants for type-safe access.
 
 ### Design Systems Lead
 
-You own one Figma file that feeds four platforms. ExFig's unified PKL config lets you define
-the source once and export to iOS, Android, Flutter, and Web from a single `exfig batch` run.
-When a designer publishes a library update, one CI pipeline updates everything.
+You own one Figma file — or a Penpot project — that feeds four platforms. ExFig's unified
+PKL config lets you define the source once and export to iOS, Android, Flutter, and Web from
+a single `exfig batch` run. When a designer publishes a library update, one CI pipeline
+updates everything. Switching from Figma to Penpot? Change the source in config, keep
+everything else.
 
 ### CI/CD Engineer
 

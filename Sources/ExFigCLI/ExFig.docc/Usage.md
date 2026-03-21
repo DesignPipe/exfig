@@ -4,7 +4,7 @@ Command-line interface reference and common usage patterns.
 
 ## Overview
 
-ExFig provides commands for exporting colors, icons, images, and typography from Figma to native platform resources.
+ExFig provides commands for exporting colors, icons, images, and typography from Figma and Penpot to native platform resources.
 
 ## Basic Commands
 

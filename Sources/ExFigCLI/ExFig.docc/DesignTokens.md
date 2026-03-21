@@ -1,6 +1,6 @@
 # Design Tokens
 
-Export Figma design data as W3C Design Tokens for token pipelines and cross-tool interoperability.
+Export design data from Figma or Penpot as W3C Design Tokens for token pipelines and cross-tool interoperability.
 
 ## Overview
 

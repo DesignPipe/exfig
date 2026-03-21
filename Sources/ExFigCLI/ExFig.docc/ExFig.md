@@ -1,22 +1,23 @@
 # ``ExFigCLI``
 
-Export colors, typography, icons, and images from Figma to iOS, Android, Flutter, and Web projects.
+Export colors, typography, icons, and images from Figma and Penpot to iOS, Android, Flutter, and Web projects.
 
 ## Overview
 
-ExFig is a command-line tool that automates design-to-code handoff. Point it at a Figma file,
-and it generates platform-native resources: Color Sets for Xcode, XML resources for Android,
-Dart constants for Flutter, and CSS variables for React — all from one source of truth.
+ExFig is a command-line tool that automates design-to-code handoff. Point it at a Figma file
+or a Penpot project, and it generates platform-native resources: Color Sets for Xcode, XML
+resources for Android, Dart constants for Flutter, and CSS variables for React — all from one
+source of truth.
 
 ExFig handles the details that make manual export painful: light/dark mode variants, @1x/@2x/@3x
 image scales, high contrast colors, RTL icon mirroring, and Dynamic Type mappings. A single
 `exfig batch` command replaces hours of copy-paste work across platforms.
 
-It's built for teams that maintain a Figma-based design system and need a reliable, automated
-pipeline to keep code in sync with design. ExFig works locally for quick exports and in CI/CD
-for fully automated workflows.
+It's built for teams that maintain a Figma or Penpot-based design system and need a reliable,
+automated pipeline to keep code in sync with design. ExFig works locally for quick exports and
+in CI/CD for fully automated workflows.
 
-> Tip: ExFig also works with local `.tokens.json` files — no Figma API access needed.
+> Tip: ExFig also works with local `.tokens.json` files and Penpot projects — no Figma API access needed.
 
 ### Supported Platforms
 
@@ -30,7 +31,7 @@ for fully automated workflows.
 **Design Assets**
 Colors with light/dark/high-contrast variants, vector icons (PDF, SVG, VectorDrawable),
 raster images with multi-scale support, typography with Dynamic Type, RTL layout support,
-and Figma Variables integration.
+Figma Variables integration, and Penpot library colors/components/typography.
 
 **Export Formats**
 PNG, SVG, PDF, JPEG, WebP, HEIC output formats with quality control.
@@ -53,8 +54,8 @@ customizable Jinja2 code templates, and rich progress indicators with ETA.
 Type-safe Swift/Kotlin/Dart/TypeScript extensions, pre-configured UILabel subclasses,
 Compose color and icon objects, and Flutter path constants.
 
-> Important: Exporting icons and images requires a Figma Professional or Organization plan
-> (uses Shareable Team Libraries).
+> Important: Exporting icons and images from Figma requires a Professional or Organization plan
+> (uses Shareable Team Libraries). Penpot has no plan restrictions for API access.
 
 ## Topics
 
