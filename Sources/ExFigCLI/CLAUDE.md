@@ -190,6 +190,9 @@ reserved for MCP JSON-RPC protocol.
 
 **Keepalive:** `withCheckedContinuation { _ in }` — suspends indefinitely without hacks (no `Task.sleep(365 days)`).
 
+**Guide resources:** `exfig://guides/` serves markdown files from `Resources/Guides/` (copied from DocC articles).
+DocC `.docc` articles are NOT accessible via `Bundle.module` at runtime — must be separately copied to `Resources/Guides/`.
+
 **Tool handler order:** Validate input parameters BEFORE expensive operations (PKL eval, API client creation).
 
 ### Adding an MCP Tool Handler

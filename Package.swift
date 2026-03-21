@@ -61,6 +61,7 @@ let package = Package(
             exclude: ["CLAUDE.md", "AGENTS.md"],
             resources: [
                 .copy("Resources/Schemas/"),
+                .copy("Resources/Guides/"),
             ]
         ),
 

@@ -1,7 +1,7 @@
 import Foundation
 import MCP
 
-/// MCP resource definitions — PKL schemas and starter config templates.
+/// MCP resource definitions — PKL schemas, starter config templates, and guides.
 enum MCPResources {
     // MARK: - Schema file names
 
@@ -22,6 +22,16 @@ enum MCPResources {
         ("Android Starter Config", "android", androidConfigFileContents),
         ("Flutter Starter Config", "flutter", flutterConfigFileContents),
         ("Web Starter Config", "web", webConfigFileContents),
+    ]
+
+    // MARK: - Guide entries
+
+    private static let guideFiles: [(name: String, file: String, description: String)] = [
+        (
+            "Design File Structure",
+            "DesignRequirements.md",
+            "How to prepare Figma and Penpot files for ExFig export — colors, components, typography, naming"
+        ),
     ]
 
     // MARK: - Public API
@@ -50,6 +60,16 @@ enum MCPResources {
             ))
         }
 
+        // Guides
+        for guide in guideFiles {
+            resources.append(Resource(
+                name: guide.name,
+                uri: "exfig://guides/\(guide.file)",
+                description: guide.description,
+                mimeType: "text/markdown"
+            ))
+        }
+
         return resources
     }
 
@@ -75,6 +95,17 @@ enum MCPResources {
             return .init(contents: [Resource.Content.text(entry.content, uri: uri, mimeType: "text/plain")])
         }
 
+        // Guide resources
+        if uri.hasPrefix("exfig://guides/") {
+            let fileName = String(uri.dropFirst("exfig://guides/".count))
+            guard guideFiles.contains(where: { $0.file == fileName }) else {
+                throw MCPError.invalidParams("Unknown guide: \(fileName)")
+            }
+
+            let content = try loadGuideContent(fileName: fileName)
+            return .init(contents: [Resource.Content.text(content, uri: uri, mimeType: "text/markdown")])
+        }
+
         throw MCPError.invalidParams("Unknown resource URI: \(uri)")
     }
 
@@ -84,6 +115,15 @@ enum MCPResources {
         // Load from Bundle.module (SPM resource bundle)
         guard let url = Bundle.module.url(forResource: fileName, withExtension: nil, subdirectory: "Schemas") else {
             throw MCPError.invalidParams("Schema file not found in bundle: \(fileName)")
+        }
+        return try String(contentsOf: url, encoding: .utf8)
+    }
+
+    // MARK: - Guide Loading
+
+    private static func loadGuideContent(fileName: String) throws -> String {
+        guard let url = Bundle.module.url(forResource: fileName, withExtension: nil, subdirectory: "Guides") else {
+            throw MCPError.invalidParams("Guide file not found in bundle: \(fileName)")
         }
         return try String(contentsOf: url, encoding: .utf8)
     }

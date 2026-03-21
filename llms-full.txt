@@ -627,7 +627,10 @@ common = new Common.CommonConfig {
 
 ### Penpot Source
 
-Use a Penpot project instead of Figma as the design source:
+Use a Penpot project instead of Figma as the design source. For file preparation guidelines,
+see DesignRequirements.
+
+**Colors:**
 
 ```pkl
 import ".exfig/schemas/Common.pkl"
@@ -635,25 +638,30 @@ import ".exfig/schemas/iOS.pkl"
 
 ios = new iOS.iOSConfig {
   colors = new iOS.ColorsEntry {
-    // Load colors from a Penpot file
     penpotSource = new Common.PenpotSource {
-      // Penpot file UUID
       fileId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-
-      // Optional: custom Penpot instance URL (default: https://design.penpot.app/)
-      baseUrl = "https://penpot.mycompany.com/"
-
-      // Optional: filter by path prefix
-      pathFilter = "Brand"
+      // baseUrl = "https://penpot.mycompany.com/"  // optional: self-hosted
+      pathFilter = "Brand"  // optional: filter by path prefix
     }
-
     assetsFolder = "Colors"
     nameStyle = "camelCase"
   }
 }
 ```
 
-> When `penpotSource` is set, `sourceKind` auto-detects as `"penpot"`. ExFig reads colors from
+**Typography:**
+
+```pkl
+ios = new iOS.iOSConfig {
+  typography = new iOS.TypographyEntry {
+    penpotSource = new Common.PenpotSource {
+      fileId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    }
+  }
+}
+```
+
+> When `penpotSource` is set, `sourceKind` auto-detects as `"penpot"`. ExFig reads from
 > the Penpot API and does not require `FIGMA_PERSONAL_TOKEN`. Set `PENPOT_ACCESS_TOKEN` instead.
 >
 > **v1 limitation:** Penpot icons/images are exported as raster thumbnails (the Penpot API has
@@ -1101,16 +1109,19 @@ flutter = new Flutter.FlutterConfig {
 
 ### Design Requirements
 
-# Design Requirements
+# Design File Structure
 
-How to structure your Figma files for optimal export with ExFig.
+How to structure your design files for optimal export with ExFig.
 
 ## Overview
 
-ExFig extracts design resources from Figma files based on specific naming conventions and organizational structures.
-This guide explains how to set up your Figma files for seamless export.
+ExFig extracts design resources from **Figma** files and **Penpot** projects based on naming conventions
+and organizational structures. This guide explains how to set up your design files for seamless export.
 
-## General Principles
+- **Figma**: Uses frames, components, color styles, and Variables
+- **Penpot**: Uses shared library colors, components, and typographies
+
+## Figma
 
 ### Frame Organization
 
@@ -1149,9 +1160,9 @@ common = new Common.CommonConfig {
 }
 ```
 
-## Colors
+### Colors
 
-### Using Color Styles
+#### Using Color Styles
 
 Create color styles in Figma with descriptive names:
 
@@ -1166,7 +1177,7 @@ Colors frame
 └── border/default
 ```
 
-### Using Figma Variables
+#### Using Figma Variables
 
 For Figma Variables API support:
 
@@ -1197,15 +1208,15 @@ Colors collection
     └── text: #FFFFFF
 ```
 
-### Naming Guidelines
+#### Naming Guidelines
 
 - Use lowercase with optional separators: `/`, `-`, `_`
 - Group related colors with prefixes: `text/primary`, `background/card`
 - Avoid special characters except separators
 
-## Icons
+### Icons
 
-### Component Structure
+#### Component Structure
 
 Icons must be **components** (not plain frames):
 
@@ -1218,7 +1229,7 @@ Icons frame
 └── ic/32/menu            (component)
 ```
 
-### Size Conventions
+#### Size Conventions
 
 Organize icons by size:
 
@@ -1230,7 +1241,7 @@ Icons frame
 └── ic/48/...   (48pt icons)
 ```
 
-### Vector Requirements
+#### Vector Requirements
 
 For optimal vector export:
 
@@ -1239,7 +1250,7 @@ For optimal vector export:
 3. **Remove hidden layers**: Delete unused or hidden elements
 4. **Use consistent viewBox**: Keep viewBox dimensions consistent within size groups
 
-### Dark Mode Icons
+#### Dark Mode Icons
 
 Two approaches for dark mode support:
 
@@ -1277,9 +1288,9 @@ Icons frame
 └── ic/24/close_dark
 ```
 
-## Images
+### Images
 
-### Component Structure
+#### Component Structure
 
 Images must be **components**:
 
@@ -1291,7 +1302,7 @@ Illustrations frame
 └── img-hero-banner       (component)
 ```
 
-### Size Recommendations
+#### Size Recommendations
 
 Design at the largest needed scale:
 
@@ -1299,7 +1310,7 @@ Design at the largest needed scale:
 - **Android**: Design at xxxhdpi (4x), ExFig generates all densities
 - **Flutter**: Design at 3x, ExFig generates 1x, 2x, 3x
 
-### Multi-Idiom Support (iOS)
+#### Multi-Idiom Support (iOS)
 
 Use suffixes for device-specific variants:
 
@@ -1311,7 +1322,7 @@ Illustrations frame
 └── img-sidebar~ipad
 ```
 
-### Dark Mode Images
+#### Dark Mode Images
 
 Same approaches as icons:
 
@@ -1325,9 +1336,9 @@ Illustrations frame
 └── img-hero_dark
 ```
 
-## Typography
+### Typography
 
-### Text Style Structure
+#### Text Style Structure
 
 Create text styles with hierarchical names:
 
@@ -1342,7 +1353,7 @@ Typography frame
 └── caption/small
 ```
 
-### Required Properties
+#### Required Properties
 
 Each text style should define:
 
@@ -1352,7 +1363,7 @@ Each text style should define:
 - **Line height**: in pixels or percentage
 - **Letter spacing**: in pixels or percentage
 
-### Font Mapping
+#### Font Mapping
 
 Map Figma fonts to platform fonts in your config:
 
@@ -1373,9 +1384,9 @@ android = new Android.AndroidConfig {
 }
 ```
 
-## Validation Regex Patterns
+### Validation Regex Patterns
 
-### Common Patterns
+#### Common Patterns
 
 ```pkl
 import ".exfig/schemas/Common.pkl"
@@ -1398,7 +1409,7 @@ common = new Common.CommonConfig {
 }
 ```
 
-### Transform Patterns
+#### Transform Patterns
 
 Transform names during export:
 
@@ -1412,8 +1423,6 @@ common = new Common.CommonConfig {
   }
 }
 ```
-
-## File Organization Tips
 
 ### Recommended Figma Structure
 
@@ -1447,26 +1456,181 @@ For complex theming, use separate files:
 
 Ensure component names match exactly between files.
 
-## Troubleshooting
+### Figma Troubleshooting
 
-### Resources Not Found
+#### Resources Not Found
 
 - Verify frame names match `figmaFrameName` in config
 - Check that resources are **components**, not plain frames
 - Ensure names pass validation regex
 
-### Missing Dark Mode
+#### Missing Dark Mode
 
 - Verify `darkFileId` is set correctly
 - Check component names match between light and dark files
 - For single-file mode, verify suffix is correct
 
-### Export Quality Issues
+#### Export Quality Issues
 
 - Design at highest needed resolution
 - Use vector graphics when possible
 - Avoid raster effects in vector icons
 - Flatten complex boolean operations
+
+## Penpot
+
+ExFig reads Penpot library assets — colors, components, and typographies — from the shared library
+of a Penpot file. All assets must be added to the **shared library** (Assets panel), not just placed
+on the canvas.
+
+### Authentication
+
+Set the `PENPOT_ACCESS_TOKEN` environment variable:
+
+1. Open Penpot → Settings → Access Tokens
+2. Create a new token (no expiration recommended for CI)
+3. Export:
+
+```bash
+export PENPOT_ACCESS_TOKEN="your-token-here"
+```
+
+No `FIGMA_PERSONAL_TOKEN` needed when using only Penpot sources.
+
+### Library Colors
+
+Colors must be in the shared **Library** (Assets panel → Local library → Colors):
+
+```
+Library Colors
+├── Brand/Primary      (#3B82F6)
+├── Brand/Secondary    (#8B5CF6)
+├── Semantic/Success   (#22C55E)
+├── Semantic/Warning   (#F59E0B)
+├── Semantic/Error     (#EF4444)
+├── Neutral/Background (#1E1E2E)
+├── Neutral/Text       (#F8F8F2)
+└── Neutral/Overlay    (#000000, 50% opacity)
+```
+
+Key points:
+
+- Only **solid hex colors** are exported. Gradients and image fills are skipped in v1.
+- The `path` field organizes colors into groups: `path: "Brand"`, `name: "Primary"` → `Brand/Primary`
+- Use `pathFilter` in your config to select a specific group: `pathFilter = "Brand"` exports only Brand colors
+- **Opacity** is preserved (0.0–1.0)
+
+Config example:
+
+```pkl
+penpotSource = new Common.PenpotSource {
+  fileId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  pathFilter = "Brand"  // optional: export only Brand/* colors
+}
+```
+
+### Library Components (Icons and Images)
+
+Components must be in the shared **Library** (Assets panel → Local library → Components).
+ExFig filters by the component `path` prefix (equivalent to Figma's frame name):
+
+```
+Library Components
+├── Icons/Navigation/arrow-left
+├── Icons/Navigation/arrow-right
+├── Icons/Actions/close
+├── Icons/Actions/check
+├── Illustrations/Empty States/no-data
+└── Illustrations/Onboarding/welcome
+```
+
+Config example:
+
+```pkl
+penpotSource = new Common.PenpotSource {
+  fileId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+// Use path prefix as the frame filter
+figmaFrameName = "Icons/Navigation"  // exports arrow-left, arrow-right
+```
+
+> **v1 limitation:** Penpot components are exported as **raster thumbnails** (PNG only).
+> The Penpot API has no public SVG/PNG render endpoint. SVG reconstruction from the
+> shape tree is planned for a future version. For best quality, design components at the
+> largest needed scale.
+
+### Library Typography
+
+Typography styles must be in the shared **Library** (Assets panel → Local library → Typography):
+
+```
+Library Typography
+├── Heading/H1     (Roboto Bold 32px)
+├── Heading/H2     (Roboto Bold 24px)
+├── Body/Regular   (Roboto Regular 16px)
+├── Body/Bold      (Roboto Bold 16px)
+└── Caption/Small  (Roboto Regular 12px)
+```
+
+Required fields:
+
+- **fontFamily** — e.g., "Roboto", "DM Mono"
+- **fontSize** — must be set (styles without a parseable font size are skipped)
+
+Supported fields: `fontWeight`, `lineHeight`, `letterSpacing`, `textTransform` (uppercase/lowercase).
+
+> Penpot may serialize numeric fields as strings (e.g., `"24"` instead of `24`). ExFig handles both formats automatically.
+
+### Recommended Penpot Structure
+
+```
+Design System (Penpot file)
+├── Library Colors
+│   ├── Brand/* (primary, secondary, accent)
+│   ├── Semantic/* (success, warning, error, info)
+│   └── Neutral/* (background, text, border, overlay)
+├── Library Components
+│   ├── Icons/Navigation/* (arrow, chevron, menu)
+│   ├── Icons/Actions/* (close, check, edit, delete)
+│   └── Illustrations/* (empty states, onboarding)
+└── Library Typography
+    ├── Heading/* (H1, H2, H3)
+    ├── Body/* (regular, bold, italic)
+    └── Caption/* (regular, small)
+```
+
+### Known Limitations (v1)
+
+- **No dark mode support** — Penpot has no Variables/modes equivalent; colors export as light-only
+- **Raster-only components** — icons and images export as PNG thumbnails, not SVG
+- **No `exfig_inspect` for Penpot** — the MCP inspect tool works with Figma API only
+- **Gradients skipped** — only solid hex colors are supported
+- **No page filtering** — all library assets are global to the file, not page-scoped
+
+### Penpot Troubleshooting
+
+#### No Colors Exported
+
+- Verify colors are in the **shared library**, not just swatches on the canvas
+- Check `pathFilter` — a too-specific prefix returns no results
+- Gradient colors are skipped; use solid fills
+
+#### No Components Exported
+
+- Verify components are in the **shared library** (right-click shape → "Create component")
+- Check the path prefix in `figmaFrameName` matches the component `path`
+- Thumbnails may not be generated for programmatically created components
+
+#### Typography Styles Skipped
+
+- Ensure `fontSize` is set on the typography style
+- Styles with unparseable font size values are silently skipped
+
+#### Authentication Errors
+
+- `PENPOT_ACCESS_TOKEN environment variable is required` — set the token
+- Penpot 401 — token expired or invalid; regenerate in Settings → Access Tokens
+- Self-hosted instances: set `baseUrl` in `penpotSource`
 
 ## See Also
 

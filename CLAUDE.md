@@ -436,6 +436,9 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — standalone modules (PenpotAPI) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                           |
 | `function_body_length` after branch | Split into private extension helper methods (e.g., `penpotColorsSourceInput()`, `tokensFileColorsSourceInput()`)                                                                       |
 | `ExFigCommand.terminalUI` in tests  | Implicitly unwrapped — must init in `setUp()`: `ExFigCommand.terminalUI = TerminalUI(outputMode: .quiet)` before testing code that uses it (SourceFactory, Penpot sources)             |
+| `--timeout` duplicate in `fetch`    | `FetchImages` uses both `DownloadOptions` and `HeavyFaultToleranceOptions` which both define `--timeout`. Fix: inline Heavy options + computed property                                |
+| DocC articles not in Bundle.module  | `.docc` articles aren't copied to SPM bundle — use `Resources/Guides/` with `.copy()` for MCP-served content                                                                           |
+| Penpot `update-file` changes format | Flat `changes[]` array, `type` dispatch, needs `vern` field. Shapes need `parentId`, `frameId`, `selrect`, `points`, `transform`. Undocumented — use validation errors                 |
 
 ## Additional Rules
 
