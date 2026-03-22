@@ -12,17 +12,36 @@ public enum PenpotShapeRenderer {
     ///   - objects: Flat dictionary of all shapes on the page (from `PenpotPage.objects`)
     ///   - rootId: The component's `mainInstanceId` — the root frame shape
     /// - Returns: SVG string with coordinates normalized to (0,0), or nil if root not found
-    public static func renderSVG(
+    /// Describes why SVG rendering failed.
+    public enum RenderFailure: Error, Sendable {
+        case rootNotFound(id: String)
+        case missingSelrect(id: String)
+    }
+
+    /// Result of SVG rendering including any warnings about skipped shapes.
+    public struct RenderResult: Sendable {
+        public let svg: String
+        public let skippedShapeTypes: Set<String>
+    }
+
+    /// Renders a component's shape tree as an SVG string with diagnostics.
+    public static func renderSVGResult(
         objects: [String: PenpotShape],
         rootId: String
-    ) -> String? {
-        guard let root = objects[rootId] else { return nil }
-        guard let selrect = root.selrect else { return nil }
+    ) -> Result<RenderResult, RenderFailure> {
+        guard let root = objects[rootId] else {
+            return .failure(.rootNotFound(id: rootId))
+        }
+        guard let selrect = root.selrect else {
+            return .failure(.missingSelrect(id: rootId))
+        }
 
         let originX = selrect.x
         let originY = selrect.y
         let width = selrect.width
         let height = selrect.height
+
+        var skippedTypes: Set<String> = []
 
         var svg = """
         <svg xmlns="http://www.w3.org/2000/svg" \
@@ -35,12 +54,24 @@ public enum PenpotShapeRenderer {
                 id: childId,
                 objects: objects,
                 originX: originX,
-                originY: originY
+                originY: originY,
+                skippedTypes: &skippedTypes
             )
         }
 
         svg += "\n</svg>"
-        return svg
+        return .success(RenderResult(svg: svg, skippedShapeTypes: skippedTypes))
+    }
+
+    /// Convenience wrapper that returns just the SVG string, or nil on failure.
+    public static func renderSVG(
+        objects: [String: PenpotShape],
+        rootId: String
+    ) -> String? {
+        switch renderSVGResult(objects: objects, rootId: rootId) {
+        case let .success(result): result.svg
+        case .failure: nil
+        }
     }
 
     // MARK: - Private
@@ -49,7 +80,8 @@ public enum PenpotShapeRenderer {
         id: String,
         objects: [String: PenpotShape],
         originX: Double,
-        originY: Double
+        originY: Double,
+        skippedTypes: inout Set<String>
     ) -> String {
         guard let shape = objects[id] else { return "" }
         if shape.hidden == true { return "" }
@@ -69,16 +101,19 @@ public enum PenpotShapeRenderer {
         }
 
         switch shape.type {
-        case "path", "bool":
+        case .path, .bool:
             result += renderPath(shape, originX: originX, originY: originY)
-        case "rect":
+        case .rect:
             result += renderRect(shape, originX: originX, originY: originY)
-        case "circle":
+        case .circle:
             result += renderEllipse(shape, originX: originX, originY: originY)
-        case "group", "frame":
-            result += renderGroup(shape, objects: objects, originX: originX, originY: originY)
-        default:
-            break
+        case .group, .frame:
+            result += renderGroup(
+                shape, objects: objects, originX: originX, originY: originY,
+                skippedTypes: &skippedTypes
+            )
+        case let .unknown(typeName):
+            skippedTypes.insert(typeName)
         }
 
         if needsTransform {
@@ -142,7 +177,8 @@ public enum PenpotShapeRenderer {
         _ shape: PenpotShape,
         objects: [String: PenpotShape],
         originX: Double,
-        originY: Double
+        originY: Double,
+        skippedTypes: inout Set<String>
     ) -> String {
         guard let children = shape.shapes, !children.isEmpty else { return "" }
 
@@ -150,7 +186,10 @@ public enum PenpotShapeRenderer {
         var result = "\n<g\(attrs)>"
 
         for childId in children {
-            result += renderShape(id: childId, objects: objects, originX: originX, originY: originY)
+            result += renderShape(
+                id: childId, objects: objects, originX: originX, originY: originY,
+                skippedTypes: &skippedTypes
+            )
         }
 
         result += "\n</g>"
@@ -214,79 +253,95 @@ public enum PenpotShapeRenderer {
         originX: Double,
         originY: Double
     ) -> String {
-        // SVG path commands: M, L, C, S, Q, T, A, Z (uppercase = absolute, lowercase = relative)
-        // Only absolute commands need normalization
         var result = ""
         var i = pathData.startIndex
-        var isX = true // alternate X/Y for coordinate pairs
+        var state = PathNormState()
 
         while i < pathData.endIndex {
             let ch = pathData[i]
 
             if ch.isLetter {
                 result.append(ch)
-                // Reset coordinate tracking for new command
-                isX = true
-                // Relative commands (lowercase) don't need offset
-                // Z/z has no coordinates
+                state.setCommand(ch)
                 i = pathData.index(after: i)
-                continue
-            }
-
-            if ch == "," || ch == " " {
+            } else if ch == "," || ch == " " {
                 result.append(ch)
                 i = pathData.index(after: i)
-                continue
-            }
-
-            if ch == "-" || ch == "." || ch.isNumber {
-                // Parse number
-                var numStr = ""
-                var j = i
-                // Handle negative sign
-                if pathData[j] == "-" {
-                    numStr.append("-")
-                    j = pathData.index(after: j)
-                }
-                // Parse digits and decimal
-                var hasDot = false
-                while j < pathData.endIndex {
-                    let c = pathData[j]
-                    if c.isNumber {
-                        numStr.append(c)
-                    } else if c == ".", !hasDot {
-                        hasDot = true
-                        numStr.append(c)
-                    } else {
-                        break
-                    }
-                    j = pathData.index(after: j)
-                }
-
+            } else if ch == "-" || ch == "." || ch.isNumber {
+                let (numStr, nextIndex) = parseNumber(in: pathData, from: i)
                 if let value = Double(numStr) {
-                    // Find the last command to check if absolute
-                    let lastCmd = findLastCommand(in: pathData, before: i)
-                    if let cmd = lastCmd, cmd.isUppercase, cmd != "Z", cmd != "A" {
-                        // For A (arc) command, only coordinates 6&7 of each 7-param set need offset
-                        // Simplified: offset all X/Y pairs for non-arc absolute commands
-                        let offset = isX ? originX : originY
-                        result.append(formatNumber(value - offset))
-                    } else {
-                        result.append(formatNumber(value))
-                    }
-                    isX.toggle()
+                    let cmd = state.currentCmd ?? findLastCommand(in: pathData, before: i)
+                    result.append(offsetValue(value, cmd: cmd, state: &state, originX: originX, originY: originY))
                 } else {
                     result.append(numStr)
                 }
-                i = j
-                continue
+                i = nextIndex
+            } else {
+                result.append(ch)
+                i = pathData.index(after: i)
             }
-
-            result.append(ch)
-            i = pathData.index(after: i)
         }
 
         return result
+    }
+
+    /// Mutable state for path coordinate normalization.
+    private struct PathNormState {
+        var isX = true
+        var currentCmd: Character?
+        var arcParamIndex = 0
+
+        mutating func setCommand(_ ch: Character) {
+            currentCmd = ch
+            isX = true
+            arcParamIndex = 0
+        }
+    }
+
+    private static func parseNumber(in path: String, from start: String.Index) -> (String, String.Index) {
+        var numStr = ""
+        var j = start
+        if path[j] == "-" {
+            numStr.append("-")
+            j = path.index(after: j)
+        }
+        var hasDot = false
+        while j < path.endIndex {
+            let c = path[j]
+            if c.isNumber {
+                numStr.append(c)
+            } else if c == ".", !hasDot {
+                hasDot = true
+                numStr.append(c)
+            } else {
+                break
+            }
+            j = path.index(after: j)
+        }
+        return (numStr, j)
+    }
+
+    private static func offsetValue(
+        _ value: Double, cmd: Character?, state: inout PathNormState,
+        originX: Double, originY: Double
+    ) -> String {
+        guard let cmd, cmd.isUppercase, cmd != "Z" else {
+            return formatNumber(value)
+        }
+
+        if cmd == "A" {
+            // Arc: 7 params per segment (rx, ry, x-rotation, large-arc, sweep, x, y)
+            // Only params 5 (x) and 6 (y) are endpoint coordinates
+            let paramPos = state.arcParamIndex % 7
+            state.arcParamIndex += 1
+            if paramPos == 5 { return formatNumber(value - originX) }
+            if paramPos == 6 { return formatNumber(value - originY) }
+            return formatNumber(value)
+        }
+
+        let offset = state.isX ? originX : originY
+        state.isX.toggle()
+        return formatNumber(value - offset)
     }
 
     private static func findLastCommand(in path: String, before index: String.Index) -> Character? {

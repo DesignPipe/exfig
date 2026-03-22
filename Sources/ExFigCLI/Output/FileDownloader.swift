@@ -49,10 +49,11 @@ final class FileDownloader: Sendable {
     ) async throws -> [FileContents] {
         // file:// URLs (e.g., Penpot SVG from shape tree) are already on disk — treat as local
         let remoteFiles = files.filter { $0.sourceURL != nil && !($0.sourceURL?.isFileURL ?? false) }
-        let localFileURLs = files.filter { $0.sourceURL?.isFileURL == true }.map { file in
-            FileContents(
+        let localFileURLs = files.filter { $0.sourceURL?.isFileURL == true }.compactMap { file -> FileContents? in
+            guard let sourceURL = file.sourceURL else { return nil }
+            return FileContents(
                 destination: file.destination,
-                dataFile: file.sourceURL!,
+                dataFile: sourceURL,
                 scale: file.scale,
                 dark: file.dark,
                 isRTL: file.isRTL

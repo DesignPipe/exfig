@@ -47,9 +47,12 @@ If switching to `/api/rpc/command/`, update `BasePenpotClient.buildURL(for:)`.
 
 Icons/images exported via shape tree → SVG (no CDN, no headless Chrome):
 
-- `PenpotShapeRenderer.renderSVG(objects:rootId:)` — pure function, shape tree → SVG string
+- `PenpotShape.ShapeType` enum (not String) — `.path`, `.rect`, `.circle`, `.group`, `.frame`, `.bool`, `.unknown(String)`. Exhaustive switch in renderer.
+- `PenpotComponent.MainInstance` struct pairs `id` + `page`. Backward-compat computed properties `mainInstanceId`/`mainInstancePage`.
+- `renderSVGResult()` returns `Result<RenderResult, RenderFailure>` — includes `skippedShapeTypes: Set<String>` and typed failure reasons (`.rootNotFound`, `.missingSelrect`). `renderSVG()` is a convenience wrapper returning `String?`.
 - Shapes are in canvas-space — subtract root frame's `selrect.x/y` to normalize
+- Arc (`A`) command normalization: 7 params per segment, only params 5 (x) and 6 (y) get origin offset. Tracked via `PathNormState.arcParamIndex`.
+- `normalizePathCoordinates` helpers extracted into `PathNormState`, `parseNumber`, `offsetValue` to stay under SwiftLint cyclomatic_complexity/function_body_length limits.
 - `svgAttrs` has mixed types (string values + nested `style` dict) — `SVGAttributes` type extracts strings only
-- Supported shape types: path, rect, circle, bool (compound path), group, frame
-- Components need `mainInstanceId` + `mainInstancePage` for shape tree lookup
+- Components need `mainInstanceId` + `mainInstancePage` (via `MainInstance` struct) for shape tree lookup
 - Linked libraries: use `get-file` with library file ID (from `get-file-libraries`)

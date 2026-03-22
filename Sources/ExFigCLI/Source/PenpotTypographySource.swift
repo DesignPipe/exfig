@@ -32,8 +32,8 @@ struct PenpotTypographySource: TypographySource {
 
             let textCase = mapTextTransform(typography.textTransform)
 
-            if typography.letterSpacing == nil, typography.lineHeight != nil {
-                ui.warning("Typography '\(typography.name)' has unparseable letter-spacing — defaulting to 0")
+            if typography.letterSpacing == nil {
+                ui.warning("Typography '\(typography.name)' has no letter-spacing — defaulting to 0")
             }
 
             textStyles.append(TextStyle(

@@ -21,14 +21,20 @@ struct PenpotColorsSource: ColorsSource {
         }
 
         var colors: [Color] = []
+        var skippedNonSolid = 0
+        var skippedByFilter = 0
 
         for (_, penpotColor) in penpotColors.sorted(by: { $0.key < $1.key }) {
             // Skip gradient/image fills (no solid hex)
-            guard let hex = penpotColor.color else { continue }
+            guard let hex = penpotColor.color else {
+                skippedNonSolid += 1
+                continue
+            }
 
             // Apply path filter
             if let pathFilter = config.pathFilter {
                 guard let path = penpotColor.path, path.hasPrefix(pathFilter) else {
+                    skippedByFilter += 1
                     continue
                 }
             }
@@ -52,6 +58,16 @@ struct PenpotColorsSource: ColorsSource {
                 blue: rgba.blue,
                 alpha: rgba.alpha
             ))
+        }
+
+        if skippedNonSolid > 0 {
+            ui.warning(
+                "Skipped \(skippedNonSolid) color(s) without solid hex values " +
+                    "(gradients and image fills are not supported)"
+            )
+        }
+        if skippedByFilter > 0 {
+            ui.warning("Skipped \(skippedByFilter) color(s) not matching path filter '\(config.pathFilter!)'")
         }
 
         // Penpot has no mode-based variants — light only

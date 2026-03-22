@@ -384,10 +384,26 @@ extension ExFigCommand {
                     continue
                 }
 
-                guard let svgString = PenpotShapeRenderer.renderSVG(
+                let renderResult = PenpotShapeRenderer.renderSVGResult(
                     objects: objects, rootId: instanceId
-                ) else {
-                    ui.warning("Component '\(component.name)' — SVG reconstruction failed, skipping")
+                )
+                let svgString: String
+                switch renderResult {
+                case let .success(result):
+                    svgString = result.svg
+                    if !result.skippedShapeTypes.isEmpty {
+                        ui.warning(
+                            "Component '\(component.name)' — unsupported shape types skipped: " +
+                                result.skippedShapeTypes.sorted().joined(separator: ", ")
+                        )
+                    }
+                case let .failure(reason):
+                    switch reason {
+                    case let .rootNotFound(id):
+                        ui.warning("Component '\(component.name)' — root shape '\(id)' not found, skipping")
+                    case let .missingSelrect(id):
+                        ui.warning("Component '\(component.name)' — root shape '\(id)' has no bounds, skipping")
+                    }
                     continue
                 }
 
@@ -407,9 +423,10 @@ extension ExFigCommand {
                     let fileURL = outputURL.appendingPathComponent("\(safeName).png")
                     try pngData.write(to: fileURL)
                 default:
-                    // For other formats (pdf, webp, jpg), save as SVG
-                    let fileURL = outputURL.appendingPathComponent("\(safeName).svg")
-                    try svgData.write(to: fileURL)
+                    throw ExFigError.custom(
+                        errorString: "Format '\(format.rawValue)' is not yet supported for Penpot export. " +
+                            "Supported formats: svg, png"
+                    )
                 }
 
                 exportedCount += 1

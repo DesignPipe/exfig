@@ -262,10 +262,10 @@ func resolveClient(
         return injectedClient
     }
     guard let accessToken else {
-        // No Figma token — return a placeholder client.
+        // No Figma token — return a client that throws on any call.
         // Non-Figma sources (Penpot, tokens-file) never call it.
-        // SourceFactory guards the .figma branch and throws accessTokenNotFound.
-        return FigmaClient(accessToken: "no-token", timeout: nil)
+        // SourceFactory also guards the .figma branch with accessTokenNotFound.
+        return NoTokenFigmaClient()
     }
     // CLI timeout takes precedence over config timeout
     let effectiveTimeout: TimeInterval? = options.timeout.map { TimeInterval($0) } ?? timeout
@@ -308,7 +308,7 @@ func resolveClient(
         return injectedClient
     }
     guard let accessToken else {
-        return FigmaClient(accessToken: "no-token", timeout: nil)
+        return NoTokenFigmaClient()
     }
     // CLI timeout takes precedence over config timeout
     let effectiveTimeout: TimeInterval? = options.timeout.map { TimeInterval($0) } ?? timeout
@@ -328,4 +328,17 @@ func resolveClient(
             ui.warning(warning)
         }
     )
+}
+
+// MARK: - No-Token Client
+
+/// A Figma API client placeholder that throws `accessTokenNotFound` on any request.
+///
+/// Used when `FIGMA_PERSONAL_TOKEN` is not set. Non-Figma sources (Penpot, tokens-file)
+/// never call this client. If accidentally invoked, the error message clearly tells the user
+/// to set the token — instead of making real HTTP requests with an invalid token.
+final class NoTokenFigmaClient: Client, @unchecked Sendable {
+    func request<T: Endpoint>(_: T) async throws -> T.Content {
+        throw ExFigError.accessTokenNotFound
+    }
 }

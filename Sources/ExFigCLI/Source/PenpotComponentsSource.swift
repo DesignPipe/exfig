@@ -58,6 +58,15 @@ struct PenpotComponentsSource: ComponentsSource {
         let sortedComponents = matchedComponents.sorted { $0.name < $1.name }
 
         guard !sortedComponents.isEmpty else {
+            let availablePaths = components.values
+                .compactMap(\.path)
+                .reduce(into: Set<String>()) { $0.insert($1) }
+                .sorted()
+                .prefix(5)
+            let pathHint = availablePaths.isEmpty
+                ? ""
+                : " Available paths: \(availablePaths.joined(separator: ", "))"
+            ui.warning("No components matching path prefix '\(pathFilter)'.\(pathHint)")
             return []
         }
 
@@ -98,10 +107,26 @@ struct PenpotComponentsSource: ComponentsSource {
                 continue
             }
 
-            guard let svgString = PenpotShapeRenderer.renderSVG(
+            let renderResult = PenpotShapeRenderer.renderSVGResult(
                 objects: objects, rootId: instanceId
-            ) else {
-                ui.warning("Component '\(component.name)' — failed to reconstruct SVG, skipping")
+            )
+            let svgString: String
+            switch renderResult {
+            case let .success(result):
+                svgString = result.svg
+                if !result.skippedShapeTypes.isEmpty {
+                    ui.warning(
+                        "Component '\(component.name)' — unsupported shape types skipped: " +
+                            result.skippedShapeTypes.sorted().joined(separator: ", ")
+                    )
+                }
+            case let .failure(reason):
+                switch reason {
+                case let .rootNotFound(id):
+                    ui.warning("Component '\(component.name)' — root shape '\(id)' not found, skipping")
+                case let .missingSelrect(id):
+                    ui.warning("Component '\(component.name)' — root shape '\(id)' has no bounds, skipping")
+                }
                 continue
             }
 

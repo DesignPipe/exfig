@@ -39,6 +39,7 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        // All entries in a platform section share one source kind (mixed sources not yet supported)
         let sourceKind = entries.first?.resolvedSourceKind ?? .figma
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
@@ -118,6 +119,7 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        // All entries in a platform section share one source kind (mixed sources not yet supported)
         let sourceKind = entries.first?.resolvedSourceKind ?? .figma
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
@@ -173,6 +175,7 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        // All entries in a platform section share one source kind (mixed sources not yet supported)
         let sourceKind = entries.first?.resolvedSourceKind ?? .figma
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
@@ -228,6 +231,7 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
+        // All entries in a platform section share one source kind (mixed sources not yet supported)
         let sourceKind = entries.first?.resolvedSourceKind ?? .figma
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,

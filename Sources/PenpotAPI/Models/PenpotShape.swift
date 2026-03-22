@@ -7,7 +7,7 @@ import Foundation
 public struct PenpotShape: Decodable, Sendable {
     public let id: String
     public let name: String?
-    public let type: String
+    public let type: ShapeType
 
     // Geometry
     public let x: Double?
@@ -43,6 +43,49 @@ public struct PenpotShape: Decodable, Sendable {
 
     public let opacity: Double?
     public let hidden: Bool?
+}
+
+// MARK: - Shape Type
+
+public extension PenpotShape {
+    /// Known shape types from Penpot's shape tree.
+    enum ShapeType: Sendable, Equatable, CustomStringConvertible {
+        case path
+        case rect
+        case circle
+        case group
+        case frame
+        case bool
+        case unknown(String)
+
+        public var description: String {
+            switch self {
+            case .path: "path"
+            case .rect: "rect"
+            case .circle: "circle"
+            case .group: "group"
+            case .frame: "frame"
+            case .bool: "bool"
+            case let .unknown(value): value
+            }
+        }
+    }
+}
+
+extension PenpotShape.ShapeType: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        switch rawValue {
+        case "path": self = .path
+        case "rect": self = .rect
+        case "circle": self = .circle
+        case "group": self = .group
+        case "frame": self = .frame
+        case "bool": self = .bool
+        default: self = .unknown(rawValue)
+        }
+    }
 }
 
 // MARK: - Supporting Types

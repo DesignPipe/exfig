@@ -305,13 +305,18 @@ Do NOT inject `colorsSource` at context construction time — it breaks multi-so
 
 ### Lazy Figma Client Pattern
 
-`resolveClient(accessToken:...)` accepts `String?`. When nil (no `FIGMA_PERSONAL_TOKEN`), returns a placeholder `FigmaClient(accessToken: "no-token")` that is never called by non-Figma sources. `SourceFactory` guards the `.figma` branch: `guard let client else { throw ExFigError.accessTokenNotFound }`. This avoids making `Client?` cascade through 20+ type signatures.
+`resolveClient(accessToken:...)` accepts `String?`. When nil (no `FIGMA_PERSONAL_TOKEN`), returns `NoTokenFigmaClient()` — a fail-fast client that throws `accessTokenNotFound` on any request. Non-Figma sources never call it. `SourceFactory` also guards the `.figma` branch. This avoids making `Client?` cascade through 20+ type signatures.
 
 ### Penpot Source Patterns
 
-- `PenpotClientFactory.makeClient(baseURL:)` — shared factory in `Source/PenpotClientFactory.swift`. All Penpot sources use this (NOT a static on any single source).
+- `PenpotClientFactory.makeClient(baseURL:)` — shared factory in `Source/PenpotClientFactory.swift`. Returns `any PenpotClient` (protocol, not `BasePenpotClient`) for testability. All Penpot sources use this (NOT a static on any single source).
+- `PenpotShape.ShapeType` enum — `.path`, `.rect`, `.circle`, `.group`, `.frame`, `.bool`, `.unknown(String)`. Exhaustive switch in renderer (no `default` branch).
+- `PenpotComponent.MainInstance` struct — pairs `id` + `page` (both or neither). Computed properties `mainInstanceId`/`mainInstancePage` for backward compat.
+- `PenpotShapeRenderer.renderSVGResult()` — returns `Result<RenderResult, RenderFailure>` with `skippedShapeTypes` and typed failure reasons. `renderSVG()` is a convenience wrapper.
 - Dictionary iteration from Penpot API (`colors`, `typographies`, `components`) must be sorted by key for deterministic export order: `.sorted(by: { $0.key < $1.key })`.
 - `exfig fetch --source penpot` — `FetchSource` enum in `DownloadOptions.swift`. Route: `--source` flag > wizard result > default `.figma`. Also `--penpot-base-url` for self-hosted.
+- Penpot fetch supports only `svg` and `png` formats — unsupported formats (pdf, webp, jpg) throw an error.
+- Download commands (`download all/colors/icons/images/typography`) are **Figma-only** by design. Penpot export uses `exfig colors/icons/images` (via SourceFactory) and `exfig fetch --source penpot`.
 
 ### Entry Bridge Source Kind Resolution
 
