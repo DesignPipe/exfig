@@ -405,83 +405,6 @@ NooraUI.format(.command("bold"))   // bold/secondary
 NooraUI.formatLink("url", useColors: true)  // underlined primary
 ```
 
-## Dependencies
-
-| Package               | Version | Purpose                                                 |
-| --------------------- | ------- | ------------------------------------------------------- |
-| swift-argument-parser | 1.5.0+  | CLI framework                                           |
-| swift-collections     | 1.2.x   | Ordered collections                                     |
-| swift-jinja           | 2.0.0+  | Jinja2 template engine                                  |
-| XcodeProj             | 8.27.0+ | Xcode project manipulation                              |
-| swift-log             | 1.6.0+  | Logging                                                 |
-| Rainbow               | 4.2.0+  | Terminal colors                                         |
-| libwebp               | 1.4.1+  | WebP encoding                                           |
-| libpng                | 1.6.45+ | PNG decoding                                            |
-| swift-custom-dump     | 1.3.0+  | Test assertions                                         |
-| Noora                 | 0.54.0+ | Terminal UI design system                               |
-| swift-figma-api       | 0.2.0+  | Figma REST API client (async/await, rate limiting)      |
-| swift-penpot-api      | 0.1.0+  | Penpot RPC API client (async/await, SVG reconstruction) |
-| swift-svgkit          | 0.1.0+  | SVG parsing, ImageVector/VectorDrawable generation      |
-| swift-resvg           | 0.45.1  | SVG parsing/rendering                                   |
-| swift-docc-plugin     | 1.4.5+  | DocC documentation                                      |
-| swift-yyjson          | 0.5.0+  | High-performance JSON codec                             |
-| pkl-swift             | 0.8.0+  | PKL config evaluation & codegen                         |
-
-## Troubleshooting
-
-| Problem                             | Solution                                                                                                                                                                                                                                             |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| codegen:pkl gen.pkl error           | gen.pkl `read?` bug: needs `--generator-settings` + `--project-dir` flags (see mise.toml)                                                                                                                                                            |
-| xcsift "signal code 5"              | False positive when piping `swift test` through xcsift; run `swift test` directly to verify                                                                                                                                                          |
-| PKL tests need Pkl 0.31+            | Schemas use `isNotEmpty`; run tests via `./bin/mise exec -- swift test` to get correct Pkl in PATH                                                                                                                                                   |
-| PKL FrameSource change              | Update ALL entry init calls in tests (EnumBridgingTests, IconsLoaderConfigTests)                                                                                                                                                                     |
-| Build fails                         | `swift package clean && swift build`                                                                                                                                                                                                                 |
-| Tests fail                          | Check `FIGMA_PERSONAL_TOKEN` is set                                                                                                                                                                                                                  |
-| Formatting fails                    | Run `./bin/mise run setup` to install tools                                                                                                                                                                                                          |
-| test:filter no matches              | SPM converts hyphens→underscores: use `ExFig_FlutterTests` not `ExFig-FlutterTests`                                                                                                                                                                  |
-| Template errors                     | Check Jinja2 syntax and context variables                                                                                                                                                                                                            |
-| Linux test hangs                    | Build first: `swift build --build-tests`, then `swift test --skip-build --parallel`                                                                                                                                                                  |
-| Android pathData long               | Simplify in Figma or use `--strict-path-validation`                                                                                                                                                                                                  |
-| PKL parse error 1                   | Check `PklError.message` — actual error is in `.message`, not `.localizedDescription`                                                                                                                                                                |
-| Test target won't compile           | Broken test files block entire target; use `swift test --filter Target.Class` after `build`                                                                                                                                                          |
-| Test helper JSON decode             | `ContainingFrame` uses default Codable (camelCase: `nodeId`, `pageName`), NOT snake_case                                                                                                                                                             |
-| Web entry test fails                | Web entry types use `outputDirectory` field, while Android/Flutter use `output`                                                                                                                                                                      |
-| Logger concatenation err            | `Logger.Message` (swift-log) requires interpolation `"\(a) \(b)"`, not concatenation `a + b`                                                                                                                                                         |
-| Deleted variables in output         | Filter `VariableValue.deletedButReferenced != true` in variable loaders AND `CodeSyntaxSyncer`                                                                                                                                                       |
-| mise "sources up-to-date"           | mise caches tasks with `sources`/`outputs` — run script directly via `bash` when debugging                                                                                                                                                           |
-| Jinja trailing `\n`                 | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results                                                                                                                                           |
-| `Bundle.module` in tests            | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle                                                                                                                                            |
-| SwiftLint trailing closure          | When function takes 2+ closures, use explicit label for last closure (`export: { ... }`) not trailing syntax                                                                                                                                         |
-| CLI flag default vs absent          | swift-argument-parser can't distinguish explicit `--flag default_value` from omitted. Use `Optional` + computed `effectiveX` property for flags that wizard may override                                                                             |
-| MCP `Client` ambiguous              | `FigmaAPI.Client` vs `MCP.Client` — always use `FigmaAPI.Client` in MCP/ files                                                                                                                                                                       |
-| MCP `FigmaConfig` fields            | No `colorsFileId` — use `config.getFileIds()` or `figma.lightFileId`/`darkFileId`                                                                                                                                                                    |
-| `distantFuture` on clock            | `ContinuousClock.Instant` has no `distantFuture`; use `withCheckedContinuation { _ in }` for infinite suspend                                                                                                                                        |
-| MCP stderr duplication              | `TerminalOutputManager.setStderrMode(true)` handles all output routing — don't duplicate in `ExFigLogHandler`                                                                                                                                        |
-| MCP `Process` race condition        | Set `terminationHandler` BEFORE `process.run()` — process may exit before handler is installed, hanging the continuation forever                                                                                                                     |
-| MCP pipe deadlock                   | Read stderr via concurrent `Task` BEFORE waiting for termination — pipe buffer (~64KB) can fill and block the subprocess                                                                                                                             |
-| MCP `encodeJSON` errors             | Use `throws` not `try?` — silently returning `"\(value)"` (Swift debug dump) breaks JSON consumers; top-level `do/catch` in `handle()` catches automatically                                                                                         |
-| `VariablesColors` vs `Colors`       | `ColorsVariablesLoader` takes `Common.VariablesColors?`, not `Common.Colors?` — different PKL types                                                                                                                                                  |
-| PKL template word search            | Template comments on `lightFileId` contain cross-refs (`variablesColors`, `typography`); test section removal by matching full markers (`colors = new Common.Colors {`) not bare words                                                               |
-| CI llms-full.txt stale              | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result                                                                             |
-| `docs/` source files lost           | `docs/` is gitignored (DocC output). Source docs live in `ExFig.docc/`. Never `git add -f` to docs/                                                                                                                                                  |
-| Release build .pcm warnings         | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                                                                                  |
-| `nil` in switch expression          | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                                                                                            |
-| `ColorsConfigError` new case        | Has TWO switch blocks (`errorDescription` + `recoverySuggestion`) — adding a case to one without the other causes exhaustive switch error. Adding associated value breaks auto-`Equatable` — add explicit `: Equatable` (tests use `XCTAssertEqual`) |
-| `ExFigConfig` → `ExFigError`        | `ExFigError` lives in ExFigCLI, not ExFigConfig. Use `ColorsConfigError` (ExFigCore) for validation errors in `VariablesSourceValidation.swift`                                                                                                      |
-| PKL↔Swift enum rawValue             | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                                                                                          |
-| `unsupportedSourceKind` compile err | Changed to `.unsupportedSourceKind(kind, assetType:)` — add asset type string ("colors", "icons/images", "typography")                                                                                                                               |
-| `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — external packages (swift-penpot-api) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                                                                                   |
-| `function_body_length` after branch | Split into private extension helper methods (e.g., `penpotColorsSourceInput()`, `tokensFileColorsSourceInput()`)                                                                                                                                     |
-| `ExFigCommand.terminalUI` in tests  | Implicitly unwrapped — must init in `setUp()`: `ExFigCommand.terminalUI = TerminalUI(outputMode: .quiet)` before testing code that uses it (SourceFactory, Penpot sources)                                                                           |
-| `--timeout` duplicate in `fetch`    | `FetchImages` uses both `DownloadOptions` and `HeavyFaultToleranceOptions` which both define `--timeout`. Fix: inline Heavy options + computed property                                                                                              |
-| DocC articles not in Bundle.module  | `.docc` articles aren't copied to SPM bundle — use `Resources/Guides/` with `.copy()` for MCP-served content                                                                                                                                         |
-| Penpot `update-file` changes format | Flat `changes[]` array, `type` dispatch, needs `vern` field. Shapes need `parentId`, `frameId`, `selrect`, `points`, `transform`. Undocumented — use validation errors                                                                               |
-| Switch expression + `return`        | When any switch branch has side-effects before `return`, use explicit `return` on ALL branches — implicit return breaks type inference                                                                                                               |
-| Lazy Figma token validation         | `ExFigOptions.validate()` reads token without throwing; `resolveClient()` returns placeholder if nil; `SourceFactory` guards `.figma` branch with `accessTokenNotFound`                                                                              |
-| PKL `swiftuiColorSwift` casing      | PKL codegen lowercases: `swiftuiColorSwift`, not `swiftUIColorSwift` — check with `pkl eval` if unsure                                                                                                                                               |
-| Penpot `svgAttrs` decoding          | `svgAttrs` contains mixed types (strings + nested dicts) — use `SVGAttributes` wrapper that extracts string values only, not `[String: String]`                                                                                                      |
-| iOS icons PKL: `xcassetsPath`       | `xcassetsPath` and `target` are required in iOS PKL config even for Penpot; `assetsFolder` is folder name inside xcassets, not absolute path                                                                                                         |
-
 ## Additional Rules
 
 Contextual documentation is in `.claude/rules/`:
@@ -495,6 +418,7 @@ Contextual documentation is in `.claude/rules/`:
 | `batch-processing.md` | Batch pre-fetch, pipelined downloads               |
 | `cache-granular.md`   | Experimental granular node-level cache             |
 | `api-reference.md`    | Figma API endpoints, response mapping              |
+| `troubleshooting.md`  | Build/test/PKL/MCP/Penpot problem-solution pairs   |
 | `gotchas.md`          | Swift 6 concurrency, SwiftLint, rate limits        |
 | `linux-compat.md`     | Linux-specific workarounds                         |
 | `testing-workflow.md` | Testing guidelines, commit format                  |
