@@ -354,8 +354,9 @@ When changing fields on `ColorsSourceInput` / `IconsSourceInput` / `ImagesSource
 | README.md       | Keep compact (~80 lines, pain-driven) | Detailed docs (use CONFIG.md / DocC)  |
 
 **Documentation structure:** README is a short pain-driven intro (~80 lines). Detailed docs live in DocC articles
-(`Sources/ExFigCLI/ExFig.docc/`). When adding new features, mention briefly in README Quick Start AND update
-relevant DocC articles (`Usage.md` for CLI, `ExFig.md` landing page for capabilities).
+(`Sources/ExFigCLI/ExFig.docc/`). Architecture, PKL Guide, and Migration are also DocC articles.
+`docs/` is DocC OUTPUT (gitignored, for GitHub Pages) — never put source docs there.
+When adding new features, mention briefly in README Quick Start AND update relevant DocC articles.
 
 **JSONCodec usage:**
 
@@ -449,6 +450,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `VariablesColors` vs `Colors`       | `ColorsVariablesLoader` takes `Common.VariablesColors?`, not `Common.Colors?` — different PKL types                                                                                    |
 | PKL template word search            | Template comments on `lightFileId` contain cross-refs (`variablesColors`, `typography`); test section removal by matching full markers (`colors = new Common.Colors {`) not bare words |
 | CI llms-full.txt stale              | `llms-full.txt` is generated from README + DocC articles; after editing `Usage.md`, `ExFig.md`, or `README.md`, run `./bin/mise run generate:llms` and commit the result               |
+| `docs/` source files lost           | `docs/` is gitignored (DocC output). Source docs live in `ExFig.docc/`. Never `git add -f` to docs/                                                                                    |
 | Release build .pcm warnings         | Stale `ModuleCache` — clean with: `rm -r .build/*/release/ModuleCache` then rebuild                                                                                                    |
 | `nil` in switch expression          | After adding enum case, `nil` in `String?` switch branch fails to compile                                                                                                              |
 | `ColorsConfigError` new case        | Has TWO switch blocks (`errorDescription` + `recoverySuggestion`) — adding a case to one without the other causes exhaustive switch error                                              |
