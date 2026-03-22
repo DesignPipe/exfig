@@ -1,5 +1,5 @@
 {
-  "originHash" : "4a819b3065360bf98b89befa8fb35fa89db17992c9cce7813c9b1eb3c57b8221",
+  "originHash" : "2b3e6002adcb3e450ba06731dcbfc333d3f62894c0ca599c86c390156f0cf048",
   "pins" : [
     {
       "identity" : "aexml",
@@ -197,6 +197,15 @@
       "state" : {
         "revision" : "b31565862a8f39866af50bc6676160d8dda7de35",
         "version" : "2.96.0"
+      }
+    },
+    {
+      "identity" : "swift-penpot-api",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DesignPipe/swift-penpot-api.git",
+      "state" : {
+        "revision" : "3f0ed762b6130d32e96ae0624b2ad084756847b5",
+        "version" : "0.1.0"
       }
     },
     {

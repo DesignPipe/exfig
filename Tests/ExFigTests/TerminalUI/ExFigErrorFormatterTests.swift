@@ -53,7 +53,7 @@ final class ExFigErrorFormatterTests: XCTestCase {
 
         let result = formatter.format(error)
 
-        XCTAssertTrue(result.contains("FIGMA_PERSONAL_TOKEN not set"))
+        XCTAssertTrue(result.contains("FIGMA_PERSONAL_TOKEN is required"))
         XCTAssertTrue(result.contains("→"))
         XCTAssertTrue(result.contains("export FIGMA_PERSONAL_TOKEN"))
     }

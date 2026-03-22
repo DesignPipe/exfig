@@ -98,23 +98,22 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Architecture
 
-Thirteen modules in `Sources/`:
+Twelve modules in `Sources/`:
 
-| Module          | Purpose                                                     |
-| --------------- | ----------------------------------------------------------- |
-| `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI                |
-| `ExFigCore`     | Domain models (Color, Image, TextStyle), processors         |
-| `ExFigConfig`   | PKL config parsing, evaluation, type bridging               |
-| `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.)   |
-| `ExFig-Android` | Android platform plugin                                     |
-| `ExFig-Flutter` | Flutter platform plugin                                     |
-| `ExFig-Web`     | Web platform plugin                                         |
-| `XcodeExport`   | iOS export (.xcassets, Swift extensions)                    |
-| `AndroidExport` | Android export (XML resources, Compose, Vector Drawables)   |
-| `FlutterExport` | Flutter export (Dart code, SVG/PNG assets)                  |
-| `WebExport`     | Web/React export (CSS variables, JSX icons)                 |
-| `JinjaSupport`  | Shared Jinja2 template rendering across Export modules      |
-| `PenpotAPI`     | Penpot RPC API client (standalone, no ExFigCore dependency) |
+| Module          | Purpose                                                   |
+| --------------- | --------------------------------------------------------- |
+| `ExFigCLI`      | CLI commands, loaders, file I/O, terminal UI              |
+| `ExFigCore`     | Domain models (Color, Image, TextStyle), processors       |
+| `ExFigConfig`   | PKL config parsing, evaluation, type bridging             |
+| `ExFig-iOS`     | iOS platform plugin (ColorsExporter, IconsExporter, etc.) |
+| `ExFig-Android` | Android platform plugin                                   |
+| `ExFig-Flutter` | Flutter platform plugin                                   |
+| `ExFig-Web`     | Web platform plugin                                       |
+| `XcodeExport`   | iOS export (.xcassets, Swift extensions)                  |
+| `AndroidExport` | Android export (XML resources, Compose, Vector Drawables) |
+| `FlutterExport` | Flutter export (Dart code, SVG/PNG assets)                |
+| `WebExport`     | Web/React export (CSS variables, JSX icons)               |
+| `JinjaSupport`  | Shared Jinja2 template rendering across Export modules    |
 
 **Data flow:** CLI -> PKL config parsing -> FigmaAPI (external) fetch -> ExFigCore processing -> Platform plugin -> Export module -> File write
 **Alt data flow (tokens):** CLI -> local .tokens.json file -> TokensFileSource -> ExFigCore models -> W3C JSON export
@@ -394,24 +393,25 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 
 ## Dependencies
 
-| Package               | Version | Purpose                                            |
-| --------------------- | ------- | -------------------------------------------------- |
-| swift-argument-parser | 1.5.0+  | CLI framework                                      |
-| swift-collections     | 1.2.x   | Ordered collections                                |
-| swift-jinja           | 2.0.0+  | Jinja2 template engine                             |
-| XcodeProj             | 8.27.0+ | Xcode project manipulation                         |
-| swift-log             | 1.6.0+  | Logging                                            |
-| Rainbow               | 4.2.0+  | Terminal colors                                    |
-| libwebp               | 1.4.1+  | WebP encoding                                      |
-| libpng                | 1.6.45+ | PNG decoding                                       |
-| swift-custom-dump     | 1.3.0+  | Test assertions                                    |
-| Noora                 | 0.54.0+ | Terminal UI design system                          |
-| swift-figma-api       | 0.2.0+  | Figma REST API client (async/await, rate limiting) |
-| swift-svgkit          | 0.1.0+  | SVG parsing, ImageVector/VectorDrawable generation |
-| swift-resvg           | 0.45.1  | SVG parsing/rendering                              |
-| swift-docc-plugin     | 1.4.5+  | DocC documentation                                 |
-| swift-yyjson          | 0.5.0+  | High-performance JSON codec                        |
-| pkl-swift             | 0.8.0+  | PKL config evaluation & codegen                    |
+| Package               | Version | Purpose                                                 |
+| --------------------- | ------- | ------------------------------------------------------- |
+| swift-argument-parser | 1.5.0+  | CLI framework                                           |
+| swift-collections     | 1.2.x   | Ordered collections                                     |
+| swift-jinja           | 2.0.0+  | Jinja2 template engine                                  |
+| XcodeProj             | 8.27.0+ | Xcode project manipulation                              |
+| swift-log             | 1.6.0+  | Logging                                                 |
+| Rainbow               | 4.2.0+  | Terminal colors                                         |
+| libwebp               | 1.4.1+  | WebP encoding                                           |
+| libpng                | 1.6.45+ | PNG decoding                                            |
+| swift-custom-dump     | 1.3.0+  | Test assertions                                         |
+| Noora                 | 0.54.0+ | Terminal UI design system                               |
+| swift-figma-api       | 0.2.0+  | Figma REST API client (async/await, rate limiting)      |
+| swift-penpot-api      | 0.1.0+  | Penpot RPC API client (async/await, SVG reconstruction) |
+| swift-svgkit          | 0.1.0+  | SVG parsing, ImageVector/VectorDrawable generation      |
+| swift-resvg           | 0.45.1  | SVG parsing/rendering                                   |
+| swift-docc-plugin     | 1.4.5+  | DocC documentation                                      |
+| swift-yyjson          | 0.5.0+  | High-performance JSON codec                             |
+| pkl-swift             | 0.8.0+  | PKL config evaluation & codegen                         |
 
 ## Troubleshooting
 
@@ -454,7 +454,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `ColorsConfigError` new case        | Has TWO switch blocks (`errorDescription` + `recoverySuggestion`) — adding a case to one without the other causes exhaustive switch error                                              |
 | PKL↔Swift enum rawValue             | PKL kebab `"tokens-file"` → `.tokensFile`, but Swift rawValue is `"tokensFile"` — rawValue round-trip fails                                                                            |
 | `unsupportedSourceKind` compile err | Changed to `.unsupportedSourceKind(kind, assetType:)` — add asset type string ("colors", "icons/images", "typography")                                                                 |
-| `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — standalone modules (PenpotAPI) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                           |
+| `JSONCodec` in standalone module    | `JSONCodec` lives in ExFigCore — external packages (swift-penpot-api) use `YYJSONEncoder()`/`YYJSONDecoder()` from YYJSON directly                                                     |
 | `function_body_length` after branch | Split into private extension helper methods (e.g., `penpotColorsSourceInput()`, `tokensFileColorsSourceInput()`)                                                                       |
 | `ExFigCommand.terminalUI` in tests  | Implicitly unwrapped — must init in `setUp()`: `ExFigCommand.terminalUI = TerminalUI(outputMode: .quiet)` before testing code that uses it (SourceFactory, Penpot sources)             |
 | `--timeout` duplicate in `fetch`    | `FetchImages` uses both `DownloadOptions` and `HeavyFaultToleranceOptions` which both define `--timeout`. Fix: inline Heavy options + computed property                                |

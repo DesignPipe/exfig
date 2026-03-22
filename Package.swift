@@ -28,6 +28,7 @@ let package = Package(
         .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
         .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.1.0"),
         .package(url: "https://github.com/DesignPipe/swift-figma-api.git", from: "0.2.0"),
+        .package(url: "https://github.com/DesignPipe/swift-penpot-api.git", from: "0.1.0"),
         .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.9.0"),
     ],
     targets: [
@@ -36,7 +37,7 @@ let package = Package(
             name: "ExFigCLI",
             dependencies: [
                 .product(name: "FigmaAPI", package: "swift-figma-api"),
-                "PenpotAPI",
+                .product(name: "PenpotAPI", package: "swift-penpot-api"),
                 "ExFigCore",
                 "ExFigConfig",
                 "XcodeExport",
@@ -147,15 +148,6 @@ let package = Package(
             ]
         ),
 
-        // Penpot API client
-        .target(
-            name: "PenpotAPI",
-            dependencies: [
-                .product(name: "YYJSON", package: "swift-yyjson"),
-            ],
-            exclude: ["CLAUDE.md"]
-        ),
-
         // MARK: - Platform Plugins
 
         // iOS platform plugin
@@ -255,18 +247,6 @@ let package = Package(
             name: "WebExportTests",
             dependencies: [
                 "WebExport", .product(name: "CustomDump", package: "swift-custom-dump"),
-            ]
-        ),
-
-        .testTarget(
-            name: "PenpotAPITests",
-            dependencies: [
-                "PenpotAPI",
-                .product(name: "CustomDump", package: "swift-custom-dump"),
-            ],
-            exclude: ["README.md"],
-            resources: [
-                .copy("Fixtures/"),
             ]
         ),
 
