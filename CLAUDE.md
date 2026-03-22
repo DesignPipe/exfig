@@ -459,6 +459,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Lazy Figma token validation         | `ExFigOptions.validate()` reads token without throwing; `resolveClient()` returns placeholder if nil; `SourceFactory` guards `.figma` branch with `accessTokenNotFound`                |
 | PKL `swiftuiColorSwift` casing      | PKL codegen lowercases: `swiftuiColorSwift`, not `swiftUIColorSwift` — check with `pkl eval` if unsure                                                                                 |
 | Penpot `svgAttrs` decoding          | `svgAttrs` contains mixed types (strings + nested dicts) — use `SVGAttributes` wrapper that extracts string values only, not `[String: String]`                                        |
+| iOS icons PKL: `xcassetsPath`       | `xcassetsPath` and `target` are required in iOS PKL config even for Penpot; `assetsFolder` is folder name inside xcassets, not absolute path                                           |
 
 ## Additional Rules
 

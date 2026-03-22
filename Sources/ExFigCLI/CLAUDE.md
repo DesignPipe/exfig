@@ -219,6 +219,12 @@ All platforms (iOS/Android/Flutter/Web) use `SourceFactory.createComponentsSourc
 When adding a new source kind: update `SourceFactory`, add source impl in `Source/`, update error `assetType`.
 Penpot sources create `BasePenpotClient` internally from `PENPOT_ACCESS_TOKEN` env var (like TokensFileSource reads local files — no injected client).
 
+### Local File URLs (Penpot SVG)
+
+`PenpotComponentsSource` writes reconstructed SVGs to temp files and passes `file://` URLs in `Image.url`.
+`FileDownloader.fetch()` treats `file://` URLs as local files (skips HTTP download). Do NOT weaken
+`validateDownloadURL()` — it must remain HTTPS-only. Filter file URLs in `fetch()` before download loop.
+
 ### Adding a New Subcommand
 
 1. Create `Subcommands/NewCommand.swift` implementing `AsyncParsableCommand`
