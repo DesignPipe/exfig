@@ -57,29 +57,40 @@ swift build -c release
 
 ```
 Sources/
-├── ExFig/              # CLI commands and main executable
+├── ExFigCLI/           # CLI commands and main executable
 │   ├── Subcommands/    # CLI command implementations
 │   ├── Loaders/        # Figma data loaders
 │   ├── Input/          # Configuration parsing
 │   ├── Output/         # File writers
 │   ├── TerminalUI/     # Progress bars, spinners
 │   ├── Cache/          # Version tracking
-│   └── Batch/          # Batch processing
+│   ├── Batch/          # Batch processing
+│   ├── Source/         # Design source implementations (Figma, Penpot, TokensFile)
+│   └── MCP/            # Model Context Protocol server
 ├── ExFigCore/          # Domain models and processors
-├── FigmaAPI/           # Figma REST API client
+├── ExFigConfig/        # PKL config parsing, evaluation
+├── ExFig-iOS/          # iOS platform plugin
+├── ExFig-Android/      # Android platform plugin
+├── ExFig-Flutter/      # Flutter platform plugin
+├── ExFig-Web/          # Web platform plugin
 ├── XcodeExport/        # iOS export (xcassets, Swift)
-├── AndroidExport/      # Android export (XML, Compose)
+├── AndroidExport/      # Android export (XML, Compose, VectorDrawable)
 ├── FlutterExport/      # Flutter export (Dart, assets)
-└── SVGKit/             # SVG parsing and code generation
+├── WebExport/          # Web export (CSS, JSX icons)
+└── JinjaSupport/       # Shared Jinja2 template rendering
 
 Tests/
 ├── ExFigTests/
 ├── ExFigCoreTests/
-├── FigmaAPITests/
 ├── XcodeExportTests/
 ├── AndroidExportTests/
 ├── FlutterExportTests/
-└── SVGKitTests/
+├── WebExportTests/
+├── JinjaSupportTests/
+├── ExFig-iOSTests/
+├── ExFig-AndroidTests/
+├── ExFig-FlutterTests/
+└── ExFig-WebTests/
 ```
 
 ## Available Tasks
@@ -167,35 +178,7 @@ static let configuration = CommandConfiguration(
 
 ## Adding a Figma API Endpoint
 
-1. Create endpoint in `Sources/FigmaAPI/Endpoint/`:
-
-```swift
-struct NewEndpoint: FigmaEndpoint {
-    typealias Response = NewResponse
-
-    let fileId: String
-
-    var path: String {
-        "files/\(fileId)/new-resource"
-    }
-}
-```
-
-2. Create response model in `Sources/FigmaAPI/Model/`:
-
-```swift
-struct NewResponse: Codable {
-    let data: [NewItem]
-}
-```
-
-3. Add method to `FigmaClient`:
-
-```swift
-func fetchNewResource(fileId: String) async throws -> NewResponse {
-    try await request(NewEndpoint(fileId: fileId))
-}
-```
+FigmaAPI is an external package ([swift-figma-api](https://github.com/DesignPipe/swift-figma-api)). See its repository for endpoint patterns and contribution guidelines.
 
 ## Modifying Templates
 
