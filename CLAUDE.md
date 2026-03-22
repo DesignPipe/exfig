@@ -98,7 +98,7 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Architecture
 
-Fifteen modules in `Sources/`:
+Thirteen modules in `Sources/`:
 
 | Module          | Purpose                                                     |
 | --------------- | ----------------------------------------------------------- |
@@ -303,6 +303,11 @@ FigmaAPI is now an external package (`swift-figma-api`). See its repository for 
 This enables per-entry `sourceKind` — different entries in one config can use different sources.
 Do NOT inject `colorsSource` at context construction time — it breaks multi-source configs.
 
+### Penpot Source Patterns
+
+- `PenpotClientFactory.makeClient(baseURL:)` — shared factory in `Source/PenpotClientFactory.swift`. All Penpot sources use this (NOT a static on any single source).
+- Dictionary iteration from Penpot API (`colors`, `typographies`, `components`) must be sorted by key for deterministic export order: `.sorted(by: { $0.key < $1.key })`.
+
 ### Entry Bridge Source Kind Resolution
 
 Entry bridge methods (`iconsSourceInput()`, `imagesSourceInput()`) use `resolvedSourceKind` (computed property on `Common_FrameSource`)
@@ -445,6 +450,9 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `--timeout` duplicate in `fetch`    | `FetchImages` uses both `DownloadOptions` and `HeavyFaultToleranceOptions` which both define `--timeout`. Fix: inline Heavy options + computed property                                |
 | DocC articles not in Bundle.module  | `.docc` articles aren't copied to SPM bundle — use `Resources/Guides/` with `.copy()` for MCP-served content                                                                           |
 | Penpot `update-file` changes format | Flat `changes[]` array, `type` dispatch, needs `vern` field. Shapes need `parentId`, `frameId`, `selrect`, `points`, `transform`. Undocumented — use validation errors                 |
+| Switch expression + `return`        | When any switch branch has side-effects before `return`, use explicit `return` on ALL branches — implicit return breaks type inference                                                 |
+| `FIGMA_PERSONAL_TOKEN` for Penpot   | `ExFigOptions.validate()` requires it even for Penpot-only configs — pass dummy value for testing                                                                                      |
+| PKL `swiftuiColorSwift` casing      | PKL codegen lowercases: `swiftuiColorSwift`, not `swiftUIColorSwift` — check with `pkl eval` if unsure                                                                                 |
 
 ## Additional Rules
 

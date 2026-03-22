@@ -12,16 +12,17 @@ struct PenpotColorsSource: ColorsSource {
             )
         }
 
-        let client = try Self.makeClient(baseURL: config.baseURL)
+        let client = try PenpotClientFactory.makeClient(baseURL: config.baseURL)
         let fileResponse = try await client.request(GetFileEndpoint(fileId: config.fileId))
 
         guard let penpotColors = fileResponse.data.colors else {
+            ui.warning("Penpot file '\(fileResponse.name)' has no library colors")
             return ColorsLoadOutput(light: [])
         }
 
         var colors: [Color] = []
 
-        for (_, penpotColor) in penpotColors {
+        for (_, penpotColor) in penpotColors.sorted(by: { $0.key < $1.key }) {
             // Skip gradient/image fills (no solid hex)
             guard let hex = penpotColor.color else { continue }
 
@@ -58,15 +59,6 @@ struct PenpotColorsSource: ColorsSource {
     }
 
     // MARK: - Internal
-
-    static func makeClient(baseURL: String) throws -> BasePenpotClient {
-        guard let token = ProcessInfo.processInfo.environment["PENPOT_ACCESS_TOKEN"], !token.isEmpty else {
-            throw ExFigError.configurationError(
-                "PENPOT_ACCESS_TOKEN environment variable is required for Penpot source"
-            )
-        }
-        return BasePenpotClient(accessToken: token, baseURL: baseURL)
-    }
 
     static func hexToRGBA(hex: String, opacity: Double)
         -> (red: Double, green: Double, blue: Double, alpha: Double)?

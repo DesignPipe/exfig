@@ -36,6 +36,11 @@ public struct PenpotAPIError: LocalizedError, Sendable {
             "The requested resource was not found. Verify the file UUID is correct."
         case 429:
             "Rate limited by Penpot API. The request was retried but still failed. Try again later."
+        case 500 ... 599:
+            "Penpot server error. This may be temporary — try again in a few minutes. " +
+                "If the problem persists, check your Penpot instance status."
+        case 0:
+            "A network error occurred. Check your internet connection and verify the Penpot base URL is correct."
         default:
             nil
         }

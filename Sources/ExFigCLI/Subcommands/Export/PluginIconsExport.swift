@@ -39,7 +39,9 @@ extension ExFigCommand.ExportIcons {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
-        let componentsSource = FigmaComponentsSource(
+        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        let componentsSource = try SourceFactory.createComponentsSource(
+            for: sourceKind,
             client: client,
             params: params,
             platform: .ios,

@@ -50,11 +50,12 @@ struct PenpotComponentsSource: ComponentsSource {
         }
 
         let effectiveBaseURL = baseURL ?? BasePenpotClient.defaultBaseURL
-        let client = try PenpotColorsSource.makeClient(baseURL: effectiveBaseURL)
+        let client = try PenpotClientFactory.makeClient(baseURL: effectiveBaseURL)
 
         let fileResponse = try await client.request(GetFileEndpoint(fileId: fileId))
 
         guard let components = fileResponse.data.components else {
+            ui.warning("Penpot file '\(fileResponse.name)' has no library components")
             return []
         }
 
@@ -64,19 +65,21 @@ struct PenpotComponentsSource: ComponentsSource {
             return path.hasPrefix(pathFilter)
         }
 
-        guard !matchedComponents.isEmpty else {
+        let sortedComponents = matchedComponents.sorted { $0.name < $1.name }
+
+        guard !sortedComponents.isEmpty else {
             return []
         }
 
         // Get thumbnails for matched components
-        let objectIds = matchedComponents.map(\.id)
+        let objectIds = sortedComponents.map(\.id)
         let thumbnails = try await client.request(
             GetFileObjectThumbnailsEndpoint(fileId: fileId, objectIds: objectIds)
         )
 
         var packs: [ImagePack] = []
 
-        for component in matchedComponents {
+        for component in sortedComponents {
             guard let thumbnailRef = thumbnails[component.id] else {
                 ui.warning("Component '\(component.name)' has no thumbnail — skipping")
                 continue
@@ -86,7 +89,7 @@ struct PenpotComponentsSource: ComponentsSource {
             let fullURL: String = if thumbnailRef.hasPrefix("http") {
                 thumbnailRef
             } else {
-                "\(effectiveBaseURL)assets/by-file-media-id/\(thumbnailRef)"
+                "\(effectiveBaseURL)assets/by-id/\(thumbnailRef)"
             }
 
             guard let url = URL(string: fullURL) else {

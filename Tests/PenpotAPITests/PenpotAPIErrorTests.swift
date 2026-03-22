@@ -23,10 +23,16 @@ struct PenpotAPIErrorTests {
         #expect(error.recoverySuggestion?.contains("Rate") == true)
     }
 
-    @Test("500 error has no recovery suggestion")
+    @Test("500 error suggests server-side issue")
     func serverError() {
         let error = PenpotAPIError(statusCode: 500, message: "Internal error", endpoint: "get-file")
-        #expect(error.recoverySuggestion == nil)
+        #expect(error.recoverySuggestion?.contains("server error") == true)
+    }
+
+    @Test("0 status code suggests network error")
+    func networkError() {
+        let error = PenpotAPIError(statusCode: 0, message: nil, endpoint: "get-file")
+        #expect(error.recoverySuggestion?.contains("network") == true)
     }
 
     @Test("Error description includes endpoint and status code")

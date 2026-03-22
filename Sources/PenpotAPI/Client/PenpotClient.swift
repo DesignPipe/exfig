@@ -32,8 +32,11 @@ public struct BasePenpotClient: PenpotClient {
         precondition(maxRetries >= 1, "maxRetries must be at least 1")
         precondition(!accessToken.isEmpty, "accessToken must not be empty")
 
+        let normalizedURL = baseURL.hasSuffix("/") ? baseURL : baseURL + "/"
+        precondition(URL(string: normalizedURL) != nil, "baseURL must be a valid URL: \(baseURL)")
+
         self.accessToken = accessToken
-        self.baseURL = baseURL.hasSuffix("/") ? baseURL : baseURL + "/"
+        self.baseURL = normalizedURL
         self.maxRetries = maxRetries
 
         let config = URLSessionConfiguration.ephemeral
@@ -68,17 +71,30 @@ public struct BasePenpotClient: PenpotClient {
             )
         }
 
-        return try endpoint.content(from: data)
+        do {
+            return try endpoint.content(from: data)
+        } catch let error as PenpotAPIError {
+            throw error
+        } catch {
+            throw PenpotAPIError(
+                statusCode: httpResponse.statusCode,
+                message: "Failed to decode response for '\(endpoint.commandName)': \(error.localizedDescription)",
+                endpoint: endpoint.commandName
+            )
+        }
     }
 
     public func download(path: String) async throws -> Data {
-        guard let url = URL(string: baseURL + path) else {
+        let isAbsolute = path.hasPrefix("http://") || path.hasPrefix("https://")
+        let urlString = isAbsolute ? path : baseURL + path
+        guard let url = URL(string: urlString) else {
             throw PenpotAPIError(statusCode: 0, message: "Invalid download URL: \(path)", endpoint: "download")
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Token \(accessToken)", forHTTPHeaderField: "Authorization")
+        // Penpot asset storage (S3/MinIO) uses presigned URLs that conflict
+        // with an Authorization header. Do not send auth for asset downloads.
 
         let (data, response) = try await performWithRetry(request: request, endpoint: "download")
 
@@ -123,17 +139,19 @@ public struct BasePenpotClient: PenpotClient {
 
                     // Retry on 429 or 5xx
                     if statusCode == 429 || (500 ..< 600).contains(statusCode) {
-                        lastError = PenpotAPIError(
+                        let error = PenpotAPIError(
                             statusCode: statusCode,
                             message: String(data: data, encoding: .utf8),
                             endpoint: endpoint
                         )
 
                         if attempt < maxRetries - 1 {
+                            lastError = error
                             let delay = pow(2.0, Double(attempt)) // 1s, 2s, 4s
                             try await Task.sleep(for: .seconds(delay))
                             continue
                         }
+                        throw error
                     }
                 }
 

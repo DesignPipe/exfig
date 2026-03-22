@@ -30,10 +30,10 @@ public struct PenpotTypography: Sendable {
     /// Font weight (e.g., 400, 700).
     public let fontWeight: Double?
 
-    /// Line height multiplier.
+    /// Line height value.
     public let lineHeight: Double?
 
-    /// Letter spacing in em.
+    /// Letter spacing value.
     public let letterSpacing: Double?
 
     public init(

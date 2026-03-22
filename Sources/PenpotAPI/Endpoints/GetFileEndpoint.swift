@@ -12,6 +12,7 @@ public struct GetFileEndpoint: PenpotEndpoint {
     private let fileId: String
 
     public init(fileId: String) {
+        precondition(!fileId.isEmpty, "fileId must not be empty")
         self.fileId = fileId
     }
 

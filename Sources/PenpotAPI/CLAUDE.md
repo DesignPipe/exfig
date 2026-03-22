@@ -36,3 +36,9 @@ If switching to `/api/rpc/command/`, update `BasePenpotClient.buildURL(for:)`.
 - `BasePenpotClient` validates `maxRetries >= 1` and `!accessToken.isEmpty` via preconditions
 - Retry loop respects `CancellationError` — rethrows immediately instead of retrying
 - `download()` includes response body in error message for diagnostics
+- `performWithRetry` must `throw` on the final attempt for retryable errors — falling through to `return` would return the error response as success data
+- `BasePenpotClient.init` validates `baseURL` via precondition — invalid URLs fail at construction, not at first request
+- `download(path:)` handles both absolute URLs (`http://...`) and relative paths — does NOT blindly prepend `baseURL`
+- `download()` must NOT send `Authorization` header — Penpot assets are served via S3/MinIO presigned URLs that conflict with extra auth
+- Thumbnail download path is `assets/by-id/<uuid>`, NOT `assets/by-file-media-id/<uuid>`
+- `get-file-object-thumbnails` returns compound keys (`fileId/pageId/objectId/type`), not simple component IDs — v1 limitation

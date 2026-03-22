@@ -7,17 +7,18 @@ struct PenpotTypographySource: TypographySource {
 
     func loadTypography(from input: TypographySourceInput) async throws -> TypographyLoadOutput {
         let effectiveBaseURL = input.penpotBaseURL ?? BasePenpotClient.defaultBaseURL
-        let client = try PenpotColorsSource.makeClient(baseURL: effectiveBaseURL)
+        let client = try PenpotClientFactory.makeClient(baseURL: effectiveBaseURL)
 
         let fileResponse = try await client.request(GetFileEndpoint(fileId: input.fileId))
 
         guard let typographies = fileResponse.data.typographies else {
+            ui.warning("Penpot file '\(fileResponse.name)' has no library typographies")
             return TypographyLoadOutput(textStyles: [])
         }
 
         var textStyles: [TextStyle] = []
 
-        for (_, typography) in typographies {
+        for (_, typography) in typographies.sorted(by: { $0.key < $1.key }) {
             guard let fontSize = typography.fontSize else {
                 ui.warning("Typography '\(typography.name)' has unparseable font-size — skipping")
                 continue
@@ -30,6 +31,10 @@ struct PenpotTypographySource: TypographySource {
             }
 
             let textCase = mapTextTransform(typography.textTransform)
+
+            if typography.letterSpacing == nil, typography.lineHeight != nil {
+                ui.warning("Typography '\(typography.name)' has unparseable letter-spacing — defaulting to 0")
+            }
 
             textStyles.append(TextStyle(
                 name: name,
@@ -50,11 +55,14 @@ struct PenpotTypographySource: TypographySource {
     private func mapTextTransform(_ transform: String?) -> TextStyle.TextCase {
         switch transform {
         case "uppercase":
-            .uppercased
+            return .uppercased
         case "lowercase":
-            .lowercased
+            return .lowercased
+        case nil, "none":
+            return .original
         default:
-            .original
+            ui.warning("Unknown text transform '\(transform!)' — using original")
+            return .original
         }
     }
 }

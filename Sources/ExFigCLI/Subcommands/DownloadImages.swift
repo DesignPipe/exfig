@@ -116,8 +116,8 @@ extension ExFigCommand {
             }
 
             // Penpot path — use PenpotAPI directly
-            if wizardResult?.designSource == .penpot {
-                try await runPenpotFetch(options: options, wizardResult: wizardResult!, ui: ui)
+            if let result = wizardResult, result.designSource == .penpot {
+                try await runPenpotFetch(options: options, wizardResult: result, ui: ui)
                 return
             }
 
@@ -323,7 +323,7 @@ extension ExFigCommand {
             }
 
             let baseURL = wizardResult.penpotBaseURL ?? BasePenpotClient.defaultBaseURL
-            let client = try PenpotColorsSource.makeClient(baseURL: baseURL)
+            let client = try PenpotClientFactory.makeClient(baseURL: baseURL)
 
             let outputURL = URL(fileURLWithPath: outputPath, isDirectory: true)
             try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
@@ -369,14 +369,13 @@ extension ExFigCommand {
                     continue
                 }
 
-                let fullURL: String = if thumbnailRef.hasPrefix("http") {
+                let downloadPath: String = if thumbnailRef.hasPrefix("http") {
                     thumbnailRef
                 } else {
-                    "\(baseURL)assets/by-file-media-id/\(thumbnailRef)"
+                    "assets/by-id/\(thumbnailRef)"
                 }
 
-                let data = try await client
-                    .download(path: fullURL.hasPrefix("http") ? fullURL : "assets/by-file-media-id/\(thumbnailRef)")
+                let data = try await client.download(path: downloadPath)
                 let fileName = "\(component.name).png"
                 let fileURL = outputURL.appendingPathComponent(fileName)
                 try data.write(to: fileURL)

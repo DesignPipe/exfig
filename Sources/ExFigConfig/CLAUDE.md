@@ -60,6 +60,10 @@ ExFigCore domain types (NameStyle, ColorsSourceInput, etc.)
 | `Common_FrameSource.resolvedFileId`                     | `penpotSource?.fileId ?? figmaFileId` — auto-resolves file ID for any source. Defined in `SourceKindBridging.swift`                        |
 | `Common_FrameSource.resolvedPenpotBaseURL`              | `penpotSource?.baseUrl` — passes Penpot base URL through entry bridges. Defined in `SourceKindBridging.swift`                              |
 
+### Generated Type Gotchas
+
+- `Common.PenpotSource.baseUrl` is non-optional `String` (has PKL default) — tests must pass a real URL, not `nil`
+
 ### PklError Workaround
 
 `PklSwift.PklError` doesn't conform to `LocalizedError`. The `@retroactive` extension in `PKLEvaluator.swift` exposes `.message` — without it, `.localizedDescription` returns a useless generic string.

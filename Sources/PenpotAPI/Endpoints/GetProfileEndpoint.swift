@@ -4,7 +4,7 @@ import YYJSON
 /// Retrieves the authenticated user's profile.
 ///
 /// Command: `get-profile`
-/// Body: none
+/// Body: `{}` (empty JSON object — Penpot requires non-nil body)
 public struct GetProfileEndpoint: PenpotEndpoint {
     public typealias Content = PenpotProfile
 
