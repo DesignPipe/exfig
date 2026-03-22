@@ -11,9 +11,6 @@ typealias DownloadProgressCallback = @Sendable (Int, Int) async -> Void
 /// Validates that a download URL uses HTTPS and has a valid host.
 /// Shared by both `FileDownloader` and `SharedDownloadQueue`.
 func validateDownloadURL(_ url: URL) throws {
-    // Allow file:// URLs for locally reconstructed assets (e.g., Penpot SVG from shape tree)
-    if url.isFileURL { return }
-
     guard url.scheme?.lowercased() == "https" else {
         throw URLError(
             .badURL,
@@ -50,8 +47,18 @@ final class FileDownloader: Sendable {
         files: [FileContents],
         onProgress: DownloadProgressCallback? = nil
     ) async throws -> [FileContents] {
-        let remoteFiles = files.filter { $0.sourceURL != nil }
-        let localFiles = files.filter { $0.sourceURL == nil }
+        // file:// URLs (e.g., Penpot SVG from shape tree) are already on disk — treat as local
+        let remoteFiles = files.filter { $0.sourceURL != nil && !($0.sourceURL?.isFileURL ?? false) }
+        let localFileURLs = files.filter { $0.sourceURL?.isFileURL == true }.map { file in
+            FileContents(
+                destination: file.destination,
+                dataFile: file.sourceURL!,
+                scale: file.scale,
+                dark: file.dark,
+                isRTL: file.isRTL
+            )
+        }
+        let localFiles = files.filter { $0.sourceURL == nil } + localFileURLs
         let remoteFileCount = remoteFiles.count
 
         if remoteFiles.isEmpty {
@@ -108,18 +115,6 @@ final class FileDownloader: Sendable {
         }
 
         try validateDownloadURL(remoteURL)
-
-        // Local files (e.g., Penpot SVG reconstructed from shape tree) — already on disk
-        if remoteURL.isFileURL {
-            return FileContents(
-                destination: file.destination,
-                dataFile: remoteURL,
-                scale: file.scale,
-                dark: file.dark,
-                isRTL: file.isRTL
-            )
-        }
-
         let (localURL, _) = try await session.download(from: remoteURL)
 
         return FileContents(
