@@ -215,7 +215,7 @@ DocC `.docc` articles are NOT accessible via `Bundle.module` at runtime — must
 `ColorsExportContextImpl.loadColors()` creates source via `SourceFactory.createColorsSource(for:...)` per call.
 `IconsExportContextImpl` / `ImagesExportContextImpl` use injected `componentsSource` (Figma and Penpot supported via `SourceFactory`).
 `PluginColorsExport` does NOT create sources — context handles dispatch internally.
-**Source dispatch gap:** `PluginIconsExport` iOS uses `SourceFactory`; Android/Flutter/Web still hardcode `FigmaComponentsSource`. `PluginImagesExport` all platforms hardcoded.
+All platforms (iOS/Android/Flutter/Web) use `SourceFactory.createComponentsSource(for:)` in both `PluginIconsExport` and `PluginImagesExport`.
 When adding a new source kind: update `SourceFactory`, add source impl in `Source/`, update error `assetType`.
 Penpot sources create `BasePenpotClient` internally from `PENPOT_ACCESS_TOKEN` env var (like TokensFileSource reads local files — no injected client).
 

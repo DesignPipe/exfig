@@ -38,7 +38,9 @@ extension ExFigCommand.ExportImages {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
-        let componentsSource = FigmaComponentsSource(
+        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        let componentsSource = try SourceFactory.createComponentsSource(
+            for: sourceKind,
             client: client,
             params: params,
             platform: .ios,
@@ -114,7 +116,9 @@ extension ExFigCommand.ExportImages {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
-        let componentsSource = FigmaComponentsSource(
+        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        let componentsSource = try SourceFactory.createComponentsSource(
+            for: sourceKind,
             client: client,
             params: params,
             platform: .android,
@@ -167,7 +171,9 @@ extension ExFigCommand.ExportImages {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
-        let componentsSource = FigmaComponentsSource(
+        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        let componentsSource = try SourceFactory.createComponentsSource(
+            for: sourceKind,
             client: client,
             params: params,
             platform: .flutter,
@@ -220,7 +226,9 @@ extension ExFigCommand.ExportImages {
         let batchMode = BatchSharedState.current?.isBatchMode ?? false
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
-        let componentsSource = FigmaComponentsSource(
+        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        let componentsSource = try SourceFactory.createComponentsSource(
+            for: sourceKind,
             client: client,
             params: params,
             platform: .web,

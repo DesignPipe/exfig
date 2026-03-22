@@ -458,6 +458,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Switch expression + `return`        | When any switch branch has side-effects before `return`, use explicit `return` on ALL branches — implicit return breaks type inference                                                 |
 | Lazy Figma token validation         | `ExFigOptions.validate()` reads token without throwing; `resolveClient()` returns placeholder if nil; `SourceFactory` guards `.figma` branch with `accessTokenNotFound`                |
 | PKL `swiftuiColorSwift` casing      | PKL codegen lowercases: `swiftuiColorSwift`, not `swiftUIColorSwift` — check with `pkl eval` if unsure                                                                                 |
+| Penpot `svgAttrs` decoding          | `svgAttrs` contains mixed types (strings + nested dicts) — use `SVGAttributes` wrapper that extracts string values only, not `[String: String]`                                        |
 
 ## Additional Rules
 

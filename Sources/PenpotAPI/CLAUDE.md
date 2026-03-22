@@ -42,3 +42,14 @@ If switching to `/api/rpc/command/`, update `BasePenpotClient.buildURL(for:)`.
 - `download()` must NOT send `Authorization` header — Penpot assets are served via S3/MinIO presigned URLs that conflict with extra auth
 - Thumbnail download path is `assets/by-id/<uuid>`, NOT `assets/by-file-media-id/<uuid>`
 - `get-file-object-thumbnails` returns compound keys (`fileId/pageId/objectId/type`), not simple component IDs — v1 limitation
+
+## SVG Reconstruction
+
+Icons/images exported via shape tree → SVG (no CDN, no headless Chrome):
+
+- `PenpotShapeRenderer.renderSVG(objects:rootId:)` — pure function, shape tree → SVG string
+- Shapes are in canvas-space — subtract root frame's `selrect.x/y` to normalize
+- `svgAttrs` has mixed types (string values + nested `style` dict) — `SVGAttributes` type extracts strings only
+- Supported shape types: path, rect, circle, bool (compound path), group, frame
+- Components need `mainInstanceId` + `mainInstancePage` for shape tree lookup
+- Linked libraries: use `get-file` with library file ID (from `get-file-libraries`)

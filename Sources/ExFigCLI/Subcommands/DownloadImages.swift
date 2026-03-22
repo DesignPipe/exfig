@@ -321,7 +321,7 @@ extension ExFigCommand {
 
         // MARK: - Penpot Fetch
 
-        // swiftlint:disable function_body_length
+        // swiftlint:disable function_body_length cyclomatic_complexity
         private func runPenpotFetch(
             options: DownloadOptions,
             wizardResult: FetchWizardResult,
@@ -356,10 +356,12 @@ extension ExFigCommand {
             }
 
             // Filter by path prefix
-            let matched = components.values.filter { comp in
-                guard let path = comp.path else { return false }
-                return path.hasPrefix(frameName)
-            }
+            let matched = components.values
+                .filter { comp in
+                    guard let path = comp.path else { return false }
+                    return path.hasPrefix(frameName)
+                }
+                .sorted { $0.name < $1.name }
 
             guard !matched.isEmpty else {
                 ui.warning("No components matching path '\(frameName)' found")
@@ -368,42 +370,60 @@ extension ExFigCommand {
 
             ui.info("Found \(matched.count) components")
 
-            // Get thumbnails
-            let objectIds = matched.map(\.id)
-            let thumbnails = try await ui.withSpinner("Fetching thumbnails...") {
-                try await client.request(
-                    GetFileObjectThumbnailsEndpoint(fileId: fileId, objectIds: objectIds)
-                )
-            }
+            // Reconstruct SVG from shape tree
+            let format = options.format ?? .svg
+            var exportedCount = 0
 
-            // Download each thumbnail
-            var downloadedCount = 0
             for component in matched {
-                guard let thumbnailRef = thumbnails[component.id] else {
-                    ui.warning("Component '\(component.name)' has no thumbnail — skipping")
+                guard let pageId = component.mainInstancePage,
+                      let instanceId = component.mainInstanceId,
+                      let page = fileResponse.data.pagesIndex?[pageId],
+                      let objects = page.objects
+                else {
+                    ui.warning("Component '\(component.name)' has no shape data — skipping")
                     continue
                 }
 
-                let downloadPath: String = if thumbnailRef.hasPrefix("http") {
-                    thumbnailRef
-                } else {
-                    "assets/by-id/\(thumbnailRef)"
+                guard let svgString = PenpotShapeRenderer.renderSVG(
+                    objects: objects, rootId: instanceId
+                ) else {
+                    ui.warning("Component '\(component.name)' — SVG reconstruction failed, skipping")
+                    continue
                 }
 
-                let data = try await client.download(path: downloadPath)
-                let fileName = "\(component.name).png"
-                let fileURL = outputURL.appendingPathComponent(fileName)
-                try data.write(to: fileURL)
-                downloadedCount += 1
+                let svgData = Data(svgString.utf8)
+                let safeName = component.name
+                    .replacingOccurrences(of: "/", with: "_")
+                    .replacingOccurrences(of: " ", with: "_")
+
+                switch format {
+                case .svg:
+                    let fileURL = outputURL.appendingPathComponent("\(safeName).svg")
+                    try svgData.write(to: fileURL)
+                case .png:
+                    let scale = options.scale ?? 3.0
+                    let converter = SvgToPngConverter()
+                    let pngData = try converter.convert(svgData: svgData, scale: scale, fileName: safeName)
+                    let fileURL = outputURL.appendingPathComponent("\(safeName).png")
+                    try pngData.write(to: fileURL)
+                default:
+                    // For other formats (pdf, webp, jpg), save as SVG
+                    let fileURL = outputURL.appendingPathComponent("\(safeName).svg")
+                    try svgData.write(to: fileURL)
+                }
+
+                exportedCount += 1
             }
 
-            if downloadedCount > 0 {
-                ui.success("Downloaded \(downloadedCount) components to \(outputURL.path)")
-            } else {
+            if exportedCount > 0 {
                 ui
-                    .warning(
-                        "No thumbnails available for download (components may need to be opened in Penpot editor first)"
+                    .success(
+                        "Exported \(exportedCount) components as \(format.rawValue.uppercased()) to \(outputURL.path)"
                     )
+            } else {
+                ui.warning(
+                    "No components could be exported. Components may lack mainInstanceId (not opened in Penpot editor)."
+                )
             }
         }
 

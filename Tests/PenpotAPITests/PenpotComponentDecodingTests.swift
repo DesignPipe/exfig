@@ -7,14 +7,17 @@ import YYJSON
 struct PenpotComponentDecodingTests {
     @Test("Decodes component with camelCase keys")
     func decodeCamelCase() throws {
-        let json = Data(
-            #"{"id":"c1","name":"arrow-right","path":"Icons/Navigation"}"#.utf8
-        )
+        let json = Data((
+            #"{"id":"c1","name":"arrow-right","path":"Icons/Navigation","# +
+                #""mainInstanceId":"inst-123","mainInstancePage":"page-456"}"#
+        ).utf8)
 
         let comp = try YYJSONDecoder().decode(PenpotComponent.self, from: json)
         #expect(comp.id == "c1")
         #expect(comp.name == "arrow-right")
         #expect(comp.path == "Icons/Navigation")
+        #expect(comp.mainInstanceId == "inst-123")
+        #expect(comp.mainInstancePage == "page-456")
     }
 
     @Test("Component with optional fields nil")
@@ -27,6 +30,7 @@ struct PenpotComponentDecodingTests {
         #expect(comp.id == "c2")
         #expect(comp.name == "star")
         #expect(comp.path == nil)
+        #expect(comp.mainInstanceId == nil)
     }
 
     @Test("Components map from file response")
@@ -45,5 +49,6 @@ struct PenpotComponentDecodingTests {
 
         let arrow = comps?["comp-uuid-1"]
         #expect(arrow?.name == "arrow-right")
+        #expect(arrow?.mainInstanceId == "instance-123")
     }
 }

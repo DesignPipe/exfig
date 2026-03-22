@@ -6,21 +6,12 @@ struct PenpotComponentsSource: ComponentsSource {
     let ui: TerminalUI
 
     func loadIcons(from input: IconsSourceInput) async throws -> IconsLoadOutput {
-        // Warn about raster-only limitation when SVG requested
-        if input.format == .svg {
-            ui.warning(
-                "Penpot API provides raster thumbnails only — SVG format is not available. " +
-                    "Icons will be exported as PNG thumbnails."
-            )
-        }
-
         let packs = try await loadComponents(
             fileId: input.figmaFileId,
             baseURL: input.penpotBaseURL,
             pathFilter: input.frameName,
             sourceKind: input.sourceKind
         )
-
         return IconsLoadOutput(light: packs)
     }
 
@@ -31,7 +22,6 @@ struct PenpotComponentsSource: ComponentsSource {
             pathFilter: input.frameName,
             sourceKind: input.sourceKind
         )
-
         return ImagesLoadOutput(light: packs)
     }
 
@@ -71,42 +61,60 @@ struct PenpotComponentsSource: ComponentsSource {
             return []
         }
 
-        // Get thumbnails for matched components
-        let objectIds = sortedComponents.map(\.id)
-        let thumbnails = try await client.request(
-            GetFileObjectThumbnailsEndpoint(fileId: fileId, objectIds: objectIds)
+        let packs = try reconstructSVGs(
+            components: sortedComponents,
+            fileResponse: fileResponse,
+            fileId: fileId
         )
+
+        if packs.isEmpty, !sortedComponents.isEmpty {
+            ui.warning(
+                "Found \(sortedComponents.count) components but could not reconstruct SVG for any. " +
+                    "Components may lack mainInstanceId (not opened in Penpot editor)."
+            )
+        }
+
+        return packs
+    }
+
+    private func reconstructSVGs(
+        components: [PenpotComponent],
+        fileResponse: PenpotFileResponse,
+        fileId: String
+    ) throws -> [ImagePack] {
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("exfig-penpot-\(ProcessInfo.processInfo.processIdentifier)")
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
         var packs: [ImagePack] = []
 
-        for component in sortedComponents {
-            guard let thumbnailRef = thumbnails[component.id] else {
-                ui.warning("Component '\(component.name)' has no thumbnail — skipping")
+        for component in components {
+            guard let pageId = component.mainInstancePage,
+                  let instanceId = component.mainInstanceId,
+                  let page = fileResponse.data.pagesIndex?[pageId],
+                  let objects = page.objects
+            else {
+                ui.warning("Component '\(component.name)' has no shape data — skipping")
                 continue
             }
 
-            // Build download URL for the thumbnail
-            let fullURL: String = if thumbnailRef.hasPrefix("http") {
-                thumbnailRef
-            } else {
-                "\(effectiveBaseURL)assets/by-id/\(thumbnailRef)"
-            }
-
-            guard let url = URL(string: fullURL) else {
-                ui.warning("Component '\(component.name)' has invalid thumbnail URL — skipping")
+            guard let svgString = PenpotShapeRenderer.renderSVG(
+                objects: objects, rootId: instanceId
+            ) else {
+                ui.warning("Component '\(component.name)' — failed to reconstruct SVG, skipping")
                 continue
             }
 
-            let image = Image(
-                name: component.name,
-                scale: .individual(1.0),
-                url: url,
-                format: "png"
-            )
+            let svgData = Data(svgString.utf8)
+            let safeName = component.name
+                .replacingOccurrences(of: "/", with: "_")
+                .replacingOccurrences(of: " ", with: "_")
+            let tempURL = tempDir.appendingPathComponent("\(safeName).svg")
+            try svgData.write(to: tempURL)
 
             packs.append(ImagePack(
                 name: component.name,
-                images: [image],
+                images: [Image(name: component.name, scale: .all, url: tempURL, format: "svg")],
                 nodeId: component.id,
                 fileId: fileId
             ))

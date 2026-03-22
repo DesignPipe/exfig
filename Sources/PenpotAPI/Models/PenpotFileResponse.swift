@@ -22,4 +22,8 @@ public struct PenpotFileData: Decodable, Sendable {
 
     /// Library components keyed by UUID.
     public let components: [String: PenpotComponent]?
+
+    /// Pages keyed by page UUID, each containing a flat object tree.
+    /// Used for SVG reconstruction of component shapes.
+    public let pagesIndex: [String: PenpotPage]?
 }
