@@ -3,7 +3,7 @@
 [![CI](https://github.com/DesignPipe/exfig/actions/workflows/ci.yml/badge.svg)](https://github.com/DesignPipe/exfig/actions/workflows/ci.yml)
 [![Release](https://github.com/DesignPipe/exfig/actions/workflows/release.yml/badge.svg)](https://github.com/DesignPipe/exfig/actions/workflows/release.yml)
 [![Docs](https://github.com/DesignPipe/exfig/actions/workflows/deploy-docc.yml/badge.svg)](https://DesignPipe.github.io/exfig/documentation/exfigcli)
-![Coverage](https://img.shields.io/badge/coverage-50.65%25-yellow)
+![Coverage](https://img.shields.io/badge/coverage-43.65%25-yellow)
 [![License](https://img.shields.io/github/license/DesignPipe/exfig.svg)](LICENSE)
 
 Export colors, typography, icons, and images from Figma and Penpot to Xcode, Android Studio, Flutter, and Web projects — automatically.
