@@ -2,6 +2,12 @@
 
 Export text styles from Figma to Swift font extensions.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "typography-icon", alt: "iOS typography export")
+    @PageColor(blue)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports typography as:

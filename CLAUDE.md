@@ -371,6 +371,13 @@ When changing fields on `ColorsSourceInput` / `IconsSourceInput` / `ImagesSource
 `docs/` is DocC OUTPUT (gitignored, for GitHub Pages) — never put source docs there.
 When adding new features, mention briefly in README Quick Start AND update relevant DocC articles.
 
+**DocC visual directives:** Articles use `@Metadata` with `@PageImage`, `@PageColor`, `@TitleHeading`.
+SVG icons from Lucide (MIT) in `ExFig.docc/Resources/`. Dark variants use `~dark.svg` suffix
+with `#ffffff` stroke (light uses `#1d1d1f`). `currentColor` does NOT work in DocC icon SVGs
+(`<img>` tag context). `@Links(visualStyle: compactGrid|detailedGrid)` for card-grid navigation.
+`theme-settings.json` in docc root for global color/font customization.
+Color scheme: Getting Started → blue, iOS → blue, Android → green, Flutter → blue, Advanced → purple, Contributing → orange.
+
 **JSONCodec usage:**
 
 ```swift

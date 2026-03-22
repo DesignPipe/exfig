@@ -2,6 +2,12 @@
 
 Install ExFig and configure your first export.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "getting-started-icon", alt: "Getting started with ExFig")
+    @PageColor(blue)
+    @TitleHeading("Getting Started")
+}
+
 ## Overview
 
 ExFig is a command-line tool that exports design resources from Figma and Penpot to iOS, Android, Flutter, and Web projects.

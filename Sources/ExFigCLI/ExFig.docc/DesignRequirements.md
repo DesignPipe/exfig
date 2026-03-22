@@ -2,6 +2,12 @@
 
 How to structure your design files for optimal export with ExFig.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "design-reqs-icon", alt: "Design requirements")
+    @PageColor(blue)
+    @TitleHeading("Getting Started")
+}
+
 ## Overview
 
 ExFig extracts design resources from **Figma** files and **Penpot** projects based on naming conventions

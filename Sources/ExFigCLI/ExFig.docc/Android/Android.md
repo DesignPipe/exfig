@@ -2,6 +2,12 @@
 
 Export Figma resources to Android projects with XML resources and Jetpack Compose code.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "android-icon", alt: "Android platform")
+    @PageColor(green)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports design resources from Figma to Android projects:
@@ -224,10 +230,12 @@ fun MyScreen() {
 
 ### Resources
 
-- <doc:AndroidColors>
-- <doc:AndroidIcons>
-- <doc:AndroidImages>
-- <doc:AndroidTypography>
+@Links(visualStyle: compactGrid) {
+    - <doc:AndroidColors>
+    - <doc:AndroidIcons>
+    - <doc:AndroidImages>
+    - <doc:AndroidTypography>
+}
 
 ## See Also
 

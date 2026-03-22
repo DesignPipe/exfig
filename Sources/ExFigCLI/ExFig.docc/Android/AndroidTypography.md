@@ -2,6 +2,12 @@
 
 Export text styles from Figma to Android XML resources and Jetpack Compose code.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "typography-icon", alt: "Android typography export")
+    @PageColor(green)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports typography as:

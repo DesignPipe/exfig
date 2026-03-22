@@ -2,6 +2,12 @@
 
 Guide for contributing to ExFig development.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "development-icon", alt: "Development guide")
+    @PageColor(orange)
+    @TitleHeading("Contributing")
+}
+
 ## Overview
 
 ExFig is built with Swift Package Manager and supports macOS 13.0+ and Linux (Ubuntu 22.04). This guide covers setting up

@@ -2,6 +2,12 @@
 
 Export design data from Figma as W3C Design Tokens for token pipelines and cross-tool interoperability.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "tokens-icon", alt: "Design tokens")
+    @PageColor(purple)
+    @TitleHeading("Advanced")
+}
+
 ## Overview
 
 ExFig can export colors, typography, dimensions, and numbers as JSON following the

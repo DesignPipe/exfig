@@ -2,6 +2,12 @@
 
 ExFig v2.0 uses a plugin-based architecture with twelve modules. This document explains the system design and how to extend it.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "architecture-icon", alt: "Architecture overview")
+    @PageColor(orange)
+    @TitleHeading("Contributing")
+}
+
 ## Overview
 
 ```

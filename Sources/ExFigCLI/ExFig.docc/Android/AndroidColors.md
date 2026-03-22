@@ -2,6 +2,12 @@
 
 Export color palettes from Figma to Android XML resources and Jetpack Compose code.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "colors-icon", alt: "Android colors export")
+    @PageColor(green)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports colors as:

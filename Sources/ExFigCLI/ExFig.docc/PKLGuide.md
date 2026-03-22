@@ -2,6 +2,12 @@
 
 PKL (Programmable, Scalable, Safe) is ExFig's configuration language, replacing YAML in v2.0. PKL provides native configuration inheritance via `amends`, type safety, and IDE support.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "pkl-icon", alt: "PKL configuration guide")
+    @PageColor(purple)
+    @TitleHeading("Advanced")
+}
+
 ## Installation
 
 PKL CLI is required to run ExFig. Install via mise:

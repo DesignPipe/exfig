@@ -2,6 +2,12 @@
 
 Export all resource types from one or more configs in a single run.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "batch-icon", alt: "Batch processing")
+    @PageColor(purple)
+    @TitleHeading("Advanced")
+}
+
 ## Overview
 
 The `batch` command is the primary way to use ExFig in production. It exports colors, icons, images,

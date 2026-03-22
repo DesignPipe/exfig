@@ -2,6 +2,12 @@
 
 Customize generated code using Jinja2 templates.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "templates-icon", alt: "Custom templates")
+    @PageColor(purple)
+    @TitleHeading("Advanced")
+}
+
 ## Overview
 
 ExFig uses [Jinja2](https://github.com/huggingface/swift-jinja) templates to generate platform-specific code. You can customize the

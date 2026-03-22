@@ -2,6 +2,12 @@
 
 Integrate ExFig with AI assistants via the Model Context Protocol.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "mcp-icon", alt: "MCP server")
+    @PageColor(purple)
+    @TitleHeading("Advanced")
+}
+
 ## Overview
 
 ExFig includes an [MCP](https://modelcontextprotocol.io) server that exposes tools, resources,

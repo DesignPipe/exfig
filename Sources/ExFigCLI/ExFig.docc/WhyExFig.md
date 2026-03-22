@@ -2,6 +2,12 @@
 
 Understand the problems ExFig solves and how it fits into your workflow.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "why-icon", alt: "Why ExFig")
+    @PageColor(purple)
+    @TitleHeading("Getting Started")
+}
+
 ## Overview
 
 Design-to-code handoff is broken. Every team that ships a mobile or web app with a Figma or
@@ -124,22 +130,28 @@ flutter_project/
 
 ## Before and After
 
-### Before: Manual workflow
+@Row {
+    @Column {
+        ### Before: Manual workflow
 
-1. Designer updates colors in Figma
-2. Developer opens Figma, copies hex values one by one
-3. Developer updates `colors.xml`, `Colors.xcassets`, and `colors.dart`
-4. Developer creates a PR for each platform
-5. QA finds the dark mode variant was missed
-6. Repeat for 3 platforms, every sprint
+        1. Designer updates colors in Figma
+        2. Developer opens Figma, copies hex values one by one
+        3. Developer updates `colors.xml`, `Colors.xcassets`, and `colors.dart`
+        4. Developer creates a PR for each platform
+        5. QA finds the dark mode variant was missed
+        6. Repeat for 3 platforms, every sprint
+    }
 
-### After: `exfig batch`
+    @Column {
+        ### After: `exfig batch`
 
-1. Designer publishes a library update in Figma
-2. CI runs `exfig batch exfig.pkl --cache`
-3. ExFig detects changed colors, exports only the diff
-4. Automated PR with all platforms updated, including dark mode
-5. QA verifies — everything matches Figma
+        1. Designer publishes a library update in Figma
+        2. CI runs `exfig batch exfig.pkl --cache`
+        3. ExFig detects changed colors, exports only the diff
+        4. Automated PR with all platforms updated, including dark mode
+        5. QA verifies — everything matches Figma
+    }
+}
 
 ## See Also
 

@@ -2,6 +2,12 @@
 
 Export color palettes from Figma to Xcode Color Sets with Swift extensions.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "colors-icon", alt: "iOS colors export")
+    @PageColor(blue)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports colors as:

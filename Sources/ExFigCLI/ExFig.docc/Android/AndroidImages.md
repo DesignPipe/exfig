@@ -2,6 +2,12 @@
 
 Export raster images from Figma to Android drawable resources in PNG or WebP format.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "images-icon", alt: "Android images export")
+    @PageColor(green)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports images as:

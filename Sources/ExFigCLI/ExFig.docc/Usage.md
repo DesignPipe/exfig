@@ -2,6 +2,12 @@
 
 Command-line interface reference and common usage patterns.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "usage-icon", alt: "CLI usage")
+    @PageColor(blue)
+    @TitleHeading("Getting Started")
+}
+
 ## Overview
 
 ExFig provides commands for exporting colors, icons, images, and typography from Figma and Penpot to native platform resources.

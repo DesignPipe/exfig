@@ -2,6 +2,12 @@
 
 Export Figma resources to Xcode projects with Assets catalogs and Swift extensions.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "ios-icon", alt: "iOS platform")
+    @PageColor(blue)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports design resources from Figma to iOS projects:
@@ -201,10 +207,12 @@ struct ContentView: View {
 
 ### Resources
 
-- <doc:iOSColors>
-- <doc:iOSIcons>
-- <doc:iOSImages>
-- <doc:iOSTypography>
+@Links(visualStyle: compactGrid) {
+    - <doc:iOSColors>
+    - <doc:iOSIcons>
+    - <doc:iOSImages>
+    - <doc:iOSTypography>
+}
 
 ## See Also
 

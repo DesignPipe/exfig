@@ -2,6 +2,12 @@
 
 Export vector icons from Figma to Xcode Image Sets as PDF or SVG with Swift extensions.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "icons-icon", alt: "iOS icons export")
+    @PageColor(blue)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports icons as:

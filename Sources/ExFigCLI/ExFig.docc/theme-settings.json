@@ -1,0 +1,28 @@
+{
+  "theme": {
+    "color": {
+      "documentation-intro-fill": {
+        "dark": "hsl(255, 50%, 12%)",
+        "light": "hsl(255, 60%, 96%)"
+      },
+      "documentation-intro-figure": {
+        "dark": "hsl(255, 70%, 75%)",
+        "light": "hsl(255, 60%, 40%)"
+      },
+      "documentation-intro-accent": {
+        "dark": "hsl(255, 70%, 70%)",
+        "light": "hsl(255, 60%, 50%)"
+      }
+    }
+  },
+  "meta": {
+    "title": "ExFig"
+  },
+  "features": {
+    "docs": {
+      "quickNavigation": {
+        "enable": true
+      }
+    }
+  }
+}

@@ -1,5 +1,11 @@
 # ``ExFigCLI``
 
+@Metadata {
+    @PageImage(purpose: icon, source: "exfig-icon", alt: "ExFig logo")
+    @PageImage(purpose: card, source: "exfig-card", alt: "ExFig — design to code pipeline")
+    @TitleHeading("Framework")
+}
+
 Export colors, typography, icons, and images from Figma and Penpot to iOS, Android, Flutter, and Web projects.
 
 ## Overview
@@ -61,34 +67,32 @@ Compose color and icon objects, and Flutter path constants.
 
 ### Getting Started
 
-- <doc:WhyExFig>
-- <doc:GettingStarted>
-- <doc:Usage>
-- <doc:Configuration>
-- <doc:DesignRequirements>
+@Links(visualStyle: detailedGrid) {
+    - <doc:WhyExFig>
+    - <doc:GettingStarted>
+    - <doc:Usage>
+    - <doc:Configuration>
+    - <doc:DesignRequirements>
+}
 
 ### Platform Guides
 
-- <doc:iOS>
-- <doc:iOSColors>
-- <doc:iOSIcons>
-- <doc:iOSImages>
-- <doc:iOSTypography>
-- <doc:Android>
-- <doc:AndroidColors>
-- <doc:AndroidIcons>
-- <doc:AndroidImages>
-- <doc:AndroidTypography>
-- <doc:Flutter>
+@Links(visualStyle: compactGrid) {
+    - <doc:iOS>
+    - <doc:Android>
+    - <doc:Flutter>
+}
 
 ### Advanced
 
-- <doc:BatchProcessing>
-- <doc:DesignTokens>
-- <doc:CustomTemplates>
-- <doc:MCPServer>
-- <doc:CICDIntegration>
-- <doc:PKLGuide>
+@Links(visualStyle: detailedGrid) {
+    - <doc:BatchProcessing>
+    - <doc:DesignTokens>
+    - <doc:CustomTemplates>
+    - <doc:MCPServer>
+    - <doc:CICDIntegration>
+    - <doc:PKLGuide>
+}
 
 ### Contributing
 

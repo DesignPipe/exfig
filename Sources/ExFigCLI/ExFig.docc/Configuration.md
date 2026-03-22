@@ -2,6 +2,12 @@
 
 Complete reference for exfig.pkl configuration options.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "config-icon", alt: "Configuration reference")
+    @PageColor(blue)
+    @TitleHeading("Getting Started")
+}
+
 ## Overview
 
 ExFig uses a PKL configuration file (typically `exfig.pkl`) to define export settings. PKL (Programmable, Scalable, Safe)

@@ -2,6 +2,12 @@
 
 Export raster images from Figma to Xcode Image Sets as PNG or HEIC files with multiple scales.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "images-icon", alt: "iOS images export")
+    @PageColor(blue)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports images as:

@@ -2,6 +2,12 @@
 
 Export Figma resources to Flutter projects with Dart code and asset files.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "flutter-icon", alt: "Flutter platform")
+    @PageColor(blue)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports design resources from Figma to Flutter projects:

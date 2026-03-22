@@ -98,6 +98,7 @@ MIT. See [LICENSE](LICENSE).
 
 Install ExFig and configure your first export.
 
+
 ## Overview
 
 ExFig is a command-line tool that exports design resources from Figma and Penpot to iOS, Android, Flutter, and Web projects.
@@ -278,6 +279,7 @@ exfig batch exfig.pkl
 # Usage
 
 Command-line interface reference and common usage patterns.
+
 
 ## Overview
 
@@ -557,6 +559,7 @@ exfig --version
 # Configuration
 
 Complete reference for exfig.pkl configuration options.
+
 
 ## Overview
 
@@ -1165,6 +1168,7 @@ flutter = new Flutter.FlutterConfig {
 
 How to structure your design files for optimal export with ExFig.
 
+
 ## Overview
 
 ExFig extracts design resources from **Figma** files and **Penpot** projects based on naming conventions
@@ -1695,6 +1699,7 @@ Design System (Penpot file)
 
 Customize generated code using Jinja2 templates.
 
+
 ## Overview
 
 ExFig uses [Jinja2](https://github.com/huggingface/swift-jinja) templates to generate platform-specific code. You can customize the
@@ -2109,6 +2114,7 @@ images: [{ componentName: "HeroBanner", fileName: "hero_banner" }]
 
 Export Figma resources to Xcode projects with Assets catalogs and Swift extensions.
 
+
 ## Overview
 
 ExFig exports design resources from Figma to iOS projects:
@@ -2308,10 +2314,12 @@ struct ContentView: View {
 
 ### Resources
 
-- iOSColors
-- iOSIcons
-- iOSImages
-- iOSTypography
+@Links(visualStyle: compactGrid) {
+    - iOSColors
+    - iOSIcons
+    - iOSImages
+    - iOSTypography
+}
 
 ## See Also
 
@@ -2323,6 +2331,7 @@ struct ContentView: View {
 # Android Export
 
 Export Figma resources to Android projects with XML resources and Jetpack Compose code.
+
 
 ## Overview
 
@@ -2546,10 +2555,12 @@ fun MyScreen() {
 
 ### Resources
 
-- AndroidColors
-- AndroidIcons
-- AndroidImages
-- AndroidTypography
+@Links(visualStyle: compactGrid) {
+    - AndroidColors
+    - AndroidIcons
+    - AndroidImages
+    - AndroidTypography
+}
 
 ## See Also
 
@@ -2561,6 +2572,7 @@ fun MyScreen() {
 # Flutter Export
 
 Export Figma resources to Flutter projects with Dart code and asset files.
+
 
 ## Overview
 

@@ -2,6 +2,12 @@
 
 Automate design exports in your continuous integration pipeline.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "cicd-icon", alt: "CI/CD integration")
+    @PageColor(purple)
+    @TitleHeading("Advanced")
+}
+
 ## Overview
 
 ExFig is designed for headless environments. It provides quiet mode, structured JSON reports,

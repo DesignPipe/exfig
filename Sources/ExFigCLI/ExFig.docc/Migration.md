@@ -2,6 +2,12 @@
 
 ExFig v2.0 replaces YAML configuration with PKL. This guide helps migrate existing configurations.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "migration-icon", alt: "Migration guide")
+    @PageColor(orange)
+    @TitleHeading("Contributing")
+}
+
 ## Quick Migration
 
 ### 1. Install PKL

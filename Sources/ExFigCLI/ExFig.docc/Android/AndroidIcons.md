@@ -2,6 +2,12 @@
 
 Export vector icons from Figma to Android VectorDrawable XML resources.
 
+@Metadata {
+    @PageImage(purpose: icon, source: "icons-icon", alt: "Android icons export")
+    @PageColor(green)
+    @TitleHeading("Platform Guide")
+}
+
 ## Overview
 
 ExFig exports icons as:
