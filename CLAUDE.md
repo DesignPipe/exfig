@@ -143,7 +143,7 @@ Sources/ExFigCLI/
 ├── Sync/            # Figma sync functionality (state tracking, diff detection)
 ├── Plugin/          # Plugin registry
 ├── Context/         # Export context implementations (ColorsExportContextImpl, etc.)
-├── Source/          # Design source implementations (FigmaColorsSource, SourceFactory, etc.)
+├── Source/          # Design source implementations (SourceFactory, Figma*Source, Penpot*Source, TokensFile*Source)
 ├── MCP/             # Model Context Protocol server (tools, resources, prompts)
 └── Shared/          # Cross-cutting helpers (PlatformExportResult, HashMerger)
 

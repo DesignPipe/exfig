@@ -290,8 +290,12 @@ func resolveClient(
 /// Resolves a Figma API client for heavy commands, using injected client if available
 /// (batch mode) or creating a new rate-limited client (standalone command mode).
 ///
+/// When `accessToken` is nil (no `FIGMA_PERSONAL_TOKEN`), returns ``NoTokenFigmaClient`` —
+/// a fail-fast client that throws on any request. Non-Figma sources (Penpot, tokens-file)
+/// never call it, so pure-Penpot workflows work without Figma credentials.
+///
 /// - Parameters:
-///   - accessToken: Figma personal access token.
+///   - accessToken: Figma personal access token (nil when using non-Figma sources only).
 ///   - timeout: Request timeout interval from config (optional, uses FigmaClient default if nil).
 ///   - options: Heavy fault tolerance options for creating new client (may contain CLI timeout override).
 ///   - ui: Terminal UI for retry warnings.
@@ -308,6 +312,8 @@ func resolveClient(
         return injectedClient
     }
     guard let accessToken else {
+        // No Figma token — return a client that throws on any call.
+        // Non-Figma sources (Penpot, tokens-file) never call it.
         return NoTokenFigmaClient()
     }
     // CLI timeout takes precedence over config timeout
