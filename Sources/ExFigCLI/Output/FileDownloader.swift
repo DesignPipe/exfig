@@ -11,6 +11,9 @@ typealias DownloadProgressCallback = @Sendable (Int, Int) async -> Void
 /// Validates that a download URL uses HTTPS and has a valid host.
 /// Shared by both `FileDownloader` and `SharedDownloadQueue`.
 func validateDownloadURL(_ url: URL) throws {
+    // Allow file:// URLs for locally reconstructed assets (e.g., Penpot SVG from shape tree)
+    if url.isFileURL { return }
+
     guard url.scheme?.lowercased() == "https" else {
         throw URLError(
             .badURL,
@@ -105,6 +108,18 @@ final class FileDownloader: Sendable {
         }
 
         try validateDownloadURL(remoteURL)
+
+        // Local files (e.g., Penpot SVG reconstructed from shape tree) — already on disk
+        if remoteURL.isFileURL {
+            return FileContents(
+                destination: file.destination,
+                dataFile: remoteURL,
+                scale: file.scale,
+                dark: file.dark,
+                isRTL: file.isRTL
+            )
+        }
+
         let (localURL, _) = try await session.download(from: remoteURL)
 
         return FileContents(
