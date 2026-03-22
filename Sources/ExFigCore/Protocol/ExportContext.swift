@@ -140,11 +140,12 @@ public struct ColorsSourceInput: Sendable {
 }
 
 /// Error thrown when required colors configuration fields are missing.
-public enum ColorsConfigError: LocalizedError {
+public enum ColorsConfigError: LocalizedError, Equatable {
     case missingTokensFileId
     case missingTokensCollectionName
     case missingLightModeName
     case missingPenpotSource
+    case unsupportedSourceKind(DesignSourceKind)
 
     public var errorDescription: String? {
         switch self {
@@ -156,6 +157,8 @@ public enum ColorsConfigError: LocalizedError {
             "lightModeName is required for colors export"
         case .missingPenpotSource:
             "penpotSource configuration is required when sourceKind is 'penpot'"
+        case let .unsupportedSourceKind(kind):
+            "Source kind '\(kind.rawValue)' is not supported for colors export"
         }
     }
 
@@ -169,6 +172,8 @@ public enum ColorsConfigError: LocalizedError {
             "Add 'lightModeName' to your colors entry, or set common.variablesColors"
         case .missingPenpotSource:
             "Add 'penpotSource { fileId = \"...\" }' to your colors entry"
+        case let .unsupportedSourceKind(kind):
+            "Supported source kinds for colors: figma, penpot, tokensFile. Got: '\(kind.rawValue)'"
         }
     }
 }

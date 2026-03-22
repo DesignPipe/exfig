@@ -57,7 +57,7 @@ ExFigCore domain types (NameStyle, ColorsSourceInput, etc.)
 | `Common_VariablesSource.resolvedSourceKind`             | Resolution priority: explicit `sourceKind` > auto-detect (penpotSource > tokensFile) > default `.figma`                                    |
 | `Common_VariablesSource.validatedColorsSourceInput()`   | Validates required fields, returns `ColorsSourceInput`. Uses `resolvedSourceKind` for dispatch                                             |
 | `Common_FrameSource.resolvedSourceKind`                 | Resolution priority: explicit `sourceKind` > auto-detect (penpotSource presence) > default `.figma`. Defined in `SourceKindBridging.swift` |
-| `Common_FrameSource.resolvedFileId`                     | `penpotSource?.fileId ?? figmaFileId` — auto-resolves file ID for any source. Defined in `SourceKindBridging.swift`                        |
+| `Common_FrameSource.resolvedFileId`                     | Source-kind-aware: Penpot → `penpotSource?.fileId` only, Figma → `figmaFileId`. Defined in `SourceKindBridging.swift`                      |
 | `Common_FrameSource.resolvedPenpotBaseURL`              | `penpotSource?.baseUrl` — passes Penpot base URL through entry bridges. Defined in `SourceKindBridging.swift`                              |
 
 ### Generated Type Gotchas
@@ -81,6 +81,11 @@ When adding new PKL types to schemas, regenerate with `codegen:pkl` and add the 
 - After regeneration, verify bridging switch statements in `Sources/ExFig-*/Config/*Entry.swift`
 - New fields in generated inits require updating ALL test call sites with new `nil` parameters
 - Generated files are excluded from SwiftLint (`.swiftlint.yml`)
+
+## Module Boundaries
+
+ExFigConfig imports ExFigCore but NOT ExFigCLI. Error types available: `ColorsConfigError` (ExFigCore), NOT `ExFigError` (ExFigCLI).
+When adding validation errors in this module, extend `ColorsConfigError` or create a new error enum in ExFigCore.
 
 ## Consumers
 

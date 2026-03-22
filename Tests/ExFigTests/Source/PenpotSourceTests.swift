@@ -116,21 +116,25 @@ final class SourceFactoryPenpotTests: XCTestCase {
     }
 
     func testCreateComponentsSourceForPenpot() throws {
+        let ui = TerminalUI(outputMode: .quiet)
         let source = try SourceFactory.createComponentsSource(
             for: .penpot,
             client: dummyClient(),
             params: dummyPKLConfig(),
             platform: .ios,
             logger: .init(label: "test"),
-            filter: nil
+            filter: nil,
+            ui: ui
         )
         XCTAssert(source is PenpotComponentsSource)
     }
 
     func testCreateTypographySourceForPenpot() throws {
+        let ui = TerminalUI(outputMode: .quiet)
         let source = try SourceFactory.createTypographySource(
             for: .penpot,
-            client: dummyClient()
+            client: dummyClient(),
+            ui: ui
         )
         XCTAssert(source is PenpotTypographySource)
     }
@@ -147,6 +151,7 @@ final class SourceFactoryPenpotTests: XCTestCase {
     }
 
     func testUnsupportedSourceKindThrowsForComponents() {
+        let ui = TerminalUI(outputMode: .quiet)
         XCTAssertThrowsError(
             try SourceFactory.createComponentsSource(
                 for: .sketchFile,
@@ -154,14 +159,16 @@ final class SourceFactoryPenpotTests: XCTestCase {
                 params: dummyPKLConfig(),
                 platform: .ios,
                 logger: .init(label: "test"),
-                filter: nil
+                filter: nil,
+                ui: ui
             )
         )
     }
 
     func testUnsupportedSourceKindThrowsForTypography() {
+        let ui = TerminalUI(outputMode: .quiet)
         XCTAssertThrowsError(
-            try SourceFactory.createTypographySource(for: .tokensStudio, client: dummyClient())
+            try SourceFactory.createTypographySource(for: .tokensStudio, client: dummyClient(), ui: ui)
         )
     }
 }

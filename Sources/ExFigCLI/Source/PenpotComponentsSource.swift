@@ -9,8 +9,7 @@ struct PenpotComponentsSource: ComponentsSource {
         let packs = try await loadComponents(
             fileId: input.figmaFileId,
             baseURL: input.penpotBaseURL,
-            pathFilter: input.frameName,
-            sourceKind: input.sourceKind
+            pathFilter: input.frameName
         )
         return IconsLoadOutput(light: packs)
     }
@@ -19,8 +18,7 @@ struct PenpotComponentsSource: ComponentsSource {
         let packs = try await loadComponents(
             fileId: input.figmaFileId,
             baseURL: input.penpotBaseURL,
-            pathFilter: input.frameName,
-            sourceKind: input.sourceKind
+            pathFilter: input.frameName
         )
         return ImagesLoadOutput(light: packs)
     }
@@ -30,8 +28,7 @@ struct PenpotComponentsSource: ComponentsSource {
     private func loadComponents(
         fileId: String?,
         baseURL: String?,
-        pathFilter: String,
-        sourceKind: DesignSourceKind
+        pathFilter: String
     ) async throws -> [ImagePack] {
         guard let fileId, !fileId.isEmpty else {
             throw ExFigError.configurationError(

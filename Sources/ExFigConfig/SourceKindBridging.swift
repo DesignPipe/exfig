@@ -30,9 +30,15 @@ public extension Common_FrameSource {
         return .figma
     }
 
-    /// Resolves the file ID: Penpot source takes priority, then Figma file ID.
+    /// Resolves the file ID based on the resolved source kind.
+    ///
+    /// When source is Penpot, returns only the Penpot file ID (not Figma's)
+    /// to prevent passing a Figma file key to the Penpot API.
     var resolvedFileId: String? {
-        penpotSource?.fileId ?? figmaFileId
+        if resolvedSourceKind == .penpot {
+            return penpotSource?.fileId
+        }
+        return figmaFileId
     }
 
     /// Resolves the Penpot base URL from penpotSource config.

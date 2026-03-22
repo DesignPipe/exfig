@@ -40,14 +40,17 @@ extension ExFigCommand.ExportIcons {
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
         // All entries in a platform section share one source kind (mixed sources not yet supported)
-        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        guard let sourceKind = entries.first?.resolvedSourceKind else {
+            throw ExFigError.configurationError("No entries provided for icons export")
+        }
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
             params: params,
             platform: .ios,
             logger: ExFigCommand.logger,
-            filter: filter
+            filter: filter,
+            ui: ui
         )
 
         let context = IconsExportContextImpl(
@@ -120,14 +123,17 @@ extension ExFigCommand.ExportIcons {
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
         // All entries in a platform section share one source kind (mixed sources not yet supported)
-        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        guard let sourceKind = entries.first?.resolvedSourceKind else {
+            throw ExFigError.configurationError("No entries provided for icons export")
+        }
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
             params: params,
             platform: .android,
             logger: ExFigCommand.logger,
-            filter: filter
+            filter: filter,
+            ui: ui
         )
 
         let context = IconsExportContextImpl(
@@ -176,14 +182,17 @@ extension ExFigCommand.ExportIcons {
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
         // All entries in a platform section share one source kind (mixed sources not yet supported)
-        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        guard let sourceKind = entries.first?.resolvedSourceKind else {
+            throw ExFigError.configurationError("No entries provided for icons export")
+        }
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
             params: params,
             platform: .flutter,
             logger: ExFigCommand.logger,
-            filter: filter
+            filter: filter,
+            ui: ui
         )
 
         let context = IconsExportContextImpl(
@@ -232,14 +241,17 @@ extension ExFigCommand.ExportIcons {
         let fileDownloader = faultToleranceOptions.createFileDownloader()
 
         // All entries in a platform section share one source kind (mixed sources not yet supported)
-        let sourceKind = entries.first?.resolvedSourceKind ?? .figma
+        guard let sourceKind = entries.first?.resolvedSourceKind else {
+            throw ExFigError.configurationError("No entries provided for icons export")
+        }
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
             params: params,
             platform: .web,
             logger: ExFigCommand.logger,
-            filter: filter
+            filter: filter,
+            ui: ui
         )
 
         let context = IconsExportContextImpl(

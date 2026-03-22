@@ -26,8 +26,10 @@ public extension Common_VariablesSource {
             return try penpotColorsSourceInput()
         case .tokensFile:
             return try tokensFileColorsSourceInput()
-        default:
+        case .figma:
             return try figmaColorsSourceInput(kind: kind)
+        case .tokensStudio, .sketchFile:
+            throw ColorsConfigError.unsupportedSourceKind(kind)
         }
     }
 }

@@ -31,7 +31,8 @@ enum SourceFactory {
         params: PKLConfig,
         platform: Platform,
         logger: Logger,
-        filter: String?
+        filter: String?,
+        ui: TerminalUI
     ) throws -> any ComponentsSource {
         switch sourceKind {
         case .figma:
@@ -44,7 +45,7 @@ enum SourceFactory {
                 filter: filter
             )
         case .penpot:
-            return PenpotComponentsSource(ui: ExFigCommand.terminalUI)
+            return PenpotComponentsSource(ui: ui)
         case .tokensFile, .tokensStudio, .sketchFile:
             throw ExFigError.unsupportedSourceKind(sourceKind, assetType: "icons/images")
         }
@@ -52,14 +53,15 @@ enum SourceFactory {
 
     static func createTypographySource(
         for sourceKind: DesignSourceKind,
-        client: Client?
+        client: Client?,
+        ui: TerminalUI
     ) throws -> any TypographySource {
         switch sourceKind {
         case .figma:
             guard let client else { throw ExFigError.accessTokenNotFound }
             return FigmaTypographySource(client: client)
         case .penpot:
-            return PenpotTypographySource(ui: ExFigCommand.terminalUI)
+            return PenpotTypographySource(ui: ui)
         case .tokensFile, .tokensStudio, .sketchFile:
             throw ExFigError.unsupportedSourceKind(sourceKind, assetType: "typography")
         }

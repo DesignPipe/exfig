@@ -120,19 +120,8 @@ extension ExFigCommand {
 
             // Penpot path — use PenpotAPI directly
             if designSource == .penpot {
-                let penpotResult = wizardResult ?? FetchWizardResult(
-                    designSource: .penpot,
-                    fileId: options.fileId ?? "",
-                    frameName: options.frameName ?? "",
-                    pageName: options.pageName,
-                    outputPath: options.outputPath ?? "",
-                    format: options.format,
-                    scale: options.scale,
-                    nameStyle: options.nameStyle,
-                    filter: options.filter,
-                    penpotBaseURL: options.penpotBaseURL
-                )
-                try await runPenpotFetch(options: options, wizardResult: penpotResult, ui: ui)
+                let penpotBaseURL = wizardResult?.penpotBaseURL ?? options.penpotBaseURL
+                try await runPenpotFetch(options: options, penpotBaseURL: penpotBaseURL, ui: ui)
                 return
             }
 
@@ -324,7 +313,7 @@ extension ExFigCommand {
         // swiftlint:disable function_body_length cyclomatic_complexity
         private func runPenpotFetch(
             options: DownloadOptions,
-            wizardResult: FetchWizardResult,
+            penpotBaseURL: String?,
             ui: TerminalUI
         ) async throws {
             guard let fileId = options.fileId else {
@@ -337,7 +326,19 @@ extension ExFigCommand {
                 throw ValidationError("--output is required")
             }
 
-            let baseURL = wizardResult.penpotBaseURL ?? BasePenpotClient.defaultBaseURL
+            // Validate format early — Penpot supports svg and png (via SVG reconstruction)
+            let format = options.format ?? .svg
+            switch format {
+            case .svg, .png:
+                break // supported
+            default:
+                throw ExFigError.custom(
+                    errorString: "Format '\(format.rawValue)' is not yet supported for Penpot export. " +
+                        "Supported formats: svg, png"
+                )
+            }
+
+            let baseURL = penpotBaseURL ?? BasePenpotClient.defaultBaseURL
             let client = try PenpotClientFactory.makeClient(baseURL: baseURL)
 
             let outputURL = URL(fileURLWithPath: outputPath, isDirectory: true)
@@ -370,8 +371,7 @@ extension ExFigCommand {
 
             ui.info("Found \(matched.count) components")
 
-            // Reconstruct SVG from shape tree
-            let format = options.format ?? .svg
+            // Reconstruct SVG from shape tree (format already validated above)
             var exportedCount = 0
 
             for component in matched {
@@ -423,10 +423,8 @@ extension ExFigCommand {
                     let fileURL = outputURL.appendingPathComponent("\(safeName).png")
                     try pngData.write(to: fileURL)
                 default:
-                    throw ExFigError.custom(
-                        errorString: "Format '\(format.rawValue)' is not yet supported for Penpot export. " +
-                            "Supported formats: svg, png"
-                    )
+                    // Unreachable — format validated at method start
+                    fatalError("Unsupported format '\(format.rawValue)' should have been caught earlier")
                 }
 
                 exportedCount += 1
@@ -444,7 +442,7 @@ extension ExFigCommand {
             }
         }
 
-        // swiftlint:enable function_body_length
+        // swiftlint:enable function_body_length cyclomatic_complexity
 
         private func convertToWebP(
             _ files: [FileContents],
