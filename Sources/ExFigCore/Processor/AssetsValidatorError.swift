@@ -1,6 +1,6 @@
 import Foundation
 
-enum AssetsValidatorError: LocalizedError, Sendable {
+enum AssetsValidatorError: LocalizedError {
     case badName(name: String)
     case countMismatch(light: Int, dark: Int)
     case countMismatchLightHighContrastColors(light: Int, lightHC: Int)

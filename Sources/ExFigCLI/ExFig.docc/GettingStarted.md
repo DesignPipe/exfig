@@ -69,14 +69,14 @@ ExFig requires a Figma Personal Access Token to access the Figma API.
 
 Set the `FIGMA_PERSONAL_TOKEN` environment variable:
 
-```bash
+```bash nocopy
 # Add to ~/.zshrc or ~/.bashrc
 export FIGMA_PERSONAL_TOKEN="your-token-here"
 ```
 
 Or pass it directly to commands:
 
-```bash
+```bash nocopy
 FIGMA_PERSONAL_TOKEN="your-token" exfig colors
 ```
 
@@ -88,7 +88,7 @@ For Penpot sources, set the `PENPOT_ACCESS_TOKEN` environment variable:
 2. Create a new token
 3. Set it:
 
-```bash
+```bash nocopy
 export PENPOT_ACCESS_TOKEN="your-penpot-token-here"
 ```
 

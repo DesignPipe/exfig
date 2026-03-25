@@ -25,7 +25,7 @@ struct IconsLoaderResultWithHashes {
 }
 
 /// Configuration for loading icons, supporting both single-entry and multi-entry modes.
-struct IconsLoaderConfig: Sendable {
+struct IconsLoaderConfig {
     /// Entry-level Figma file ID override (takes priority over platform-level).
     let entryFileId: String?
 
@@ -337,7 +337,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
     }
 
     /// Result of loading a single file with granular cache.
-    private struct FileGranularResult: Sendable {
+    private struct FileGranularResult {
         let key: String
         let fileId: String
         let packs: [ImagePack]

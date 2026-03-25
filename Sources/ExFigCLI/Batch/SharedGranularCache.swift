@@ -19,7 +19,7 @@ import Foundation
 /// 2. Share via `@TaskLocal` (read-only during execution)
 /// 3. Workers return computed hashes in `ExportStats`
 /// 4. Merge all hashes and save once after batch completes
-struct SharedGranularCache: Sendable {
+struct SharedGranularCache {
     /// Pre-loaded cache data (read-only during batch execution).
     let cache: ImageTrackingCache
 

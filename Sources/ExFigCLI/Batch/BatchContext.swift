@@ -8,7 +8,7 @@ import FigmaAPI
 /// This struct is stored inside `BatchSharedState` and should not be used with TaskLocal directly.
 ///
 /// See: https://github.com/swiftlang/swift/issues/75501
-struct BatchContext: Sendable {
+struct BatchContext {
     /// Pre-fetched file metadata for version checking.
     let versions: PreFetchedFileVersions?
 
@@ -61,7 +61,7 @@ struct BatchContext: Sendable {
 ///
 /// This struct contains data specific to a single config being processed.
 /// It is passed as a parameter instead of using TaskLocal to avoid the Linux crash.
-struct ConfigExecutionContext: Sendable {
+struct ConfigExecutionContext {
     /// Callback type for reporting incremental download progress to batch view.
     /// Parameters: (assetType, current, total)
     typealias DownloadProgressCallback = @Sendable (AssetType, Int, Int) async -> Void
@@ -89,7 +89,7 @@ struct ConfigExecutionContext: Sendable {
     let stepCompletionCallback: StepCompletionCallback?
 
     /// Asset types that can be processed.
-    enum AssetType: String, Sendable {
+    enum AssetType: String {
         case colors
         case icons
         case images

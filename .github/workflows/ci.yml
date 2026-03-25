@@ -43,7 +43,7 @@ jobs:
     runs-on: macos-15
     needs: lint
     env:
-      DEVELOPER_DIR: "/Applications/Xcode_26.1.1.app/Contents/Developer"
+      DEVELOPER_DIR: "/Applications/Xcode_26.2.app/Contents/Developer"
 
     steps:
       - uses: actions/checkout@v6
@@ -54,9 +54,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .build
-          key: ${{ runner.os }}-xcode-26.1.1-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          key: ${{ runner.os }}-xcode-26.2-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-xcode-26.1.1-spm-
+            ${{ runner.os }}-xcode-26.2-spm-
 
       - uses: jdx/mise-action@v4
         with:
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     container:
-      image: swift:6.2.3-jammy
+      image: swift:6.3-jammy
     steps:
       - name: Install dependencies
         run: |
@@ -97,9 +97,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .build
-          key: ${{ runner.os }}-swift-6.2.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-swift-6.2.3-spm-
+            ${{ runner.os }}-swift-6.3-spm-
 
       - uses: jdx/mise-action@v4
         with:
@@ -135,8 +135,7 @@ jobs:
       - name: Install Swift
         uses: compnerd/gha-setup-swift@v0.3.0
         with:
-          branch: swift-6.3-branch
-          tag: 6.3-DEVELOPMENT-SNAPSHOT-2026-02-21-a
+          release: "6.3"
 
       - name: Cache SPM dependencies
         uses: actions/cache@v5

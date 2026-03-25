@@ -42,7 +42,7 @@ enum NativePngEncoderError: LocalizedError, Equatable {
 /// Uses platform-native APIs for reliable cross-platform PNG encoding:
 /// - macOS/iOS: CoreGraphics/ImageIO
 /// - Linux: libpng
-struct NativePngEncoder: Sendable {
+struct NativePngEncoder {
     /// Encodes RGBA pixel data to PNG
     /// - Parameters:
     ///   - rgba: RGBA pixel data (4 bytes per pixel)

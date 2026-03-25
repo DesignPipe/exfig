@@ -4,7 +4,6 @@
     import MCP
     import Testing
 
-    @Suite("MCP Tool Handlers")
     struct MCPToolHandlerTests {
         // MARK: - Fixtures Path
 
@@ -23,7 +22,7 @@
             let params = CallTool.Parameters(name: tool, arguments: arguments)
             let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
             #expect(result.isError == true)
-            if case let .text(text) = result.content.first {
+            if case let .text(text, _, _) = result.content.first {
                 #expect(text.contains(substring))
             }
         }
@@ -57,7 +56,7 @@
 
             #expect(result.isError != true)
 
-            if case let .text(text) = result.content.first {
+            if case let .text(text, _, _) = result.content.first {
                 #expect(text.contains("\"valid\""))
                 #expect(text.contains("config_path"))
                 #expect(text.contains("ios"))
@@ -123,7 +122,7 @@
 
             #expect(result.isError != true)
 
-            if case let .text(text) = result.content.first {
+            if case let .text(text, _, _) = result.content.first {
                 #expect(text.contains("total_tokens"))
                 #expect(text.contains("counts_by_type"))
                 #expect(text.contains("top_level_groups"))

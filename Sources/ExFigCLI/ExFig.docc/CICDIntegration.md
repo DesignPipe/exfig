@@ -97,8 +97,7 @@ ExFig CI runs on macOS, Linux (Ubuntu 22.04), and Windows. On Windows:
 # Windows CI example
 - uses: compnerd/gha-setup-swift@v0.3.0
   with:
-    branch: swift-6.3-branch
-    tag: DEVELOPMENT-SNAPSHOT-2025-03-09-a
+    release: "6.3"
 
 - name: Build
   run: swift build

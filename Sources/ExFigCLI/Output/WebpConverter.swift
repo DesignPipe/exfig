@@ -39,7 +39,7 @@ enum WebpConverterError: LocalizedError, Equatable {
 /// No external binaries (like cwebp) are required.
 final class WebpConverter: Sendable {
     /// WebP encoding mode
-    enum Encoding: Sendable {
+    enum Encoding {
         case lossy(quality: Int)
         case lossless
     }

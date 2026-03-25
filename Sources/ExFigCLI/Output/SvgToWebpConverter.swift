@@ -29,9 +29,9 @@ enum SvgToWebpConverterError: LocalizedError, Equatable {
 ///
 /// Rasterizes SVG images using resvg and encodes to WebP format using libwebp.
 /// Produces higher quality results than Figma's server-side PNG rendering.
-struct SvgToWebpConverter: Sendable {
+struct SvgToWebpConverter {
     /// WebP encoding mode
-    enum Encoding: Sendable {
+    enum Encoding {
         case lossy(quality: Int)
         case lossless
     }

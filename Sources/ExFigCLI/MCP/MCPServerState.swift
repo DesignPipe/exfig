@@ -5,12 +5,12 @@
 
     /// Shared state for MCP server — lazy FigmaClient, rate limiting across calls.
     actor MCPServerState {
-        private var cachedClient: FigmaAPI.Client?
+        private var cachedClient: FigmaAPI::Client?
         private var rateLimiter: SharedRateLimiter?
 
         /// Returns a configured Figma API client, creating one lazily if needed.
         /// Reuses the same client and rate limiter across all MCP tool calls.
-        func getClient() throws -> FigmaAPI.Client {
+        func getClient() throws -> FigmaAPI::Client {
             if let client = cachedClient {
                 return client
             }

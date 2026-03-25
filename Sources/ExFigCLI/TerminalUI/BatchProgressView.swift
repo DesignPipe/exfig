@@ -17,21 +17,21 @@ actor BatchProgressView {
     // MARK: - Config State
 
     /// State of a config being processed.
-    struct ConfigState: Sendable {
+    struct ConfigState {
         let name: String
         var status: Status
         var exportProgress: ExportProgress
         var stepProgress: (completed: Int, total: Int)?
         var startTime: Date?
 
-        enum Status: Sendable {
+        enum Status {
             case pending
             case running
             case succeeded
             case failed(String)
         }
 
-        struct ExportProgress: Sendable {
+        struct ExportProgress {
             var colors: (current: Int, total: Int)?
             var icons: (current: Int, total: Int)?
             var images: (current: Int, total: Int)?

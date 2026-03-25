@@ -289,14 +289,14 @@ extension ExFigCommand.Download {
 // MARK: - Raw Colors Data Structure
 
 /// Simple structure for raw color export when using styles (not variables).
-struct RawColorsData: Encodable, Sendable {
+struct RawColorsData: Encodable {
     let light: [RawColorEntry]
     let dark: [RawColorEntry]?
     let lightHC: [RawColorEntry]?
     let darkHC: [RawColorEntry]?
 }
 
-struct RawColorEntry: Encodable, Sendable {
+struct RawColorEntry: Encodable {
     let name: String
     // swiftlint:disable:next identifier_name
     let r, g, b, a: Double

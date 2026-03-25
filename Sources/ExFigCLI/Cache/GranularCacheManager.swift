@@ -3,7 +3,7 @@ import FigmaAPI
 import Foundation
 
 /// Result of filtering components through granular cache.
-struct GranularCacheResult: Sendable {
+struct GranularCacheResult {
     /// Components that have changed and need re-export.
     let changedComponents: [NodeId: Component]
 

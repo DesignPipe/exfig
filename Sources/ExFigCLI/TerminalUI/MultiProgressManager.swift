@@ -4,7 +4,7 @@ import Noora
 /// Manages multiple concurrent progress indicators
 actor MultiProgressManager {
     /// State of a single progress item
-    struct ProgressState: Sendable {
+    struct ProgressState {
         let id: UUID
         var label: String
         var current: Int
@@ -12,7 +12,7 @@ actor MultiProgressManager {
         var status: Status
         let startTime: Date
 
-        enum Status: Sendable {
+        enum Status {
             case running
             case succeeded
             case failed

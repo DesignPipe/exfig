@@ -72,13 +72,13 @@ final class ErrorGroupTests: XCTestCase {
 
 // MARK: - Test Helpers
 
-private enum TestError: Error, Sendable {
+private enum TestError: Error {
     case first
     case second
     case third
 }
 
-private enum LocalizedTestError: LocalizedError, Sendable {
+private enum LocalizedTestError: LocalizedError {
     case customMessage
     case anotherMessage
 

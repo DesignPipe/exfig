@@ -3,7 +3,7 @@ import Foundation
 
 /// Result of a platform export operation with granular cache hashes.
 /// Used by ExportIcons and ExportImages for consistent result aggregation.
-struct PlatformExportResult: Sendable {
+struct PlatformExportResult {
     /// Number of assets exported.
     let count: Int
     /// Per-file node hashes computed during export.

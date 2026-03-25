@@ -43,7 +43,7 @@ enum HeicConverterError: LocalizedError, Equatable {
 /// **macOS only** - use `isAvailable()` to check platform support.
 final class HeicConverter: Sendable {
     /// HEIC encoding mode
-    enum Encoding: Sendable {
+    enum Encoding {
         case lossy(quality: Int)
         case lossless
     }

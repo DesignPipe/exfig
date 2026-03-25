@@ -2,7 +2,6 @@ import ExFigCore
 import Foundation
 import Testing
 
-@Suite("ParallelMapEntries")
 struct ParallelMapEntriesTests {
     @Test("Empty input returns empty array")
     func emptyInput() async throws {

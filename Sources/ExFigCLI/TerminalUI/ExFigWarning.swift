@@ -1,12 +1,12 @@
 /// Info about a theme attribute name collision for warning display.
-struct ThemeAttributeCollisionInfo: Sendable, Equatable {
+struct ThemeAttributeCollisionInfo: Equatable {
     let attr: String
     let kept: String
     let discarded: String
 }
 
 /// Unified warning types for ExFig CLI output with TOON formatting support.
-enum ExFigWarning: Sendable, Equatable {
+enum ExFigWarning: Equatable {
     // MARK: - Configuration Warnings
 
     /// Platform/asset type configuration is missing from config file.

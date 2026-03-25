@@ -184,7 +184,7 @@
 
         private static func inspectColors(
             config: PKLConfig,
-            client: FigmaAPI.Client
+            client: FigmaAPI::Client
         ) async throws -> ColorsInspectResult {
             let fileId = try requireFileId(config: config)
             let styles = try await client.request(StylesEndpoint(fileId: fileId))
@@ -210,7 +210,7 @@
 
         private static func inspectIcons(
             config: PKLConfig,
-            client: FigmaAPI.Client
+            client: FigmaAPI::Client
         ) async throws -> ComponentsInspectResult {
             let fileId = try requireFileId(config: config)
             let components = try await client.request(ComponentsEndpoint(fileId: fileId))
@@ -225,7 +225,7 @@
 
         private static func inspectImages(
             config: PKLConfig,
-            client: FigmaAPI.Client
+            client: FigmaAPI::Client
         ) async throws -> FileInspectResult {
             let fileId = try requireFileId(config: config)
             let metadata = try await client.request(FileMetadataEndpoint(fileId: fileId))
@@ -240,7 +240,7 @@
 
         private static func inspectTypography(
             config: PKLConfig,
-            client: FigmaAPI.Client
+            client: FigmaAPI::Client
         ) async throws -> TypographyInspectResult {
             let fileId = try requireFileId(config: config)
             let styles = try await client.request(StylesEndpoint(fileId: fileId))
@@ -364,7 +364,7 @@
 
             // Validate cheap parameters before expensive PKL eval / API client creation
             let format = params.arguments?["format"]?.stringValue ?? "w3c"
-            let validFormats: Set<String> = ["w3c", "raw"]
+            let validFormats: Set = ["w3c", "raw"]
             guard validFormats.contains(format) else {
                 throw ExFigError.custom(
                     errorString: "Invalid format: \(format). Must be one of: w3c, raw"
@@ -485,7 +485,7 @@
 
     extension MCPToolHandlers {
         private static func downloadColors(
-            config: PKLConfig, client: FigmaAPI.Client,
+            config: PKLConfig, client: FigmaAPI::Client,
             format: String, filter: String?
         ) async throws -> CallTool.Result {
             let result: ColorsVariablesLoader.LoadResult
@@ -545,7 +545,7 @@
         }
 
         private static func downloadTypography(
-            config: PKLConfig, client: FigmaAPI.Client, format: String
+            config: PKLConfig, client: FigmaAPI::Client, format: String
         ) async throws -> CallTool.Result {
             guard let figmaParams = config.figma else {
                 throw ExFigError.custom(errorString: "No figma section configured. Check config.")
@@ -569,7 +569,7 @@
         }
 
         private static func downloadUnifiedTokens(
-            config: PKLConfig, client: FigmaAPI.Client
+            config: PKLConfig, client: FigmaAPI::Client
         ) async throws -> CallTool.Result {
             let exporter = W3CTokensExporter(version: .v2025)
             var allTokens: [String: Any] = [:]
@@ -626,7 +626,7 @@
         }
 
         private static func downloadAndMergeColors(
-            client: FigmaAPI.Client,
+            client: FigmaAPI::Client,
             variableParams: PKLConfig.Common.VariablesColors,
             exporter: W3CTokensExporter
         ) async throws -> (tokens: [String: Any], count: Int, warnings: [String]) {
@@ -646,7 +646,7 @@
         }
 
         private static func downloadAndMergeTypography(
-            client: FigmaAPI.Client,
+            client: FigmaAPI::Client,
             figmaParams: PKLConfig.Figma,
             exporter: W3CTokensExporter
         ) async throws -> (tokens: [String: Any], count: Int) {
@@ -657,7 +657,7 @@
         }
 
         private static func downloadAndMergeNumbers(
-            client: FigmaAPI.Client,
+            client: FigmaAPI::Client,
             variableParams: PKLConfig.Common.VariablesColors,
             exporter: W3CTokensExporter
         ) async throws -> (tokens: [[String: Any]], count: Int, warnings: [String]) {
@@ -716,7 +716,7 @@
 
     // MARK: - Response Types
 
-    private struct ValidateSummary: Codable, Sendable {
+    private struct ValidateSummary: Codable {
         let configPath: String
         let valid: Bool
         var platforms: [String: EntrySummary]?
@@ -730,7 +730,7 @@
         }
     }
 
-    private struct EntrySummary: Codable, Sendable {
+    private struct EntrySummary: Codable {
         var colorsEntries: Int?
         var iconsEntries: Int?
         var imagesEntries: Int?
@@ -744,7 +744,7 @@
         }
     }
 
-    private struct TokensInfoResult: Codable, Sendable {
+    private struct TokensInfoResult: Codable {
         let filePath: String
         let totalTokens: Int
         let aliasCount: Int
@@ -762,7 +762,7 @@
         }
     }
 
-    private struct InspectResult: Codable, Sendable {
+    private struct InspectResult: Codable {
         let configPath: String
         var colors: ColorsInspectResult?
         var icons: ComponentsInspectResult?
@@ -789,7 +789,7 @@
         }
     }
 
-    private struct ColorsInspectResult: Codable, Sendable {
+    private struct ColorsInspectResult: Codable {
         let fileId: String
         let stylesCount: Int
         let colorStylesCount: Int
@@ -807,7 +807,7 @@
         }
     }
 
-    private struct ComponentsInspectResult: Codable, Sendable {
+    private struct ComponentsInspectResult: Codable {
         let fileId: String
         let componentsCount: Int
         var sampleNames: [String]?
@@ -821,7 +821,7 @@
         }
     }
 
-    private struct FileInspectResult: Codable, Sendable {
+    private struct FileInspectResult: Codable {
         let fileId: String
         let fileName: String
         let lastModified: String
@@ -835,7 +835,7 @@
         }
     }
 
-    private struct TypographyInspectResult: Codable, Sendable {
+    private struct TypographyInspectResult: Codable {
         let fileId: String
         let textStylesCount: Int
         var sampleNames: [String]?
@@ -849,7 +849,7 @@
         }
     }
 
-    private struct DownloadMeta: Codable, Sendable {
+    private struct DownloadMeta: Codable {
         let resourceType: String
         let format: String
         let tokenCount: Int
@@ -863,14 +863,14 @@
         }
     }
 
-    private struct RawColorsOutput: Codable, Sendable {
+    private struct RawColorsOutput: Codable {
         let light: [RawColor]
         let dark: [RawColor]?
         let lightHC: [RawColor]?
         let darkHC: [RawColor]?
     }
 
-    private struct RawColor: Codable, Sendable {
+    private struct RawColor: Codable {
         let name: String
         let red: Double
         let green: Double
@@ -878,7 +878,7 @@
         let alpha: Double
     }
 
-    private struct RawTextStyle: Codable, Sendable {
+    private struct RawTextStyle: Codable {
         let name: String
         let fontName: String
         let fontSize: Double

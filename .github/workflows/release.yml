@@ -26,7 +26,7 @@ jobs:
             platform: linux-x64
             build-path: x86_64-unknown-linux-gnu/release
             archive-name: exfig-linux-x64
-            container: swift:6.2.3-jammy
+            container: swift:6.3-jammy
             extra-flags: --static-swift-stdlib -Xlinker -lcurl -Xlinker -lxml2 -Xlinker -lssl -Xlinker -lcrypto -Xlinker -lz
           - os: windows-latest
             platform: windows-x64
@@ -53,12 +53,11 @@ jobs:
         if: matrix.platform == 'windows-x64'
         uses: compnerd/gha-setup-swift@v0.3.0
         with:
-          branch: swift-6.3-branch
-          tag: 6.3-DEVELOPMENT-SNAPSHOT-2026-02-21-a
+          release: "6.3"
 
-      - name: Select Xcode 26.1 (macOS)
+      - name: Select Xcode 26.2 (macOS)
         if: matrix.platform == 'macos'
-        run: sudo xcode-select -s /Applications/Xcode_26.1.1.app/Contents/Developer
+        run: sudo xcode-select -s /Applications/Xcode_26.2.app/Contents/Developer
 
       - name: Install system dependencies (Linux)
         if: matrix.platform == 'linux-x64'
@@ -332,7 +331,7 @@ jobs:
       group: "pages"
       cancel-in-progress: true
     env:
-      DEVELOPER_DIR: "/Applications/Xcode_26.1.1.app/Contents/Developer"
+      DEVELOPER_DIR: "/Applications/Xcode_26.2.app/Contents/Developer"
     steps:
       - uses: actions/checkout@v6
 
@@ -343,6 +342,7 @@ jobs:
               --disable-indexing \
               --transform-for-static-hosting \
               --hosting-base-path exfig \
+              --enable-experimental-code-block-annotations \
               --output-path docs
           echo '<script>window.location.href += "/documentation/exfigcli"</script>' > docs/index.html
 

@@ -37,9 +37,9 @@ enum SvgToHeicConverterError: LocalizedError, Equatable {
 /// ~40-50% smaller file sizes.
 ///
 /// **macOS only** - use `isAvailable()` to check platform support.
-struct SvgToHeicConverter: Sendable {
+struct SvgToHeicConverter {
     /// HEIC encoding mode
-    enum Encoding: Sendable {
+    enum Encoding {
         case lossy(quality: Int)
         case lossless
     }

@@ -2,7 +2,6 @@ import ExFigConfig
 import ExFigCore
 import Testing
 
-@Suite("VariablesSource resolvedSourceKind")
 struct VariablesSourceResolvedSourceKindTests {
     @Test("Defaults to figma when no overrides")
     func defaultsFigma() {

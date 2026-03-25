@@ -42,7 +42,7 @@ pkl --version
 
 Create `exfig.pkl` in your project root:
 
-```pkl
+```pkl showLineNumbers
 amends "package://github.com/DesignPipe/exfig@2.0.0#/ExFig.pkl"
 
 import "package://github.com/DesignPipe/exfig@2.0.0#/Common.pkl"
@@ -85,7 +85,7 @@ PKL's `amends` keyword enables configuration inheritance. Create a base config t
 
 ### Base Configuration (base.pkl)
 
-```pkl
+```pkl showLineNumbers
 amends "package://github.com/DesignPipe/exfig@2.0.0#/ExFig.pkl"
 
 import "package://github.com/DesignPipe/exfig@2.0.0#/Common.pkl"
@@ -120,7 +120,7 @@ common = new Common.CommonConfig {
 
 ### Project Configuration (project-ios.pkl)
 
-```pkl
+```pkl showLineNumbers
 amends "base.pkl"
 
 import "package://github.com/DesignPipe/exfig@2.0.0#/iOS.pkl"

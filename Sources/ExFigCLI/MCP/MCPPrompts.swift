@@ -37,7 +37,7 @@
 
         // MARK: - Get Prompt
 
-        static func get(name: String, arguments: [String: Value]?) throws -> GetPrompt.Result {
+        static func get(name: String, arguments: [String: String]?) throws -> GetPrompt.Result {
             switch name {
             case "setup-config":
                 return try getSetupConfig(arguments: arguments)
@@ -50,13 +50,13 @@
 
         // MARK: - Setup Config
 
-        private static func getSetupConfig(arguments: [String: Value]?) throws -> GetPrompt.Result {
-            guard let platform = arguments?["platform"]?.stringValue else {
+        private static func getSetupConfig(arguments: [String: String]?) throws -> GetPrompt.Result {
+            guard let platform = arguments?["platform"] else {
                 throw MCPError.invalidParams("Missing required argument: platform")
             }
 
-            let source = arguments?["source"]?.stringValue ?? "figma"
-            let projectPath = arguments?["project_path"]?.stringValue ?? "."
+            let source = arguments?["source"] ?? "figma"
+            let projectPath = arguments?["project_path"] ?? "."
 
             let validPlatforms = ["ios", "android", "flutter", "web"]
             guard validPlatforms.contains(platform) else {
@@ -148,12 +148,12 @@
 
         // MARK: - Troubleshoot
 
-        private static func getTroubleshoot(arguments: [String: Value]?) throws -> GetPrompt.Result {
-            guard let errorMessage = arguments?["error_message"]?.stringValue else {
+        private static func getTroubleshoot(arguments: [String: String]?) throws -> GetPrompt.Result {
+            guard let errorMessage = arguments?["error_message"] else {
                 throw MCPError.invalidParams("Missing required argument: error_message")
             }
 
-            let configPath = arguments?["config_path"]?.stringValue ?? "exfig.pkl"
+            let configPath = arguments?["config_path"] ?? "exfig.pkl"
 
             let text = """
             I'm getting this error when running ExFig export:

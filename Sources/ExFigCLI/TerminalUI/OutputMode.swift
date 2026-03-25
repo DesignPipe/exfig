@@ -1,7 +1,7 @@
 import Foundation
 
 /// Output mode for CLI commands
-enum OutputMode: Sendable {
+enum OutputMode {
     /// Default mode with spinners, progress bars, and colors
     case normal
     /// Detailed debug output including timing and API calls

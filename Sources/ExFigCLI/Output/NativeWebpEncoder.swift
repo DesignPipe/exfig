@@ -35,7 +35,7 @@ enum NativeWebpEncoderError: LocalizedError, Equatable {
 ///
 /// Uses the `the-swift-collective/libwebp` Swift package which provides
 /// bindings to libwebp 1.4.x for WebP image encoding.
-struct NativeWebpEncoder: Sendable {
+struct NativeWebpEncoder {
     /// WebP encoding quality (0-100)
     /// Only used for lossy encoding. Higher values = better quality, larger files.
     let quality: Int

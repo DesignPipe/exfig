@@ -50,14 +50,14 @@ func testSomePngOperation() throws {
 | libpng tests | Full support | Build tests first        | Not tested               |
 | Foundation   | Full         | Some APIs missing/broken | Some APIs missing/broken |
 | XcodeProj    | Full         | Full                     | Not available            |
-| Swift version| 6.2+         | 6.2+                     | 6.3 required             |
+| Swift version| 6.3+         | 6.3+                     | 6.3+                     |
 
 ## Windows Support
 
 ### Swift Version
 
-Windows requires Swift 6.3 (development snapshot) due to `swift-resvg` artifactbundle compatibility.
-CI uses `compnerd/gha-setup-swift@v0.3.0` with `swift-6.3-branch`.
+Windows requires Swift 6.3 (stable release) due to `swift-resvg` artifactbundle compatibility.
+CI uses `compnerd/gha-setup-swift@v0.3.0` with `release: "6.3"`.
 
 ### Conditional Dependencies (Package.swift)
 

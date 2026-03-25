@@ -42,7 +42,7 @@ enum PngDecoderError: LocalizedError, Equatable {
 }
 
 /// Result of PNG decoding containing RGBA pixel data
-struct DecodedPng: Sendable {
+struct DecodedPng {
     let width: Int
     let height: Int
     let rgba: [UInt8]
@@ -58,7 +58,7 @@ struct DecodedPng: Sendable {
 /// Uses platform-native APIs for reliable cross-platform PNG decoding:
 /// - macOS/iOS: CoreGraphics/ImageIO
 /// - Linux: libpng (via libwebp transitive dependency)
-struct PngDecoder: Sendable {
+struct PngDecoder {
     /// Decodes a PNG file to RGBA pixel data
     /// - Parameter url: Path to PNG file
     /// - Returns: Decoded PNG with width, height, and RGBA bytes

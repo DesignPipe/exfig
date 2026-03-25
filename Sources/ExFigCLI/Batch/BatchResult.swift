@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents a config file to be processed.
-struct ConfigFile: Sendable {
+struct ConfigFile {
     /// URL to the config file.
     let url: URL
     /// Display name for the config.
@@ -14,7 +14,7 @@ struct ConfigFile: Sendable {
 }
 
 /// Statistics from an export operation.
-struct ExportStats: Sendable {
+struct ExportStats {
     let colors: Int
     let icons: Int
     let images: Int
@@ -109,7 +109,7 @@ struct ExportStats: Sendable {
 }
 
 /// Statistics about granular cache effectiveness.
-struct GranularCacheStats: Sendable {
+struct GranularCacheStats {
     /// Number of nodes skipped (unchanged).
     let skipped: Int
     /// Number of nodes exported (changed or new).
@@ -136,7 +136,7 @@ struct GranularCacheStats: Sendable {
 }
 
 /// Result of processing a single config.
-enum ConfigResult: Sendable {
+enum ConfigResult {
     case success(config: ConfigFile, stats: ExportStats)
     case failure(config: ConfigFile, error: any Error)
 
@@ -168,7 +168,7 @@ enum ConfigResult: Sendable {
 }
 
 /// Result of batch processing multiple configs.
-struct BatchResult: Sendable {
+struct BatchResult {
     /// Results for each config processed.
     let results: [ConfigResult]
     /// Total duration of batch execution.

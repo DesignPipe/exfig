@@ -28,7 +28,7 @@ final class ManifestTracker: Sendable {
     }
 
     /// Pre-write filesystem state for a file path.
-    struct PreWriteState: Sendable {
+    struct PreWriteState {
         let fileExisted: Bool
         let existingChecksum: String?
     }

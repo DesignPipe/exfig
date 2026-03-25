@@ -8,7 +8,7 @@ import Logging
 /// Schema versions:
 /// - v1: File-level version tracking only
 /// - v2: Added per-node hash tracking for granular cache (experimental)
-struct ImageTrackingCache: Codable, Sendable {
+struct ImageTrackingCache: Codable {
     /// Current schema version for cache file format.
     /// v2 adds nodeHashes field to CachedFileInfo.
     static let currentSchemaVersion = 2
@@ -38,7 +38,7 @@ struct ImageTrackingCache: Codable, Sendable {
 // MARK: - CachedFileInfo
 
 /// Information about a cached Figma file.
-struct CachedFileInfo: Codable, Sendable {
+struct CachedFileInfo: Codable {
     /// Figma file version identifier.
     /// Changes when library is published or version is manually saved.
     let version: String

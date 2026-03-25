@@ -270,7 +270,7 @@ actor SharedDownloadQueue {
 
 // MARK: - Statistics
 
-struct QueueStats: Sendable {
+struct QueueStats {
     let pendingJobs: Int
     let activeJobs: Int
     let activeDownloads: Int

@@ -86,14 +86,14 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 | Aspect          | Details                                                                                            |
 | --------------- | -------------------------------------------------------------------------------------------------- |
-| Language        | Swift 6.2, macOS 13.0+                                                                             |
+| Language        | Swift 6.3, macOS 13.0+                                                                             |
 | Package Manager | Swift Package Manager                                                                              |
 | CLI Framework   | swift-argument-parser                                                                              |
 | Config Format   | PKL (Programmable, Scalable, Safe)                                                                 |
 | Templates       | Jinja2 (swift-jinja)                                                                               |
 | Required Env    | `FIGMA_PERSONAL_TOKEN`                                                                             |
 | Config Files    | `exfig.pkl` (PKL configuration)                                                                    |
-| Tooling         | mise (`./bin/mise` self-contained, no global install needed)                                       |
+| Tooling         | mise (`./bin/mise` self-contained), swiftly (Swift toolchain management via `.swift-version`)      |
 | Platforms       | macOS 13+ (primary), Linux/Ubuntu 22.04, Windows (Swift 6.3) - see `.claude/rules/linux-compat.md` |
 
 ## Architecture
@@ -311,6 +311,18 @@ MCP `swift-sdk` depends on `swift-nio` which doesn't compile on Windows. All MCP
 in `#if canImport(MCP)` and the dependency is conditionally included via `#if !os(Windows)` in Package.swift.
 `ExFigCommand.allSubcommands` computed property (not array literal) handles conditional `MCPServe` registration.
 
+### MCP SDK Version (0.12.0+)
+
+MCP SDK 0.12.0 changed Content enum: `.text` case now has `(text:, annotations:, _meta:)`.
+Both `.text(_:metadata:)` and `.text(text:metadata:)` factories are deprecated but functional.
+`GetPrompt.Parameters.arguments` changed from `[String: Value]?` to `[String: String]?`.
+
+### Build Environment (Swift 6.3 via swiftly)
+
+Swift 6.3 is managed by swiftly (`.swift-version` file), not mise. For building and testing:
+`export PATH="$HOME/.swiftly/bin:$PATH" && export DEVELOPER_DIR="/Applications/Xcode-26.4.0.app/Contents/Developer"`
+swiftly provides Swift 6.3; Xcode provides macOS SDK with XCTest. Both are needed for `swift test`.
+
 ### Dependency Version Coupling (swift-resvg ↔ swift-svgkit)
 
 `swift-svgkit` uses `exact:` pin on `swift-resvg`. When bumping resvg version (e.g., for Windows artifactbundle),
@@ -437,6 +449,10 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Deleted variables in output | Filter `VariableValue.deletedButReferenced != true` in variable loaders AND `CodeSyntaxSyncer` |
 | Jinja trailing `\n` | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results |
 | `Bundle.module` in tests | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle |
+| SwiftFormat breaks `::` syntax | SwiftFormat 0.60.1+ required for Swift 6.3 module selectors (`FigmaAPI::Client`) |
+| MCP SDK 0.12.0 breaking | `.text` has 3 associated values — pattern match as `.text(text, _, _)`; `GetPrompt.arguments` is `[String: String]?` now |
+| Tests need XCTest from Xcode | swiftly's Swift 6.3 lacks XCTest; set `DEVELOPER_DIR` to Xcode app path for `swift test` |
+| `swift test` pkl failures | Run via `./bin/mise exec -- swift test` to get pkl 0.31+ in PATH; bare `swift test` uses system pkl |
 
 ## Additional Rules
 

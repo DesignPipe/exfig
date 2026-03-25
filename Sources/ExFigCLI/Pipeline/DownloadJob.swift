@@ -3,7 +3,7 @@ import Foundation
 
 /// Represents a batch of files to download for a specific config.
 /// Used by SharedDownloadQueue to coordinate downloads across multiple configs.
-struct DownloadJob: Sendable {
+struct DownloadJob {
     /// Unique identifier for this job
     let id: UUID
 
@@ -35,7 +35,7 @@ struct DownloadJob: Sendable {
 }
 
 /// Result of a completed download job
-struct DownloadJobResult: Sendable {
+struct DownloadJobResult {
     let jobId: UUID
     let configId: String
     let downloadedFiles: [FileContents]

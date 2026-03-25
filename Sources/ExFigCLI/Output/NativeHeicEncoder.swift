@@ -62,7 +62,7 @@ enum NativeHeicEncoderError: LocalizedError, Equatable {
 /// HEIC provides ~40-50% smaller file sizes than PNG while maintaining transparency.
 ///
 /// **macOS only** - on Linux, use `isAvailable()` to check and fall back to PNG.
-struct NativeHeicEncoder: Sendable {
+struct NativeHeicEncoder {
     /// HEIC encoding quality (0-100)
     /// Only used for lossy encoding. Higher values = better quality, larger files.
     let quality: Int

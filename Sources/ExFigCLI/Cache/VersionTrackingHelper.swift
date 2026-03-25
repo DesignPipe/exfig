@@ -4,7 +4,7 @@ import Foundation
 import Logging
 
 /// Result of version tracking check for export commands.
-enum VersionTrackingCheckResult: Sendable {
+enum VersionTrackingCheckResult {
     /// Export should be skipped - no changes detected.
     case skipExport
 
