@@ -16,7 +16,7 @@ your development environment and contributing to the project.
 ## Requirements
 
 - macOS 13.0 or later, Linux (Ubuntu 22.04), or Windows
-- Xcode 26.2 or later (macOS), or Swift 6.3+ toolchain (Linux/Windows)
+- Xcode 26.2 or later (macOS, provides SDK) + Swift 6.3 toolchain (.pkg), or Swift 6.3+ toolchain (Linux/Windows)
 - [mise](https://mise.jdx.dev/) (optional, for task running)
 
 ## Getting Started

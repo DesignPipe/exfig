@@ -19,7 +19,7 @@ var packageDependencies: [Package.Dependency] = [
     .package(url: "https://github.com/alexey1312/swift-resvg.git", exact: "0.45.1-swift.15"),
     .package(url: "https://github.com/mattt/swift-yyjson", from: "0.5.0"),
     .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
-    .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.1.0"),
+    .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.2.0"),
     .package(url: "https://github.com/DesignPipe/swift-figma-api.git", from: "0.2.0"),
     .package(url: "https://github.com/DesignPipe/swift-penpot-api.git", from: "0.1.0"),
 ]
@@ -48,13 +48,14 @@ var exfigCLIDependencies: [Target.Dependency] = [
 ]
 
 // XcodeProj and MCP SDK are not available on Windows
-// (XcodeProj depends on PathKit/AEXML, MCP SDK depends on swift-nio which doesn't compile on Windows)
+// (XcodeProj depends on PathKit which uses Darwin-specific APIs, MCP SDK depends on swift-nio which doesn't compile on
+// Windows)
 #if !os(Windows)
     packageDependencies.append(
         .package(url: "https://github.com/tuist/XcodeProj.git", from: "8.27.0")
     )
     packageDependencies.append(
-        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.9.0")
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.12.0")
     )
     exfigCLIDependencies.append(
         .product(name: "XcodeProj", package: "XcodeProj")

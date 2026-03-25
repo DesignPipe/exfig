@@ -98,7 +98,7 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Architecture
 
-Thirteen modules in `Sources/`:
+Twelve modules in `Sources/`:
 
 | Module          | Purpose                                                   |
 | --------------- | --------------------------------------------------------- |
@@ -452,6 +452,8 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | MCP SDK 0.12.0 breaking | `.text` has 3 associated values — pattern match as `.text(text, _, _)`; `GetPrompt.arguments` is `[String: String]?` now |
 | Tests need XCTest from Xcode | swiftly's Swift 6.3 lacks XCTest; set `DEVELOPER_DIR` to Xcode app path for `swift test` |
 | `swift test` pkl failures | Run via `./bin/mise exec -- swift test` to get pkl 0.31+ in PATH; bare `swift test` uses system pkl |
+| SwiftFormat `#if` indent | SwiftFormat 0.60.1 indents content inside `#if canImport()` — this is intentional project style, do not "fix" |
+| SPM `from:` too loose | When code uses APIs from version X, set `from: "X"` not older — SPM may resolve an incompatible earlier version |
 
 ## Additional Rules
 

@@ -22,9 +22,11 @@
             let params = CallTool.Parameters(name: tool, arguments: arguments)
             let result = await MCPToolHandlers.handle(params: params, state: MCPServerState())
             #expect(result.isError == true)
-            if case let .text(text, _, _) = result.content.first {
-                #expect(text.contains(substring))
+            guard case let .text(text, _, _) = result.content.first else {
+                Issue.record("Expected .text content, got \(result.content)")
+                return
             }
+            #expect(text.contains(substring))
         }
 
         // MARK: - Validate Tool
@@ -56,11 +58,13 @@
 
             #expect(result.isError != true)
 
-            if case let .text(text, _, _) = result.content.first {
-                #expect(text.contains("\"valid\""))
-                #expect(text.contains("config_path"))
-                #expect(text.contains("ios"))
+            guard case let .text(text, _, _) = result.content.first else {
+                Issue.record("Expected .text content, got \(result.content)")
+                return
             }
+            #expect(text.contains("\"valid\""))
+            #expect(text.contains("config_path"))
+            #expect(text.contains("ios"))
         }
 
         // MARK: - Tokens Info Tool
@@ -122,11 +126,13 @@
 
             #expect(result.isError != true)
 
-            if case let .text(text, _, _) = result.content.first {
-                #expect(text.contains("total_tokens"))
-                #expect(text.contains("counts_by_type"))
-                #expect(text.contains("top_level_groups"))
+            guard case let .text(text, _, _) = result.content.first else {
+                Issue.record("Expected .text content, got \(result.content)")
+                return
             }
+            #expect(text.contains("total_tokens"))
+            #expect(text.contains("counts_by_type"))
+            #expect(text.contains("top_level_groups"))
         }
 
         // MARK: - Unknown Tool

@@ -143,6 +143,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist
           Copy-Item ".build/${{ matrix.build-path }}/exfig.exe" "dist/ExFig.exe"
+          # Resource bundles are optional — not all modules produce them on every build config
           Copy-Item ".build/${{ matrix.build-path }}/exfig_AndroidExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
           Copy-Item ".build/${{ matrix.build-path }}/exfig_XcodeExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
           Copy-Item ".build/${{ matrix.build-path }}/exfig_FlutterExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
