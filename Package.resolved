@@ -1,5 +1,5 @@
 {
-  "originHash" : "2b3e6002adcb3e450ba06731dcbfc333d3f62894c0ca599c86c390156f0cf048",
+  "originHash" : "4775d02a1dbb70d8a2bbd991f0fc6f34825eadf35b37f0af4cb0262bcb4bc491",
   "pins" : [
     {
       "identity" : "aexml",
@@ -213,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/alexey1312/swift-resvg.git",
       "state" : {
-        "revision" : "f408b4a39dd59b402f1db3605daff6748c5e81ec",
-        "version" : "0.45.1-swift.3"
+        "revision" : "6707e4f94a05b4ea91e82cafa9b6c4ecb78a73bb",
+        "version" : "0.45.1-swift.15"
       }
     },
     {
@@ -231,8 +231,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DesignPipe/swift-svgkit.git",
       "state" : {
-        "revision" : "83a9601fc4f4d3acaf34fca2f74d1b9faea2b932",
-        "version" : "0.1.0"
+        "revision" : "6e10eef2bbb4b5921a2d59d391647e6c1c81400b",
+        "version" : "0.2.0"
       }
     },
     {
