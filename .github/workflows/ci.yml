@@ -50,12 +50,12 @@ jobs:
         with:
           lfs: true
 
-      - name: Install Swift 6.3 via swiftly
+      - name: Install Swift 6.3 toolchain
         run: |
-          curl -L https://swiftlang.github.io/swiftly/swiftly-install.sh | bash -s -- -y
-          export PATH="$HOME/.swiftly/bin:$PATH"
-          swiftly install 6.3
-          echo "$HOME/.swiftly/bin" >> "$GITHUB_PATH"
+          curl -fLo swift-6.3.pkg "https://download.swift.org/swift-6.3-release/xcode/swift-6.3-RELEASE/swift-6.3-RELEASE-osx.pkg"
+          sudo installer -pkg swift-6.3.pkg -target /
+          TOOLCHAINS=$(plutil -extract CFBundleIdentifier raw /Library/Developer/Toolchains/swift-6.3-RELEASE.xctoolchain/Info.plist)
+          echo "TOOLCHAINS=$TOOLCHAINS" >> "$GITHUB_ENV"
 
       - name: Cache SPM dependencies
         uses: actions/cache@v5
