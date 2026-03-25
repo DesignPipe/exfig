@@ -14,7 +14,7 @@ ExFig is a command-line tool that exports design resources from Figma and Penpot
 
 ## Requirements
 
-- macOS 13.0 or later (or Linux Ubuntu 22.04)
+- macOS 13.0 or later, Linux (Ubuntu 22.04), or Windows (Swift 6.3+)
 - Figma account with file access, **or** Penpot account
 - Figma Personal Access Token (for Figma sources) or Penpot Access Token (for Penpot sources)
 
