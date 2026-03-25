@@ -112,6 +112,12 @@ func withContext<T: Sendable>(operation: @Sendable () async -> T) async -> T
 func withContext<T>(operation: () async -> T) async -> T
 ```
 
+### #if Inside Array Literals (Swift Limitation)
+
+`#if` does NOT work inside array literals in Swift — not just `Package.swift`, but also
+`CommandConfiguration(subcommands: [...])` and any other `[T]` literal context.
+Use `var` + `.append()` pattern or computed property returning the array.
+
 ## SwiftLint Rules
 
 - Use `Data("string".utf8)` not `"string".data(using: .utf8)!`

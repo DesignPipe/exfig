@@ -91,6 +91,14 @@ Use `#if canImport()` instead of `#if os(Linux)` — covers both Linux and Windo
 #endif
 ```
 
+### MCP SDK Exclusion
+
+MCP swift-sdk depends on swift-nio (no Windows support). On Windows:
+- Dependency excluded via `#if !os(Windows)` in Package.swift (same pattern as XcodeProj)
+- All `Sources/ExFigCLI/MCP/*.swift` and `Subcommands/MCPServe.swift` wrapped in `#if canImport(MCP)`
+- `ExFigCommand.allSubcommands` computed var (not array literal) for conditional subcommand registration
+- `MCPToolHandlers.swift` excluded in `.swiftlint.yml` (file_length with `#if` wrapper)
+
 ### SPM Artifactbundle on Windows
 
 SPM on Windows has library naming differences:

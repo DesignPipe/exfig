@@ -305,6 +305,17 @@ Both `InitWizard` and `FetchWizard` ask "Figma or Penpot?" first (`WizardDesignS
 Follow the existing pattern in `NooraUI.swift`: static method delegating to `shared` instance with matching parameter names.
 Noora's `multipleChoicePrompt` uses `MultipleChoiceLimit` — `.unlimited` or `.limited(count:errorMessage:)`.
 
+### MCP SDK Windows Exclusion
+
+MCP `swift-sdk` depends on `swift-nio` which doesn't compile on Windows. All MCP files are wrapped
+in `#if canImport(MCP)` and the dependency is conditionally included via `#if !os(Windows)` in Package.swift.
+`ExFigCommand.allSubcommands` computed property (not array literal) handles conditional `MCPServe` registration.
+
+### Dependency Version Coupling (swift-resvg ↔ swift-svgkit)
+
+`swift-svgkit` uses `exact:` pin on `swift-resvg`. When bumping resvg version (e.g., for Windows artifactbundle),
+must first update and tag swift-svgkit with the new resvg version, then update ExFig's Package.swift.
+
 ### Adding a Figma API Endpoint
 
 FigmaAPI is now an external package (`swift-figma-api`). See its repository for endpoint patterns.
