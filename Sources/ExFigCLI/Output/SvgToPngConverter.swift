@@ -29,7 +29,7 @@ enum SvgToPngConverterError: LocalizedError, Equatable {
 ///
 /// Rasterizes SVG images using resvg and encodes to PNG format.
 /// Produces higher quality results than Figma's server-side PNG rendering.
-struct SvgToPngConverter: Sendable {
+struct SvgToPngConverter {
     private let rasterizer: SvgRasterizer
 
     /// Creates an SVG to PNG converter

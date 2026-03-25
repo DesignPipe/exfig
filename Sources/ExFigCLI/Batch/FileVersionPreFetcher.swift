@@ -37,7 +37,7 @@ struct PreFetchConfiguration {
 }
 
 /// Result of pre-fetching file versions and components.
-struct PreFetchResult: Sendable {
+struct PreFetchResult {
     let versions: PreFetchedFileVersions?
     let components: PreFetchedComponents?
     let nodes: PreFetchedNodes?
@@ -47,7 +47,7 @@ struct PreFetchResult: Sendable {
 ///
 /// Used by batch processing to fetch all unique file versions and components upfront,
 /// avoiding redundant API calls when multiple configs reference the same files.
-struct FileVersionPreFetcher: Sendable {
+struct FileVersionPreFetcher {
     let client: Client
     let ui: TerminalUI
 

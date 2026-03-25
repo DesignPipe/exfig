@@ -21,7 +21,7 @@ final class ColorsVariablesLoader: Sendable {
     /// Mode keys: "light", "dark", "lightHC", "darkHC".
     typealias ColorAliases = [String: [String: String]]
 
-    struct LoadResult: Sendable {
+    struct LoadResult {
         let output: ColorsLoaderOutput
         let warnings: [ExFigWarning]
         let aliases: ColorAliases
@@ -242,28 +242,28 @@ final class ColorsVariablesLoader: Sendable {
 }
 
 private extension ColorsVariablesLoader {
-    struct ModeIds: Sendable {
+    struct ModeIds {
         var lightModeId = String()
         var darkModeId = String()
         var lightHCModeId = String()
         var darkHCModeId = String()
     }
 
-    struct Colors: Sendable {
+    struct Colors {
         var lightColors: [Color] = []
         var darkColors: [Color] = []
         var lightHCColors: [Color] = []
         var darkHCColors: [Color] = []
     }
 
-    struct Values: Sendable {
+    struct Values {
         let light: ValuesByMode?
         let dark: ValuesByMode?
         let lightHC: ValuesByMode?
         let darkHC: ValuesByMode?
     }
 
-    struct Variable: Sendable {
+    struct Variable {
         let name: String
         let description: String
         let valuesByMode: Values

@@ -57,7 +57,7 @@ version = "6.2.3"
 backend = "core:swift"
 
 [[tools.swiftformat]]
-version = "0.59.1"
+version = "0.60.1"
 backend = "asdf:swiftformat"
 
 [[tools.swiftlint]]

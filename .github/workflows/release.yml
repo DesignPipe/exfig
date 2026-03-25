@@ -26,8 +26,12 @@ jobs:
             platform: linux-x64
             build-path: x86_64-unknown-linux-gnu/release
             archive-name: exfig-linux-x64
-            container: swift:6.2.3-jammy
+            container: swift:6.3-jammy
             extra-flags: --static-swift-stdlib -Xlinker -lcurl -Xlinker -lxml2 -Xlinker -lssl -Xlinker -lcrypto -Xlinker -lz
+          - os: windows-latest
+            platform: windows-x64
+            build-path: x86_64-unknown-windows-msvc/release
+            archive-name: exfig-windows-x64
 
 
     runs-on: ${{ matrix.os }}
@@ -45,16 +49,28 @@ jobs:
         with:
           lfs: true
 
-      - name: Select Xcode 26.1 (macOS)
+      - name: Install Swift (Windows)
+        if: matrix.platform == 'windows-x64'
+        uses: compnerd/gha-setup-swift@v0.3.0
+        with:
+          branch: swift-6.3-release
+          tag: 6.3-RELEASE
+
+      - name: Install Swift 6.3 toolchain (macOS)
         if: matrix.platform == 'macos'
-        run: sudo xcode-select -s /Applications/Xcode_26.1.1.app/Contents/Developer
+        run: |
+          curl -fLo swift-6.3.pkg "https://download.swift.org/swift-6.3-release/xcode/swift-6.3-RELEASE/swift-6.3-RELEASE-osx.pkg"
+          sudo installer -pkg swift-6.3.pkg -target /
+          TOOLCHAINS=$(plutil -extract CFBundleIdentifier raw /Library/Developer/Toolchains/swift-6.3-RELEASE.xctoolchain/Info.plist)
+          echo "TOOLCHAINS=$TOOLCHAINS" >> "$GITHUB_ENV"
 
       - name: Install system dependencies (Linux)
         if: matrix.platform == 'linux-x64'
         run: |
           apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev
 
-      - name: Set version from tag
+      - name: Set version from tag (Unix)
+        if: matrix.platform != 'windows-x64'
         run: |
           VERSION="${GITHUB_REF#refs/tags/}"
           FILE="Sources/ExFigCLI/ExFigCommand.swift"
@@ -63,6 +79,14 @@ jobs:
           else
             sed -i "s/static let version = \".*\"/static let version = \"$VERSION\"/" "$FILE"
           fi
+
+      - name: Set version from tag (Windows)
+        if: matrix.platform == 'windows-x64'
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF -replace '^refs/tags/', ''
+          $file = "Sources/ExFigCLI/ExFigCommand.swift"
+          (Get-Content $file) -replace 'static let version = ".*"', "static let version = `"$version`"" | Set-Content $file
 
       - name: Build release binary (macOS)
         if: matrix.platform == 'macos'
@@ -82,6 +106,10 @@ jobs:
       - name: Build release binary (Linux)
         if: matrix.platform == 'linux-x64'
         run: swift build -c release ${{ matrix.extra-flags }}
+
+      - name: Build release binary (Windows)
+        if: matrix.platform == 'windows-x64'
+        run: swift build -c release
 
       - name: Create release archive (macOS)
         if: matrix.platform == 'macos'
@@ -108,6 +136,21 @@ jobs:
           cp -r .build/${{ matrix.build-path }}/exfig_ExFigCLI.resources dist/
           cp LICENSE dist/
           cd dist && tar -czf ../${{ matrix.archive-name }}.tar.gz -- *
+
+      - name: Create release archive (Windows)
+        if: matrix.platform == 'windows-x64'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          Copy-Item ".build/${{ matrix.build-path }}/exfig.exe" "dist/ExFig.exe"
+          # Resource bundles are optional — not all modules produce them on every build config
+          Copy-Item ".build/${{ matrix.build-path }}/exfig_AndroidExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
+          Copy-Item ".build/${{ matrix.build-path }}/exfig_XcodeExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
+          Copy-Item ".build/${{ matrix.build-path }}/exfig_FlutterExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
+          Copy-Item ".build/${{ matrix.build-path }}/exfig_WebExport.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
+          Copy-Item ".build/${{ matrix.build-path }}/exfig_ExFigCLI.resources" "dist/" -Recurse -ErrorAction SilentlyContinue
+          Copy-Item "LICENSE" "dist/"
+          Compress-Archive -Path "dist/*" -DestinationPath "${{ matrix.archive-name }}.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
@@ -218,6 +261,7 @@ jobs:
           files: |
             artifacts/exfig-macos/exfig-macos.zip
             artifacts/exfig-linux-x64/exfig-linux-x64.tar.gz
+            artifacts/exfig-windows-x64/exfig-windows-x64.zip
             .pkl-out/exfig@*/*
             completions/exfig.bash
             completions/_exfig
@@ -292,10 +336,15 @@ jobs:
     concurrency:
       group: "pages"
       cancel-in-progress: true
-    env:
-      DEVELOPER_DIR: "/Applications/Xcode_26.1.1.app/Contents/Developer"
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install Swift 6.3 toolchain
+        run: |
+          curl -fLo swift-6.3.pkg "https://download.swift.org/swift-6.3-release/xcode/swift-6.3-RELEASE/swift-6.3-RELEASE-osx.pkg"
+          sudo installer -pkg swift-6.3.pkg -target /
+          TOOLCHAINS=$(plutil -extract CFBundleIdentifier raw /Library/Developer/Toolchains/swift-6.3-RELEASE.xctoolchain/Info.plist)
+          echo "TOOLCHAINS=$TOOLCHAINS" >> "$GITHUB_ENV"
 
       - name: Build DocC
         run: |
@@ -304,6 +353,7 @@ jobs:
               --disable-indexing \
               --transform-for-static-hosting \
               --hosting-base-path exfig \
+              --enable-experimental-code-block-annotations \
               --output-path docs
           echo '<script>window.location.href += "/documentation/exfigcli"</script>' > docs/index.html
 

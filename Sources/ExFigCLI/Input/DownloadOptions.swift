@@ -3,7 +3,7 @@ import ExFigCore
 import Foundation
 
 /// Image format for download command
-enum ImageFormat: String, ExpressibleByArgument, CaseIterable, Sendable {
+enum ImageFormat: String, ExpressibleByArgument, CaseIterable {
     case png
     case svg
     case jpg
@@ -16,7 +16,7 @@ enum ImageFormat: String, ExpressibleByArgument, CaseIterable, Sendable {
 }
 
 /// WebP encoding type for download command
-enum WebpEncoding: String, ExpressibleByArgument, CaseIterable, Sendable {
+enum WebpEncoding: String, ExpressibleByArgument, CaseIterable {
     case lossy
     case lossless
 }
@@ -46,7 +46,7 @@ extension NameStyle: ExpressibleByArgument {
 }
 
 /// Design source for fetch command.
-enum FetchSource: String, ExpressibleByArgument, CaseIterable, Sendable {
+enum FetchSource: String, ExpressibleByArgument, CaseIterable {
     case figma
     case penpot
 }

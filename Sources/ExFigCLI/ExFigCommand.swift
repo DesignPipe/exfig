@@ -94,7 +94,16 @@ struct ExFigCommand: AsyncParsableCommand {
         Requires FIGMA_PERSONAL_TOKEN environment variable to be set.
         """,
         version: version,
-        subcommands: [
+        subcommands: Self.allSubcommands,
+        defaultSubcommand: ExportColors.self
+    )
+}
+
+// MARK: - Subcommands
+
+extension ExFigCommand {
+    static var allSubcommands: [any ParsableCommand.Type] {
+        var commands: [any ParsableCommand.Type] = [
             ExportColors.self,
             ExportIcons.self,
             ExportImages.self,
@@ -105,10 +114,12 @@ struct ExFigCommand: AsyncParsableCommand {
             Download.self,
             Tokens.self,
             Batch.self,
-            MCPServe.self,
-        ],
-        defaultSubcommand: ExportColors.self
-    )
+        ]
+        #if canImport(MCP)
+            commands.append(MCPServe.self)
+        #endif
+        return commands
+    }
 }
 
 // MARK: - TerminalUI Initialization

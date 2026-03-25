@@ -2,7 +2,6 @@
 import ExFigCore
 import Testing
 
-@Suite("FetchWizard")
 struct FetchWizardTests {
     // MARK: - WizardPlatform
 
@@ -162,7 +161,6 @@ struct FetchWizardTests {
 
 // MARK: - GenerateConfigFile Tests
 
-@Suite("GenerateConfigFile")
 struct GenerateConfigFileTests {
     @Test("substitutePackageURI replaces .exfig/schemas/ paths")
     func substitutePackageURI() {

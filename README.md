@@ -6,7 +6,7 @@
 ![Coverage](https://img.shields.io/badge/coverage-43.65%25-yellow)
 [![License](https://img.shields.io/github/license/DesignPipe/exfig.svg)](LICENSE)
 
-Export colors, typography, icons, and images from Figma and Penpot to Xcode, Android Studio, Flutter, and Web projects — automatically.
+Export colors, typography, icons, and images from Figma and Penpot to Xcode, Android Studio, Flutter, and Web projects — automatically. Runs on macOS, Linux, and Windows.
 
 ## The Problem
 

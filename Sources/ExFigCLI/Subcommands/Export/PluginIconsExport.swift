@@ -11,6 +11,8 @@ import XcodeExport
 
 // MARK: - Plugin-based Icons Export
 
+// swiftlint:disable function_body_length
+
 extension ExFigCommand.ExportIcons {
     /// Exports iOS icons using plugin architecture.
     ///
@@ -79,25 +81,27 @@ extension ExFigCommand.ExportIcons {
         }
 
         // Post-export: update Xcode project (only if not in Swift Package)
-        if ios.xcassetsInSwiftPackage != true {
-            do {
-                let xcodeProject = try XcodeProjectWriter(
-                    xcodeProjPath: ios.xcodeprojPath,
-                    target: ios.target
-                )
-                for entry in entries {
-                    if let url = entry.imageSwiftURL {
-                        try xcodeProject.addFileReferenceToXcodeProj(url)
+        #if canImport(XcodeProj)
+            if ios.xcassetsInSwiftPackage != true {
+                do {
+                    let xcodeProject = try XcodeProjectWriter(
+                        xcodeProjPath: ios.xcodeprojPath,
+                        target: ios.target
+                    )
+                    for entry in entries {
+                        if let url = entry.imageSwiftURL {
+                            try xcodeProject.addFileReferenceToXcodeProj(url)
+                        }
+                        if let url = entry.swiftUIImageSwiftURL {
+                            try xcodeProject.addFileReferenceToXcodeProj(url)
+                        }
                     }
-                    if let url = entry.swiftUIImageSwiftURL {
-                        try xcodeProject.addFileReferenceToXcodeProj(url)
-                    }
+                    try xcodeProject.save()
+                } catch {
+                    ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
                 }
-                try xcodeProject.save()
-            } catch {
-                ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
             }
-        }
+        #endif
 
         // Check for updates (only in standalone mode)
         if !batchMode {

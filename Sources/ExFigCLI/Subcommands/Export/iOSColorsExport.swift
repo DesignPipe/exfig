@@ -52,19 +52,21 @@ extension ExFigCommand.ExportColors {
             return
         }
 
-        do {
-            let xcodeProject = try XcodeProjectWriter(
-                xcodeProjPath: ios.xcodeprojPath,
-                target: ios.target
-            )
-            try files.forEach { file in
-                if file.destination.file.pathExtension == "swift" {
-                    try xcodeProject.addFileReferenceToXcodeProj(file.destination.url)
+        #if canImport(XcodeProj)
+            do {
+                let xcodeProject = try XcodeProjectWriter(
+                    xcodeProjPath: ios.xcodeprojPath,
+                    target: ios.target
+                )
+                try files.forEach { file in
+                    if file.destination.file.pathExtension == "swift" {
+                        try xcodeProject.addFileReferenceToXcodeProj(file.destination.url)
+                    }
                 }
+                try xcodeProject.save()
+            } catch {
+                ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
             }
-            try xcodeProject.save()
-        } catch {
-            ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
-        }
+        #endif
     }
 }

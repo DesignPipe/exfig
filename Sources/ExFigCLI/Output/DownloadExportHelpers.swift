@@ -5,7 +5,7 @@ import Foundation
 // MARK: - Raw Asset Entry (unified for icons and images)
 
 /// Unified structure for raw asset export (icons, images).
-struct RawAssetEntry: Encodable, Sendable {
+struct RawAssetEntry: Encodable {
     let name: String
     let nodeId: String
     let description: String?

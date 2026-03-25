@@ -5,7 +5,7 @@ import FigmaAPI
 /// When batch processing multiple configs that reference the same Figma files,
 /// this storage allows sharing pre-fetched node documents across all configs,
 /// avoiding redundant API calls to the Nodes endpoint.
-struct PreFetchedNodes: Sendable {
+struct PreFetchedNodes {
     /// Stored nodes keyed by fileId, then by nodeId.
     private let nodes: [String: [NodeId: Node]]
 

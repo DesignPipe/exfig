@@ -32,6 +32,9 @@ in CI/CD for fully automated workflows.
 - **Flutter** — Dart constants, SVG/PNG assets with scale directories
 - **Web** — React/TypeScript, CSS variables, TSX icon components
 
+ExFig runs on **macOS 13+**, **Linux** (Ubuntu 22.04), and **Windows** (Swift 6.3+).
+On Windows, MCP server and Xcode project integration are not available (swift-nio and XcodeProj dependencies).
+
 ### Key Capabilities
 
 **Design Assets**

@@ -5,7 +5,7 @@ import FigmaAPI
 /// When batch processing multiple configs that reference the same Figma files,
 /// this storage allows sharing pre-fetched file metadata across all configs,
 /// avoiding redundant API calls.
-struct PreFetchedFileVersions: Sendable {
+struct PreFetchedFileVersions {
     /// Stored file metadata keyed by fileId.
     private let versions: [String: FileMetadata]
 

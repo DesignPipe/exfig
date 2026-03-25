@@ -11,6 +11,7 @@ excluded:
   - Sources/ExFigCLI/Resources/flutterConfig.swift
   - Sources/ExFigCLI/Resources/webConfig.swift
   - Tests/XcodeExportTests/XcodeIconsExporterTests.swift
+  - Sources/ExFigCLI/MCP/MCPToolHandlers.swift
 
 disabled_rules:
   - trailing_comma

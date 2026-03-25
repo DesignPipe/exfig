@@ -34,8 +34,7 @@ git config core.hooksPath .githooks 2>/dev/null || true
 
 [tools]
 # --- Swift Development ---
-swift = "6.2.3"        # Swift compiler and toolchain
-swiftformat = "0.59.1" # Swift code formatting
+swiftformat = "0.60.1" # Swift code formatting
 swiftlint = "0.63.2"   # Swift linting
 xcsift = "1.1.6"      # xcodebuild output filtering
 
@@ -135,6 +134,7 @@ swift package --allow-writing-to-directory docs \
     --disable-indexing \
     --transform-for-static-hosting \
     --hosting-base-path exfig \
+    --enable-experimental-code-block-annotations \
     --output-path docs
 echo '<script>window.location.href += "/documentation/exfigcli"</script>' > docs/index.html
 """

@@ -6,7 +6,7 @@ import FigmaAPI
 /// this storage allows sharing pre-fetched components across all configs,
 /// avoiding redundant API calls. Each config then filters components locally
 /// by its `figmaFrameName`.
-struct PreFetchedComponents: Sendable {
+struct PreFetchedComponents {
     /// Stored components keyed by fileId.
     private let components: [String: [Component]]
 

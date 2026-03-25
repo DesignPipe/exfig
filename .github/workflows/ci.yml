@@ -43,20 +43,27 @@ jobs:
     runs-on: macos-15
     needs: lint
     env:
-      DEVELOPER_DIR: "/Applications/Xcode_26.1.1.app/Contents/Developer"
+      DEVELOPER_DIR: "/Applications/Xcode_26.2.app/Contents/Developer"
 
     steps:
       - uses: actions/checkout@v6
         with:
           lfs: true
 
+      - name: Install Swift 6.3 toolchain
+        run: |
+          curl -fLo swift-6.3.pkg "https://download.swift.org/swift-6.3-release/xcode/swift-6.3-RELEASE/swift-6.3-RELEASE-osx.pkg"
+          sudo installer -pkg swift-6.3.pkg -target /
+          TOOLCHAINS=$(plutil -extract CFBundleIdentifier raw /Library/Developer/Toolchains/swift-6.3-RELEASE.xctoolchain/Info.plist)
+          echo "TOOLCHAINS=$TOOLCHAINS" >> "$GITHUB_ENV"
+
       - name: Cache SPM dependencies
         uses: actions/cache@v5
         with:
           path: .build
-          key: ${{ runner.os }}-xcode-26.1.1-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-xcode-26.1.1-spm-
+            ${{ runner.os }}-swift-6.3-spm-
 
       - uses: jdx/mise-action@v4
         with:
@@ -81,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     container:
-      image: swift:6.2.3-jammy
+      image: swift:6.3-jammy
     steps:
       - name: Install dependencies
         run: |
@@ -97,9 +104,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .build
-          key: ${{ runner.os }}-swift-6.2.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-swift-6.2.3-spm-
+            ${{ runner.os }}-swift-6.3-spm-
 
       - uses: jdx/mise-action@v4
         with:
@@ -124,3 +131,33 @@ jobs:
       - name: Run tests
         # Build tests separately to avoid hangs from concurrent build + test execution
         run: swift test --skip-build --parallel 2>&1 | xcsift
+
+  build-windows:
+    name: Build (Windows)
+    runs-on: windows-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Swift
+        uses: compnerd/gha-setup-swift@v0.3.0
+        with:
+          branch: swift-6.3-release
+          tag: 6.3-RELEASE
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v5
+        with:
+          path: .build
+          key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-6.3-spm-
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Resolve dependencies
+        run: swift package resolve
+
+      - name: Build (Debug)
+        run: swift build

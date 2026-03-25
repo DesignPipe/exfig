@@ -58,27 +58,29 @@ extension ExFigCommand.ExportTypography {
         )
 
         // Post-export: update Xcode project (only if not in Swift Package)
-        if ios.xcassetsInSwiftPackage != true {
-            do {
-                let xcodeProject = try XcodeProjectWriter(
-                    xcodeProjPath: ios.xcodeprojPath,
-                    target: ios.target
-                )
-                // Add Swift file references
-                if let url = pluginEntry.fontSwiftURL {
-                    try xcodeProject.addFileReferenceToXcodeProj(url)
+        #if canImport(XcodeProj)
+            if ios.xcassetsInSwiftPackage != true {
+                do {
+                    let xcodeProject = try XcodeProjectWriter(
+                        xcodeProjPath: ios.xcodeprojPath,
+                        target: ios.target
+                    )
+                    // Add Swift file references
+                    if let url = pluginEntry.fontSwiftURL {
+                        try xcodeProject.addFileReferenceToXcodeProj(url)
+                    }
+                    if let url = pluginEntry.swiftUIFontSwiftURL {
+                        try xcodeProject.addFileReferenceToXcodeProj(url)
+                    }
+                    if let url = pluginEntry.labelStyleSwiftURL {
+                        try xcodeProject.addFileReferenceToXcodeProj(url)
+                    }
+                    try xcodeProject.save()
+                } catch {
+                    input.ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
                 }
-                if let url = pluginEntry.swiftUIFontSwiftURL {
-                    try xcodeProject.addFileReferenceToXcodeProj(url)
-                }
-                if let url = pluginEntry.labelStyleSwiftURL {
-                    try xcodeProject.addFileReferenceToXcodeProj(url)
-                }
-                try xcodeProject.save()
-            } catch {
-                input.ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
             }
-        }
+        #endif
 
         // Check for updates (only in standalone mode)
         if !batchMode {

@@ -11,6 +11,8 @@ import XcodeExport
 
 // MARK: - Plugin-based Images Export
 
+// swiftlint:disable function_body_length
+
 extension ExFigCommand.ExportImages {
     /// Exports iOS images using plugin architecture.
     ///
@@ -78,25 +80,27 @@ extension ExFigCommand.ExportImages {
         }
 
         // Post-export: update Xcode project (only if not in Swift Package)
-        if ios.xcassetsInSwiftPackage != true {
-            do {
-                let xcodeProject = try XcodeProjectWriter(
-                    xcodeProjPath: ios.xcodeprojPath,
-                    target: ios.target
-                )
-                for entry in entries {
-                    if let url = entry.imageSwiftURL {
-                        try xcodeProject.addFileReferenceToXcodeProj(url)
+        #if canImport(XcodeProj)
+            if ios.xcassetsInSwiftPackage != true {
+                do {
+                    let xcodeProject = try XcodeProjectWriter(
+                        xcodeProjPath: ios.xcodeprojPath,
+                        target: ios.target
+                    )
+                    for entry in entries {
+                        if let url = entry.imageSwiftURL {
+                            try xcodeProject.addFileReferenceToXcodeProj(url)
+                        }
+                        if let url = entry.swiftUIImageSwiftURL {
+                            try xcodeProject.addFileReferenceToXcodeProj(url)
+                        }
                     }
-                    if let url = entry.swiftUIImageSwiftURL {
-                        try xcodeProject.addFileReferenceToXcodeProj(url)
-                    }
+                    try xcodeProject.save()
+                } catch {
+                    ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
                 }
-                try xcodeProject.save()
-            } catch {
-                ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
             }
-        }
+        #endif
 
         // Check for updates (only in standalone mode)
         if !batchMode {

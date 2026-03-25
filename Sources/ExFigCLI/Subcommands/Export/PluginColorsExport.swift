@@ -55,26 +55,28 @@ extension ExFigCommand.ExportColors {
         try await syncCodeSyntaxIfNeeded(entries: entries, client: client, ui: ui)
 
         // Post-export: update Xcode project (only if not in Swift Package)
-        if ios.xcassetsInSwiftPackage != true {
-            do {
-                let xcodeProject = try XcodeProjectWriter(
-                    xcodeProjPath: ios.xcodeprojPath,
-                    target: ios.target
-                )
-                // Add Swift file references for each entry
-                for entry in entries {
-                    if let url = entry.colorSwiftURL {
-                        try xcodeProject.addFileReferenceToXcodeProj(url)
+        #if canImport(XcodeProj)
+            if ios.xcassetsInSwiftPackage != true {
+                do {
+                    let xcodeProject = try XcodeProjectWriter(
+                        xcodeProjPath: ios.xcodeprojPath,
+                        target: ios.target
+                    )
+                    // Add Swift file references for each entry
+                    for entry in entries {
+                        if let url = entry.colorSwiftURL {
+                            try xcodeProject.addFileReferenceToXcodeProj(url)
+                        }
+                        if let url = entry.swiftuiColorSwiftURL {
+                            try xcodeProject.addFileReferenceToXcodeProj(url)
+                        }
                     }
-                    if let url = entry.swiftuiColorSwiftURL {
-                        try xcodeProject.addFileReferenceToXcodeProj(url)
-                    }
+                    try xcodeProject.save()
+                } catch {
+                    ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
                 }
-                try xcodeProject.save()
-            } catch {
-                ui.warning(.xcodeProjectUpdateFailed(detail: error.localizedDescription))
             }
-        }
+        #endif
 
         // Check for updates (only in standalone mode)
         if !batchMode {

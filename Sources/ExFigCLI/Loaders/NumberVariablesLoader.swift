@@ -42,7 +42,7 @@ final class NumberVariablesLoader: Sendable {
         self.filter = filter
     }
 
-    struct LoadResult: Sendable {
+    struct LoadResult {
         let dimensions: [NumberToken]
         let numbers: [NumberToken]
         let warnings: [ExFigWarning]

@@ -1,5 +1,5 @@
 {
-  "originHash" : "2b3e6002adcb3e450ba06731dcbfc333d3f62894c0ca599c86c390156f0cf048",
+  "originHash" : "31011d74ecc5927c563e211c66d6bb120f64c77db99e16e9faf7b2c17b959053",
   "pins" : [
     {
       "identity" : "aexml",
@@ -110,15 +110,6 @@
       }
     },
     {
-      "identity" : "swift-async-algorithms",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-async-algorithms.git",
-      "state" : {
-        "revision" : "9d349bcc328ac3c31ce40e746b5882742a0d1272",
-        "version" : "1.1.3"
-      }
-    },
-    {
       "identity" : "swift-atomics",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
@@ -213,8 +204,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/alexey1312/swift-resvg.git",
       "state" : {
-        "revision" : "f408b4a39dd59b402f1db3605daff6748c5e81ec",
-        "version" : "0.45.1-swift.3"
+        "revision" : "6707e4f94a05b4ea91e82cafa9b6c4ecb78a73bb",
+        "version" : "0.45.1-swift.15"
       }
     },
     {
@@ -222,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/modelcontextprotocol/swift-sdk.git",
       "state" : {
-        "revision" : "6112a3995a992d159ad0e82c2d62a008ce932666",
-        "version" : "0.11.0"
+        "revision" : "6132fd4b5b4217ce4717c4775e4607f5c3120129",
+        "version" : "0.12.0"
       }
     },
     {
@@ -231,8 +222,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DesignPipe/swift-svgkit.git",
       "state" : {
-        "revision" : "83a9601fc4f4d3acaf34fca2f74d1b9faea2b932",
-        "version" : "0.1.0"
+        "revision" : "6e10eef2bbb4b5921a2d59d391647e6c1c81400b",
+        "version" : "0.2.0"
       }
     },
     {

@@ -3,7 +3,7 @@ import Foundation
 import Logging
 
 /// Result of checking file versions for changes.
-enum VersionCheckResult: Sendable {
+enum VersionCheckResult {
     /// All files have changed or are not in cache, full export needed.
     case exportNeeded(files: [FileVersionInfo])
 
@@ -15,7 +15,7 @@ enum VersionCheckResult: Sendable {
 }
 
 /// Information about a file's version status.
-struct FileVersionInfo: Sendable {
+struct FileVersionInfo {
     let fileId: String
     let fileName: String
     let currentVersion: String

@@ -1,7 +1,7 @@
 import ExFigCore
 import Foundation
 import Logging
-#if os(Linux)
+#if canImport(FoundationNetworking)
     import FoundationNetworking
 #endif
 
@@ -270,7 +270,7 @@ actor SharedDownloadQueue {
 
 // MARK: - Statistics
 
-struct QueueStats: Sendable {
+struct QueueStats {
     let pendingJobs: Int
     let activeJobs: Int
     let activeDownloads: Int

@@ -84,17 +84,17 @@ pkl eval --format json <file.pkl>   # Package URI requires published package
 
 ## Project Context
 
-| Aspect          | Details                                                                            |
-| --------------- | ---------------------------------------------------------------------------------- |
-| Language        | Swift 6.2, macOS 13.0+                                                             |
-| Package Manager | Swift Package Manager                                                              |
-| CLI Framework   | swift-argument-parser                                                              |
-| Config Format   | PKL (Programmable, Scalable, Safe)                                                 |
-| Templates       | Jinja2 (swift-jinja)                                                               |
-| Required Env    | `FIGMA_PERSONAL_TOKEN`                                                             |
-| Config Files    | `exfig.pkl` (PKL configuration)                                                    |
-| Tooling         | mise (`./bin/mise` self-contained, no global install needed)                       |
-| Platforms       | macOS 13+ (primary), Linux/Ubuntu 22.04 (CI) - see `.claude/rules/linux-compat.md` |
+| Aspect          | Details                                                                                            |
+| --------------- | -------------------------------------------------------------------------------------------------- |
+| Language        | Swift 6.3, macOS 13.0+                                                                             |
+| Package Manager | Swift Package Manager                                                                              |
+| CLI Framework   | swift-argument-parser                                                                              |
+| Config Format   | PKL (Programmable, Scalable, Safe)                                                                 |
+| Templates       | Jinja2 (swift-jinja)                                                                               |
+| Required Env    | `FIGMA_PERSONAL_TOKEN`                                                                             |
+| Config Files    | `exfig.pkl` (PKL configuration)                                                                    |
+| Tooling         | mise (`./bin/mise` self-contained), swiftly (Swift toolchain management via `.swift-version`)      |
+| Platforms       | macOS 13+ (primary), Linux/Ubuntu 22.04, Windows (Swift 6.3) - see `.claude/rules/linux-compat.md` |
 
 ## Architecture
 
@@ -305,6 +305,28 @@ Both `InitWizard` and `FetchWizard` ask "Figma or Penpot?" first (`WizardDesignS
 Follow the existing pattern in `NooraUI.swift`: static method delegating to `shared` instance with matching parameter names.
 Noora's `multipleChoicePrompt` uses `MultipleChoiceLimit` — `.unlimited` or `.limited(count:errorMessage:)`.
 
+### MCP SDK Windows Exclusion
+
+MCP `swift-sdk` depends on `swift-nio` which doesn't compile on Windows. All MCP files are wrapped
+in `#if canImport(MCP)` and the dependency is conditionally included via `#if !os(Windows)` in Package.swift.
+`ExFigCommand.allSubcommands` computed property (not array literal) handles conditional `MCPServe` registration.
+
+### MCP SDK Version (0.12.0+)
+
+MCP SDK 0.12.0 changed Content enum: `.text` case now has `(text:, annotations:, _meta:)`.
+Both `.text(_:metadata:)` and `.text(text:metadata:)` factories are deprecated but functional.
+`GetPrompt.Parameters.arguments` changed from `[String: Value]?` to `[String: String]?`.
+
+### Build Environment (Swift 6.3 via swiftly)
+
+Swift 6.3 is managed by swiftly (`.swift-version` file), not mise. Always use `./bin/mise run build` and `./bin/mise run test` — mise handles PATH and DEVELOPER_DIR automatically.
+Under the hood: swiftly provides Swift 6.3; Xcode provides macOS SDK with XCTest. Both are needed for `swift test`.
+
+### Dependency Version Coupling (swift-resvg ↔ swift-svgkit)
+
+`swift-svgkit` uses `exact:` pin on `swift-resvg`. When bumping resvg version (e.g., for Windows artifactbundle),
+must first update and tag swift-svgkit with the new resvg version, then update ExFig's Package.swift.
+
 ### Adding a Figma API Endpoint
 
 FigmaAPI is now an external package (`swift-figma-api`). See its repository for endpoint patterns.
@@ -412,6 +434,27 @@ NooraUI.format(.command("bold"))   // bold/secondary
 NooraUI.formatLink("url", useColors: true)  // underlined primary
 ```
 
+| Tests fail | Check `FIGMA_PERSONAL_TOKEN` is set |
+| Formatting fails | Run `./bin/mise run setup` to install tools |
+| test:filter no matches | SPM converts hyphens→underscores: use `ExFig_FlutterTests` not `ExFig-FlutterTests` |
+| Template errors | Check Jinja2 syntax and context variables |
+| Linux test hangs | Build first: `swift build --build-tests`, then `swift test --skip-build --parallel` |
+| Android pathData long | Simplify in Figma or use `--strict-path-validation` |
+| PKL parse error 1 | Check `PklError.message` — actual error is in `.message`, not `.localizedDescription` |
+| Test target won't compile | Broken test files block entire target; use `swift test --filter Target.Class` after `build` |
+| Test helper JSON decode | `ContainingFrame` uses default Codable (camelCase: `nodeId`, `pageName`), NOT snake_case |
+| Web entry test fails | Web entry types use `outputDirectory` field, while Android/Flutter use `output` |
+| Logger concatenation err | `Logger.Message` (swift-log) requires interpolation `"\(a) \(b)"`, not concatenation `a + b` |
+| Deleted variables in output | Filter `VariableValue.deletedButReferenced != true` in variable loaders AND `CodeSyntaxSyncer` |
+| Jinja trailing `\n` | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results |
+| `Bundle.module` in tests | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle |
+| SwiftFormat breaks `::` syntax | SwiftFormat 0.60.1+ required for Swift 6.3 module selectors (`FigmaAPI::Client`) |
+| MCP SDK 0.12.0 breaking | `.text` has 3 associated values — pattern match as `.text(text, _, _)`; `GetPrompt.arguments` is `[String: String]?` now |
+| Tests need XCTest from Xcode | swiftly's Swift 6.3 lacks XCTest; set `DEVELOPER_DIR` to Xcode app path for `swift test` |
+| `swift test` pkl failures | Run via `./bin/mise exec -- swift test` to get pkl 0.31+ in PATH; bare `swift test` uses system pkl |
+| SwiftFormat `#if` indent | SwiftFormat 0.60.1 indents content inside `#if canImport()` — this is intentional project style, do not "fix" |
+| SPM `from:` too loose | When code uses APIs from version X, set `from: "X"` not older — SPM may resolve an incompatible earlier version |
+
 ## Additional Rules
 
 Contextual documentation is in `.claude/rules/`:
@@ -427,7 +470,7 @@ Contextual documentation is in `.claude/rules/`:
 | `api-reference.md`    | Figma API endpoints, response mapping              |
 | `troubleshooting.md`  | Build/test/PKL/MCP/Penpot problem-solution pairs   |
 | `gotchas.md`          | Swift 6 concurrency, SwiftLint, rate limits        |
-| `linux-compat.md`     | Linux-specific workarounds                         |
+| `linux-compat.md`     | Linux/Windows platform workarounds                 |
 | `testing-workflow.md` | Testing guidelines, commit format                  |
 | `pkl-codegen.md`      | pkl-swift generated types, enum bridging, codegen  |
 | `Sources/*/CLAUDE.md` | Module-specific patterns, modification checklists  |

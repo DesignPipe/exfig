@@ -86,7 +86,7 @@ extension ExFigCommand.Download {
 
 // MARK: - Raw Typography Data Structure
 
-struct RawTextStyleEntry: Encodable, Sendable {
+struct RawTextStyleEntry: Encodable {
     let name: String
     let fontName: String
     let fontSize: Double

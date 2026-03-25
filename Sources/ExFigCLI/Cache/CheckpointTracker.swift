@@ -7,7 +7,7 @@ import Foundation
 /// enabling resumption after interruptions.
 actor CheckpointTracker {
     /// Type of asset being tracked.
-    enum AssetType: Sendable {
+    enum AssetType {
         case icons
         case images
     }

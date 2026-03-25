@@ -141,6 +141,6 @@ final class AssetResultTests: XCTestCase {
 
 // MARK: - Test Helpers
 
-private enum TestError: Error, Sendable {
+private enum TestError: Error {
     case sampleError
 }

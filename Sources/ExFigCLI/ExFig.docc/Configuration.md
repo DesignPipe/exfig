@@ -39,7 +39,7 @@ exfig batch exfig.pkl --cache
 
 ## Figma Section
 
-```pkl
+```pkl showLineNumbers
 import ".exfig/schemas/Figma.pkl"
 
 figma = new Figma.FigmaConfig {
@@ -62,7 +62,7 @@ Shared settings across all platforms.
 
 ### Colors
 
-```pkl
+```pkl showLineNumbers
 import ".exfig/schemas/Common.pkl"
 
 common = new Common.CommonConfig {
@@ -87,7 +87,7 @@ common = new Common.CommonConfig {
 
 ### Variables Colors
 
-```pkl
+```pkl showLineNumbers
 import ".exfig/schemas/Common.pkl"
 
 common = new Common.CommonConfig {

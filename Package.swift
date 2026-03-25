@@ -1,7 +1,71 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+
+// MARK: - Conditional Dependencies
+
+var packageDependencies: [Package.Dependency] = [
+    .package(url: "https://github.com/apple/swift-collections", "1.2.0" ..< "1.3.0"),
+    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0"),
+    .package(url: "https://github.com/huggingface/swift-jinja.git", from: "2.0.0"),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.0"),
+
+    .package(url: "https://github.com/the-swift-collective/libwebp.git", from: "1.4.1"),
+    .package(url: "https://github.com/the-swift-collective/libpng.git", from: "1.6.45"),
+    .package(url: "https://github.com/tuist/Noora", from: "0.54.0"),
+    .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.5"),
+    .package(url: "https://github.com/alexey1312/swift-resvg.git", exact: "0.45.1-swift.15"),
+    .package(url: "https://github.com/mattt/swift-yyjson", from: "0.5.0"),
+    .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
+    .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.2.0"),
+    .package(url: "https://github.com/DesignPipe/swift-figma-api.git", from: "0.2.0"),
+    .package(url: "https://github.com/DesignPipe/swift-penpot-api.git", from: "0.1.0"),
+]
+
+var exfigCLIDependencies: [Target.Dependency] = [
+    .product(name: "FigmaAPI", package: "swift-figma-api"),
+    .product(name: "PenpotAPI", package: "swift-penpot-api"),
+    "ExFigCore",
+    "ExFigConfig",
+    "XcodeExport",
+    "AndroidExport",
+    "FlutterExport",
+    "WebExport",
+    .product(name: "SVGKit", package: "swift-svgkit"),
+    "ExFig-iOS",
+    "ExFig-Android",
+    "ExFig-Flutter",
+    "ExFig-Web",
+    .product(name: "Resvg", package: "swift-resvg"),
+    .product(name: "ArgumentParser", package: "swift-argument-parser"),
+    .product(name: "Logging", package: "swift-log"),
+
+    .product(name: "WebP", package: "libwebp"),
+    .product(name: "LibPNG", package: "libpng"),
+    .product(name: "Noora", package: "Noora"),
+]
+
+// XcodeProj and MCP SDK are not available on Windows
+// (XcodeProj depends on PathKit which uses Darwin-specific APIs, MCP SDK depends on swift-nio which doesn't compile on
+// Windows)
+#if !os(Windows)
+    packageDependencies.append(
+        .package(url: "https://github.com/tuist/XcodeProj.git", from: "8.27.0")
+    )
+    packageDependencies.append(
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.12.0")
+    )
+    exfigCLIDependencies.append(
+        .product(name: "XcodeProj", package: "XcodeProj")
+    )
+    exfigCLIDependencies.append(
+        .product(name: "MCP", package: "swift-sdk")
+    )
+#endif
+
+// MARK: - Package
 
 let package = Package(
     name: "exfig",
@@ -11,54 +75,12 @@ let package = Package(
     products: [
         .executable(name: "exfig", targets: ["ExFigCLI"]),
     ],
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-collections", "1.2.0" ..< "1.3.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0"),
-        .package(url: "https://github.com/huggingface/swift-jinja.git", from: "2.0.0"),
-        .package(url: "https://github.com/tuist/XcodeProj.git", from: "8.27.0"),
-        .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.0"),
-
-        .package(url: "https://github.com/the-swift-collective/libwebp.git", from: "1.4.1"),
-        .package(url: "https://github.com/the-swift-collective/libpng.git", from: "1.6.45"),
-        .package(url: "https://github.com/tuist/Noora", from: "0.54.0"),
-        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.5"),
-        .package(url: "https://github.com/alexey1312/swift-resvg.git", exact: "0.45.1-swift.3"),
-        .package(url: "https://github.com/mattt/swift-yyjson", from: "0.5.0"),
-        .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
-        .package(url: "https://github.com/DesignPipe/swift-svgkit.git", from: "0.1.0"),
-        .package(url: "https://github.com/DesignPipe/swift-figma-api.git", from: "0.2.0"),
-        .package(url: "https://github.com/DesignPipe/swift-penpot-api.git", from: "0.1.0"),
-        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.9.0"),
-    ],
+    dependencies: packageDependencies,
     targets: [
         // Main target
         .executableTarget(
             name: "ExFigCLI",
-            dependencies: [
-                .product(name: "FigmaAPI", package: "swift-figma-api"),
-                .product(name: "PenpotAPI", package: "swift-penpot-api"),
-                "ExFigCore",
-                "ExFigConfig",
-                "XcodeExport",
-                "AndroidExport",
-                "FlutterExport",
-                "WebExport",
-                .product(name: "SVGKit", package: "swift-svgkit"),
-                "ExFig-iOS",
-                "ExFig-Android",
-                "ExFig-Flutter",
-                "ExFig-Web",
-                .product(name: "Resvg", package: "swift-resvg"),
-                .product(name: "XcodeProj", package: "XcodeProj"),
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "Logging", package: "swift-log"),
-
-                .product(name: "WebP", package: "libwebp"),
-                .product(name: "LibPNG", package: "libpng"),
-                .product(name: "Noora", package: "Noora"),
-                .product(name: "MCP", package: "swift-sdk"),
-            ],
+            dependencies: exfigCLIDependencies,
             exclude: ["CLAUDE.md", "AGENTS.md"],
             resources: [
                 .copy("Resources/Schemas/"),

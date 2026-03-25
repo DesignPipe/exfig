@@ -4,7 +4,6 @@ import Testing
 
 // MARK: - extractPenpotFileId Tests
 
-@Suite("extractPenpotFileId")
 struct ExtractPenpotFileIdTests {
     @Test("Extracts UUID from full workspace URL")
     func fullWorkspaceURL() {
@@ -45,7 +44,6 @@ struct ExtractPenpotFileIdTests {
 
 // MARK: - applyPenpotResult Tests
 
-@Suite("InitWizard applyPenpotResult")
 struct ApplyPenpotResultTests {
     @Test("Removes Figma import and config section")
     func removesFigmaSection() {

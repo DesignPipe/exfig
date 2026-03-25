@@ -1,6 +1,6 @@
 import ExFigCore
 import Foundation
-#if os(Linux)
+#if canImport(FoundationXML)
     import FoundationXML
 #endif
 

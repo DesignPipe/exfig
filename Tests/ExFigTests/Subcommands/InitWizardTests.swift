@@ -2,7 +2,6 @@
 import ExFigCore
 import Testing
 
-@Suite("InitWizard")
 struct InitWizardTests {
     // MARK: - WizardPlatform.asPlatform
 
@@ -302,7 +301,6 @@ struct InitWizardTests {
 
 // MARK: - Cross-Platform Template Tests
 
-@Suite("InitWizard Cross-Platform")
 struct InitWizardCrossPlatformTests {
     @Test("applyResult works with Android template")
     func androidAllSelected() {
@@ -361,7 +359,6 @@ struct InitWizardCrossPlatformTests {
 
 // MARK: - Transform Utilities Tests
 
-@Suite("InitWizard Transform Utilities")
 struct InitWizardTransformUtilityTests {
     @Test("removeSection returns template unchanged when marker not found")
     func removeSectionMissingMarker() {

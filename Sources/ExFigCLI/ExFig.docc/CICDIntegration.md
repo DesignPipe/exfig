@@ -84,6 +84,26 @@ cache file and skips the export if nothing changed since the last run.
     key: exfig-versions-${{ github.ref }}
 ```
 
+## Cross-Platform CI
+
+ExFig CI runs on macOS, Linux (Ubuntu 22.04), and Windows. On Windows:
+
+- Requires Swift 6.3+ (use `compnerd/gha-setup-swift` action)
+- MCP server is excluded (swift-nio incompatible)
+- XcodeProj integration is excluded
+- SPM cache is supported via standard `actions/cache`
+
+```yaml
+# Windows CI example
+- uses: compnerd/gha-setup-swift@v0.3.0
+  with:
+    branch: swift-6.3-release
+    tag: 6.3-RELEASE
+
+- name: Build
+  run: swift build
+```
+
 ## See Also
 
 - <doc:BatchProcessing>

@@ -1,7 +1,7 @@
 import ExFigCore
 import Foundation
 import Logging
-#if os(Linux)
+#if canImport(FoundationNetworking)
     import FoundationNetworking
 #endif
 

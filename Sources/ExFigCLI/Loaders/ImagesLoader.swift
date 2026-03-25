@@ -11,20 +11,20 @@ import Foundation
 import Logging
 
 /// Image format for loader configuration.
-enum ImagesLoaderFormat: Sendable {
+enum ImagesLoaderFormat {
     case svg
     case png
     case webp
 }
 
 /// Source format for fetching from Figma API.
-enum ImagesSourceFormat: Sendable {
+enum ImagesSourceFormat {
     case png // Download PNG from Figma API (default)
     case svg // Download SVG and rasterize locally with resvg
 }
 
 /// Configuration for loading images from a specific Figma frame.
-struct ImagesLoaderConfig: Sendable {
+struct ImagesLoaderConfig {
     /// Entry-level Figma file ID override (takes priority over platform-level).
     let entryFileId: String?
 
@@ -483,7 +483,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
     }
 
     /// Result of loading a single file with granular cache.
-    private struct FileGranularResult: Sendable {
+    private struct FileGranularResult {
         let key: String
         let fileId: String
         let packs: [ImagePack]

@@ -210,7 +210,7 @@ struct SubcommandConfigExporter: ConfigExportPerforming {
     }
 }
 
-struct BatchConfigRunner: Sendable {
+struct BatchConfigRunner {
     let rateLimiter: SharedRateLimiter
     let retryPolicy: RetryPolicy
     let globalOptions: GlobalOptions

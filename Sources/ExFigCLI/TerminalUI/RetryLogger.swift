@@ -3,7 +3,7 @@ import Foundation
 import Noora
 
 /// Context for formatting retry messages.
-struct RetryMessageContext: Sendable {
+struct RetryMessageContext {
     let configName: String
     let attempt: Int
     let maxAttempts: Int

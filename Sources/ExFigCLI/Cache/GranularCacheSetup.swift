@@ -4,7 +4,7 @@ import FigmaAPI
 import Foundation
 
 /// Result of granular cache setup.
-struct GranularCacheSetup: Sendable {
+struct GranularCacheSetup {
     /// The granular cache manager, if enabled.
     let manager: GranularCacheManager?
     /// Whether granular cache is enabled.
