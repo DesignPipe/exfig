@@ -1,6 +1,7 @@
 import ExFigCore
 import FigmaAPI
 import Foundation
+import Logging
 
 /// Result of filtering components through granular cache.
 struct GranularCacheResult {
@@ -18,6 +19,7 @@ struct GranularCacheResult {
 final class GranularCacheManager: Sendable {
     private let client: Client
     private let cache: ImageTrackingCache
+    private let logger = Logger(label: "GranularCacheManager")
 
     /// Batch size for NodesEndpoint requests (Figma API limit).
     private let batchSize = 100
@@ -46,8 +48,21 @@ final class GranularCacheManager: Sendable {
         }
 
         // Fetch node documents - check pre-fetched storage first
+        // If fetch fails (e.g. Access denied, rate limit), degrade gracefully:
+        // export all components without filtering rather than failing the entire config.
         let nodeIds = Array(components.keys)
-        let nodes = try await fetchNodeDocumentsWithPreFetchCheck(fileId: fileId, nodeIds: nodeIds)
+        let nodes: [NodeId: Node]
+        do {
+            nodes = try await fetchNodeDocumentsWithPreFetchCheck(fileId: fileId, nodeIds: nodeIds)
+        } catch {
+            logger.warning(
+                """
+                Granular cache node fetch failed for file \(fileId): \
+                \(error.localizedDescription), exporting all components
+                """
+            )
+            return GranularCacheResult(changedComponents: components, computedHashes: [:])
+        }
 
         // Compute hashes for all nodes in parallel (CPU-bound work)
         let computedHashes = await computeHashesInParallel(nodes: nodes)

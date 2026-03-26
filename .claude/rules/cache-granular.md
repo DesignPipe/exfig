@@ -81,6 +81,12 @@ This pattern ensures:
 - Uses ~25KB per 1000 nodes in cache file
 - Output directory is not cleared - only changed files are overwritten, deleted assets remain on disk
 
+## Graceful Degradation
+
+`GranularCacheManager.filterChangedComponents()` catches node fetch errors (Access denied, rate limits)
+and returns ALL components with empty hashes — export proceeds without filtering rather than failing.
+This matches the pre-fetch fallback behavior in `Batch.preFetchNodesIfNeeded()`.
+
 ## Performance
 
 | Scenario                        | Without Granular | With Granular | Savings |

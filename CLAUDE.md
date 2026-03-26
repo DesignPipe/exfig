@@ -454,6 +454,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | `swift test` pkl failures | Run via `./bin/mise exec -- swift test` to get pkl 0.31+ in PATH; bare `swift test` uses system pkl |
 | SwiftFormat `#if` indent | SwiftFormat 0.60.1 indents content inside `#if canImport()` — this is intentional project style, do not "fix" |
 | SPM `from:` too loose | When code uses APIs from version X, set `from: "X"` not older — SPM may resolve an incompatible earlier version |
+| Granular cache "Access denied" | `GranularCacheManager.filterChangedComponents` degrades gracefully — returns all components on node fetch error instead of failing config |
 
 ## Additional Rules
 
