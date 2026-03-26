@@ -15,7 +15,7 @@ var packageDependencies: [Package.Dependency] = [
     .package(url: "https://github.com/the-swift-collective/libwebp.git", from: "1.4.1"),
     .package(url: "https://github.com/the-swift-collective/libpng.git", from: "1.6.45"),
     .package(url: "https://github.com/tuist/Noora", from: "0.54.0"),
-    .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.5"),
+    // swift-docc-plugin added conditionally below (not available on Windows)
     .package(url: "https://github.com/alexey1312/swift-resvg.git", exact: "0.45.1-swift.15"),
     .package(url: "https://github.com/mattt/swift-yyjson", from: "0.5.0"),
     .package(url: "https://github.com/apple/pkl-swift", from: "0.8.0"),
@@ -47,9 +47,8 @@ var exfigCLIDependencies: [Target.Dependency] = [
     .product(name: "Noora", package: "Noora"),
 ]
 
-// XcodeProj and MCP SDK are not available on Windows
-// (XcodeProj depends on PathKit which uses Darwin-specific APIs, MCP SDK depends on swift-nio which doesn't compile on
-// Windows)
+// XcodeProj, MCP SDK, and DocC plugin are not available on Windows
+// (XcodeProj depends on PathKit/Darwin APIs, MCP SDK depends on swift-nio, DocC plugin uses unsupported snippet APIs)
 #if !os(Windows)
     packageDependencies.append(
         .package(url: "https://github.com/tuist/XcodeProj.git", from: "8.27.0")
@@ -62,6 +61,9 @@ var exfigCLIDependencies: [Target.Dependency] = [
     )
     exfigCLIDependencies.append(
         .product(name: "MCP", package: "swift-sdk")
+    )
+    packageDependencies.append(
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.5")
     )
 #endif
 
