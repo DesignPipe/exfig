@@ -18,6 +18,9 @@ import Logging
 /// 3. Resolves each variable's dark mode value (following alias chains)
 /// 4. Downloads light SVGs, replaces hex colors, and writes dark SVGs to temp files
 struct VariableModeDarkGenerator {
+    /// Maximum depth for resolving variable alias chains (prevents infinite recursion).
+    private static let maxAliasDepth = 10
+
     struct Config {
         let fileId: String
         let collectionName: String
@@ -26,18 +29,35 @@ struct VariableModeDarkGenerator {
         let primitivesModeName: String?
         /// Separate file ID for loading variables (when primitives are in a library file).
         let variablesFileId: String?
+
+        init(
+            fileId: String,
+            collectionName: String,
+            lightModeName: String,
+            darkModeName: String,
+            primitivesModeName: String? = nil,
+            variablesFileId: String? = nil
+        ) {
+            precondition(!fileId.isEmpty, "VariableModeDarkGenerator.Config.fileId must not be empty")
+            self.fileId = fileId
+            self.collectionName = collectionName
+            self.lightModeName = lightModeName
+            self.darkModeName = darkModeName
+            self.primitivesModeName = primitivesModeName
+            self.variablesFileId = variablesFileId
+        }
     }
 
     /// Resolved mode IDs for variable resolution.
-    private struct ModeContext {
+    struct ModeContext {
         let lightModeId: String
         let darkModeId: String
         let primitivesModeId: String?
     }
 
-    private let client: Client
-    private let logger: Logger
-    private let variablesCache: VariablesCache?
+    let client: Client
+    let logger: Logger
+    let variablesCache: VariablesCache?
 
     init(client: Client, logger: Logger, variablesCache: VariablesCache? = nil) {
         self.client = client
@@ -105,7 +125,7 @@ struct VariableModeDarkGenerator {
 
         // 4. For each icon, build light→dark color map from boundVariables
         let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("exfig-variable-dark-\(ProcessInfo.processInfo.processIdentifier)")
+            .appendingPathComponent("exfig-variable-dark-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
         var cleanupNeeded = true
@@ -133,11 +153,11 @@ struct VariableModeDarkGenerator {
         return darkPacks
     }
 
-    // MARK: - Private
+    // MARK: - Internal (testable)
 
     // swiftlint:disable cyclomatic_complexity
 
-    private func processLightPacks(
+    func processLightPacks(
         _ lightPacks: [ImagePack],
         nodeMap: [String: Node],
         ctx: ResolutionContext,
@@ -146,10 +166,13 @@ struct VariableModeDarkGenerator {
         var darkPacks: [ImagePack] = []
 
         for pack in lightPacks {
-            guard let nodeId = pack.nodeId else { continue }
+            guard let nodeId = pack.nodeId else {
+                logger.warning("Icon '\(pack.name)' has no node ID, skipping dark generation")
+                continue
+            }
 
             guard let node = nodeMap[nodeId] else {
-                logger.debug(
+                logger.warning(
                     "Node '\(nodeId)' for icon '\(pack.name)' not returned by Figma API, skipping dark generation"
                 )
                 continue
@@ -157,7 +180,10 @@ struct VariableModeDarkGenerator {
 
             let colorMap = buildColorMap(node: node, ctx: ctx, iconName: pack.name)
 
-            guard !colorMap.isEmpty else { continue }
+            guard !colorMap.isEmpty else {
+                logger.debug("Icon '\(pack.name)' has no variable-bound colors, skipping dark generation")
+                continue
+            }
 
             guard let darkPack = try buildDarkPack(for: pack, colorMap: colorMap, tempDir: tempDir) else {
                 continue
@@ -170,6 +196,8 @@ struct VariableModeDarkGenerator {
     }
 
     // swiftlint:enable cyclomatic_complexity
+
+    // MARK: - Private
 
     private func buildDarkPack(
         for pack: ImagePack,
@@ -225,7 +253,7 @@ struct VariableModeDarkGenerator {
         return try await client.request(VariablesEndpoint(fileId: fileId))
     }
 
-    private func findModeIds(in meta: VariablesMeta, config: Config) -> ModeContext? {
+    func findModeIds(in meta: VariablesMeta, config: Config) -> ModeContext? {
         for collection in meta.variableCollections.values {
             guard collection.name == config.collectionName else { continue }
 
@@ -271,7 +299,7 @@ struct VariableModeDarkGenerator {
     }
 
     /// Context for cross-file variable resolution.
-    private struct ResolutionContext {
+    struct ResolutionContext {
         let variablesMeta: VariablesMeta
         let libMeta: VariablesMeta?
         let libNameIndex: [String: VariableValue]?
@@ -280,7 +308,7 @@ struct VariableModeDarkGenerator {
     }
 
     /// Walks a node tree and collects light→dark color mappings from boundVariables on paints.
-    private func buildColorMap(
+    func buildColorMap(
         node: Node,
         ctx: ResolutionContext,
         iconName: String
@@ -290,7 +318,7 @@ struct VariableModeDarkGenerator {
         return colorMap
     }
 
-    private func collectBoundColors(
+    func collectBoundColors(
         from document: Document,
         ctx: ResolutionContext,
         colorMap: inout [String: ColorReplacement],
@@ -311,7 +339,7 @@ struct VariableModeDarkGenerator {
         }
     }
 
-    private func collectFromPaint(
+    func collectFromPaint(
         _ paint: Paint,
         ctx: ResolutionContext,
         colorMap: inout [String: ColorReplacement],
@@ -358,7 +386,7 @@ struct VariableModeDarkGenerator {
     }
 
     /// Resolves a variable's dark color by finding it by name in the library file.
-    private func resolveViaLibrary(
+    func resolveViaLibrary(
         variableName: String,
         libMeta: VariablesMeta,
         libNameIndex: [String: VariableValue],
@@ -369,6 +397,8 @@ struct VariableModeDarkGenerator {
             return nil
         }
         guard let libCollection = libMeta.variableCollections[libVar.variableCollectionId] else {
+            let collId = libVar.variableCollectionId
+            logger.debug("Variable-mode dark: library collection '\(collId)' not found for '\(variableName)'")
             return nil
         }
 
@@ -395,21 +425,26 @@ struct VariableModeDarkGenerator {
     }
 
     /// Resolves a variable to its concrete color value in the given mode, following alias chains.
-    private func resolveDarkColor(
+    func resolveDarkColor(
         variableId: String,
         modeId: String,
         variablesMeta: VariablesMeta,
         primitivesModeId: String?,
         depth: Int = 0
     ) -> ColorReplacement? {
-        guard depth < 10 else {
+        guard depth < Self.maxAliasDepth else {
             logger.warning("Variable alias chain exceeded depth limit (variableId: \(variableId))")
             return nil
         }
 
-        guard let variable = variablesMeta.variables[variableId],
-              variable.deletedButReferenced != true
-        else { return nil }
+        guard let variable = variablesMeta.variables[variableId] else {
+            logger.debug("Variable '\(variableId)' not found in variables meta during dark resolution")
+            return nil
+        }
+        guard variable.deletedButReferenced != true else {
+            logger.debug("Variable '\(variable.name)' (\(variableId)) is deleted but referenced, skipping")
+            return nil
+        }
 
         // Try the requested mode first, fall back to default mode of the collection
         let value = variable.valuesByMode[modeId]
@@ -446,7 +481,12 @@ struct VariableModeDarkGenerator {
                 depth: depth + 1
             )
 
+        case .none:
+            logger.debug("Variable '\(variable.name)' has no value for mode '\(modeId)'")
+            return nil
+
         default:
+            logger.debug("Variable '\(variable.name)' has non-color type, cannot resolve dark color")
             return nil
         }
     }

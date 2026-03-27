@@ -250,11 +250,15 @@ Key files: `VariableModeDarkGenerator.swift`, `SVGColorReplacer.swift`, `FigmaCo
 
 **Logging requirements:** Every `guard ... else { continue }` in the generation loop must log a warning — silent skips cause invisible data loss. `resolveDarkColor` must check `deletedButReferenced != true` (same as all other variable loaders). `SVGColorReplacer` uses separate regex replacement templates per pattern (attribute patterns have 3 capture groups, CSS patterns have 2 — never share a single template).
 
+**Config validation:** `Config.init` uses `precondition(!fileId.isEmpty)` — catches the documented empty-fileId bug at construction time instead of relying on call-site guards.
+
+**Alias resolution behaviour:** `resolveDarkColor` alias targets resolve using the target collection's `defaultModeId`, NOT the requested modeId — test expectations must account for this (e.g., alias to primitive resolves via "light" default mode, not "dark").
+
 **pkl-swift decoding:** pkl-swift uses **keyed** decoding (by property name, not positional). TypeRegistry is only for `PklAny` polymorphic types and performance — concrete `Decodable` structs (like `VariablesDarkMode`) decode via synthesized `init(from:)` regardless of `registerPklTypes`. New types should still be added to `registerPklTypes()` for completeness, but missing entries do NOT cause silent nil for concrete typed fields.
 
 **Cross-file variable resolution:** Figma variable IDs are file-scoped — alias targets from the icons file don't exist in library files by ID. When `variablesFileId` is set, variables are loaded from BOTH files: icons file (semantic variables matching node boundVariables) + library file (primitives for alias resolution). Matching is by variable **name** across files and mode **name** across collections (not IDs).
 
-**VariablesCache pattern:** `VariablesCache` (Lock + Task dedup) caches Variables API responses by fileId across parallel entries. Created per platform section in `PluginIconsExport`, injected through `SourceFactory` → `FigmaComponentsSource` → `VariableModeDarkGenerator`. Same pattern applicable to `ColorsVariablesLoader` if needed.
+**VariablesCache pattern:** `VariablesCache` (Lock + Task dedup) caches Variables API responses by fileId across parallel entries. Created per platform section in `PluginIconsExport`, injected through `SourceFactory` → `FigmaComponentsSource` → `VariableModeDarkGenerator`. Same pattern applicable to `ColorsVariablesLoader` if needed. Failed tasks are evicted (`lock.withLock { tasks[fileId] = nil }` in catch) — transient Figma API errors (429) don't permanently poison the cache.
 
 **Alpha handling:** `SVGColorReplacer` supports opacity via `ColorReplacement(hex, alpha)`. When `alpha < 1.0`, replacement adds `fill-opacity`/`stroke-opacity` attributes (SVG) or `;fill-opacity:N` (CSS). Same hex with different alpha IS a valid replacement (e.g., `#D6FB94` opaque → `#D6FB94` transparent).
 
@@ -491,6 +495,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Granular cache skips dark gen | `loadIconsWithGranularCache()` in `IconsExportContextImpl` bypasses `FigmaComponentsSource` — must call `VariableModeDarkGenerator` explicitly via `applyVariableModeDark()` helper |
 | Variable dark always empty maps | Alias targets are external library variables — set `variablesFileId` in `VariablesDarkMode` PKL config to the library file ID containing primitives |
 | Figma variable IDs file-scoped | Variable IDs differ between files — alias targets from file A can't be found by ID in file B. Use name-based matching (`resolveViaLibrary`) + mode name matching (not modeId) for cross-file resolution |
+| `assertionFailure` in release | `assertionFailure` is stripped in release builds — add `FileHandle.standardError.write()` as production fallback for truly-impossible-but-must-not-be-silent error paths |
 
 ## Additional Rules
 

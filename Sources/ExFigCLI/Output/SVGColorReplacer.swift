@@ -98,6 +98,9 @@ enum SVGColorReplacer {
             return regex.stringByReplacingMatches(in: string, range: range, withTemplate: template)
         } catch {
             assertionFailure("Invalid regex pattern: \(pattern), error: \(error)")
+            FileHandle.standardError.write(
+                Data("[SVGColorReplacer] Invalid regex pattern: \(pattern), error: \(error)\n".utf8)
+            )
             return string
         }
     }

@@ -164,6 +164,20 @@ final class SVGColorReplacerTests: XCTestCase {
         XCTAssertTrue(result.contains("fill-opacity=\"0\""), "Should add opacity even when hex is the same: \(result)")
     }
 
+    // MARK: - flood-color / lighting-color
+
+    func testReplacesFloodColorAttribute() {
+        let svg = "<feFlood flood-color=\"#ff0000\" />"
+        let result = SVGColorReplacer.replaceColors(in: svg, colorMap: ["ff0000": opaque("00ff00")])
+        XCTAssertEqual(result, "<feFlood flood-color=\"#00ff00\" />")
+    }
+
+    func testReplacesLightingColorAttribute() {
+        let svg = "<feDiffuseLighting lighting-color=\"#aabbcc\" />"
+        let result = SVGColorReplacer.replaceColors(in: svg, colorMap: ["aabbcc": opaque("112233")])
+        XCTAssertEqual(result, "<feDiffuseLighting lighting-color=\"#112233\" />")
+    }
+
     // MARK: - ColorReplacement
 
     func testColorReplacementChangesOpacity() {
