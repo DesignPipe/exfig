@@ -127,8 +127,8 @@ generate_llms_full() {
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-generate_llms_txt > "$LLMS_TXT"
-generate_llms_full > "$LLMS_FULL"
+generate_llms_txt | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' > "$LLMS_TXT"
+generate_llms_full | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' > "$LLMS_FULL"
 
 LINES_TXT=$(wc -l < "$LLMS_TXT" | tr -d ' ')
 LINES_FULL=$(wc -l < "$LLMS_FULL" | tr -d ' ')

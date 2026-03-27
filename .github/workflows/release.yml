@@ -319,4 +319,3 @@ jobs:
           git add Formula/exfig.rb
           git diff --staged --quiet || git commit -m "chore: bump to v${{ steps.version.outputs.version }}"
           git push
-

@@ -79,6 +79,7 @@ local builtin_checks = new Mapping<String, Step> {
     }
     ["newlines"] = (Builtins.newlines) {
         exclude = generated_excludes + template_excludes
+        depends = "llms-check"
         hide = true
     }
     ["actionlint"] {
