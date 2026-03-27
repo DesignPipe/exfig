@@ -298,6 +298,9 @@ public struct IconsExportResult: Sendable {
     /// Number of icons successfully exported.
     public let count: Int
 
+    /// Number of dark mode variants generated.
+    public let darkCount: Int
+
     /// Number of icons skipped due to granular cache (unchanged).
     public let skippedCount: Int
 
@@ -309,30 +312,34 @@ public struct IconsExportResult: Sendable {
 
     public init(
         count: Int,
+        darkCount: Int = 0,
         skippedCount: Int = 0,
         computedHashes: [String: [String: String]] = [:],
         allAssetMetadata: [AssetMetadata] = []
     ) {
         self.count = count
+        self.darkCount = darkCount
         self.skippedCount = skippedCount
         self.computedHashes = computedHashes
         self.allAssetMetadata = allAssetMetadata
     }
 
     /// Creates a simple result with just count (no granular cache).
-    public static func simple(count: Int) -> IconsExportResult {
-        IconsExportResult(count: count)
+    public static func simple(count: Int, darkCount: Int = 0) -> IconsExportResult {
+        IconsExportResult(count: count, darkCount: darkCount)
     }
 
     /// Merges multiple results into one.
     public static func merge(_ results: [IconsExportResult]) -> IconsExportResult {
         var totalCount = 0
+        var totalDark = 0
         var totalSkipped = 0
         var allHashes: [String: [String: String]] = [:]
         var allMetadata: [AssetMetadata] = []
 
         for result in results {
             totalCount += result.count
+            totalDark += result.darkCount
             totalSkipped += result.skippedCount
 
             // Merge hashes
@@ -349,6 +356,7 @@ public struct IconsExportResult: Sendable {
 
         return IconsExportResult(
             count: totalCount,
+            darkCount: totalDark,
             skippedCount: totalSkipped,
             computedHashes: allHashes,
             allAssetMetadata: allMetadata

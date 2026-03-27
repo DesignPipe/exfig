@@ -58,7 +58,8 @@ public struct iOSIconsExporter: IconsExporter {
         let merged = IconsExportResult.merge(results)
 
         if !context.isBatchMode {
-            context.success("Done! Exported \(merged.count) icons to Xcode project.")
+            let darkSuffix = merged.darkCount > 0 ? " (\(merged.darkCount) dark variants)" : ""
+            context.success("Done! Exported \(merged.count) icons\(darkSuffix) to Xcode project.")
         }
 
         return merged
@@ -204,8 +205,11 @@ public struct iOSIconsExporter: IconsExporter {
             ? loadResult.allAssetMetadata.count - iconPairs.count
             : 0
 
+        let darkCount = iconPairs.count { $0.dark != nil }
+
         return IconsExportResult(
             count: iconPairs.count,
+            darkCount: darkCount,
             skippedCount: skippedCount,
             computedHashes: loadResult.computedHashes,
             allAssetMetadata: loadResult.allAssetMetadata
