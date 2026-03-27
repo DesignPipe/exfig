@@ -4,9 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Bug Fixes
+
+- **ci**: Upgrade deploy-pages to v5 for Node.js 24 compatibility by @alexey1312
+
+
+## [3.1.0] - 2026-03-27
+
+### Bug Fixes
+
+- **ci**: Remove duplicate deploy-docs job from release workflow by @alexey1312
+
+
 ### Documentation
 
 - **openspec**: Archive add-penpot-support change and sync specs by @alexey1312
+
+
+### Features
+
+- **icons**: Add dark mode generation via Figma Variable Modes  by @alexey1312 in [#78](https://github.com/DesignPipe/exfig/pull/78)
 
 
 ## [3.0.0] - 2026-03-26
