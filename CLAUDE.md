@@ -260,6 +260,8 @@ Key files: `VariableModeDarkGenerator.swift`, `SVGColorReplacer.swift`, `FigmaCo
 
 **VariablesCache pattern:** `VariablesCache` (Lock + Task dedup) caches Variables API responses by fileId across parallel entries. Created per platform section in `PluginIconsExport`, injected through `SourceFactory` → `FigmaComponentsSource` → `VariableModeDarkGenerator`. Same pattern applicable to `ColorsVariablesLoader` if needed. Failed tasks are evicted (`lock.withLock { tasks[fileId] = nil }` in catch) — transient Figma API errors (429) don't permanently poison the cache.
 
+**ComponentsCache pattern:** `ComponentsCache` (same Lock + Task dedup) caches Components API responses by fileId across parallel entries in standalone mode. Solves the problem that `ComponentPreFetcher` only works in batch mode (`BatchSharedState` is nil in standalone). Created per platform section in `PluginIconsExport`, injected through `SourceFactory` → `FigmaComponentsSource` → `ImageLoaderBase`.
+
 **Alpha handling:** `SVGColorReplacer` supports opacity via `ColorReplacement(hex, alpha)`. When `alpha < 1.0`, replacement adds `fill-opacity`/`stroke-opacity` attributes (SVG) or `;fill-opacity:N` (CSS). Same hex with different alpha IS a valid replacement (e.g., `#D6FB94` opaque → `#D6FB94` transparent).
 
 **Granular cache path:** `IconsExportContextImpl.loadIconsWithGranularCache()` creates its own `IconsLoader` and bypasses `FigmaComponentsSource` entirely. Variable-mode dark generation must be applied explicitly at the end of that method via `applyVariableModeDark(to:source:)`.
@@ -274,7 +276,7 @@ ExFigConfig imports ExFigCore but NOT ExFigCLI — `ExFigError` is not available
 
 ### Modifying SourceFactory Signatures
 
-`createComponentsSource` has 8 call sites (4 in `PluginIconsExport` + 4 in `PluginImagesExport`) plus tests in `PenpotSourceTests.swift`.
+`createComponentsSource` has 8 call sites (4 in `PluginIconsExport` + 4 in `PluginImagesExport`) plus tests in `PenpotSourceTests.swift`. Icons sites pass `componentsCache:`, Images sites use default `nil`.
 `createTypographySource` call sites: only tests (not yet wired to production export flow).
 Use `replace_all` on the trailing parameter pattern (e.g., `filter: filter\n        )`) to update all sites at once.
 
@@ -496,6 +498,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Variable dark always empty maps | Alias targets are external library variables — set `variablesFileId` in `VariablesDarkMode` PKL config to the library file ID containing primitives |
 | Figma variable IDs file-scoped | Variable IDs differ between files — alias targets from file A can't be found by ID in file B. Use name-based matching (`resolveViaLibrary`) + mode name matching (not modeId) for cross-file resolution |
 | `assertionFailure` in release | `assertionFailure` is stripped in release builds — add `FileHandle.standardError.write()` as production fallback for truly-impossible-but-must-not-be-silent error paths |
+| Components API called N times | `ComponentPreFetcher` only works in batch mode — use `ComponentsCache` via `SourceFactory(componentsCache:)` for standalone multi-entry dedup |
 
 ## Additional Rules
 

@@ -40,6 +40,9 @@ class ImageLoaderBase: @unchecked Sendable {
     /// Optional granular cache manager for per-node change detection.
     var granularCacheManager: GranularCacheManager?
 
+    /// Optional components cache for deduplicating Components API calls across entries.
+    var componentsCache: ComponentsCache?
+
     init(client: Client, params: PKLConfig, platform: Platform, logger: Logger) {
         self.client = client
         self.params = params
@@ -696,7 +699,14 @@ class ImageLoaderBase: @unchecked Sendable {
             return components
         }
 
-        // Fall back to API request (standalone mode or missing pre-fetch)
+        // Check components cache (standalone multi-entry dedup)
+        if let cache = componentsCache {
+            return try await cache.get(fileId: fileId) {
+                try await self.client.request(ComponentsEndpoint(fileId: fileId))
+            }
+        }
+
+        // Fall back to direct API request (single entry)
         let endpoint = ComponentsEndpoint(fileId: fileId)
         return try await client.request(endpoint)
     }

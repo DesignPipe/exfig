@@ -24,6 +24,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
     let granularCacheManager: GranularCacheManager?
     let platform: Platform
     let variablesCache: VariablesCache?
+    let componentsCache: ComponentsCache?
 
     init(
         client: Client,
@@ -36,7 +37,8 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
         configExecutionContext: ConfigExecutionContext? = nil,
         granularCacheManager: GranularCacheManager? = nil,
         platform: Platform,
-        variablesCache: VariablesCache? = nil
+        variablesCache: VariablesCache? = nil,
+        componentsCache: ComponentsCache? = nil
     ) {
         self.client = client
         self.componentsSource = componentsSource
@@ -49,6 +51,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
         self.granularCacheManager = granularCacheManager
         self.platform = platform
         self.variablesCache = variablesCache
+        self.componentsCache = componentsCache
     }
 
     var isGranularCacheEnabled: Bool {
@@ -169,6 +172,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
             logger: ExFigCommand.logger,
             config: config
         )
+        loader.componentsCache = componentsCache
 
         let output: IconsLoadOutputWithHashes
         if let manager = granularCacheManager {

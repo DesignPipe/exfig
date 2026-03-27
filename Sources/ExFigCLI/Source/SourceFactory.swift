@@ -33,7 +33,8 @@ enum SourceFactory {
         logger: Logger,
         filter: String?,
         ui: TerminalUI,
-        variablesCache: VariablesCache? = nil
+        variablesCache: VariablesCache? = nil,
+        componentsCache: ComponentsCache? = nil
     ) throws -> any ComponentsSource {
         switch sourceKind {
         case .figma:
@@ -44,7 +45,8 @@ enum SourceFactory {
                 platform: platform,
                 logger: logger,
                 filter: filter,
-                variablesCache: variablesCache
+                variablesCache: variablesCache,
+                componentsCache: componentsCache
             )
         case .penpot:
             return PenpotComponentsSource(ui: ui)

@@ -180,6 +180,7 @@ Converter factories (`WebpConverterFactory`, `HeicConverterFactory`) handle plat
 | `Source/TokensFileColorsSource.swift`     | Local .tokens.json source (extracted from ColorsExportContextImpl)                                              |
 | `Loaders/VariableModeDarkGenerator.swift` | Generates dark SVGs via Figma Variables; supports cross-file resolution (name-based) when `variablesFileId` set |
 | `Loaders/VariablesCache.swift`            | Lock+Task dedup cache for Variables API responses across parallel entries                                       |
+| `Loaders/ComponentsCache.swift`           | Lock+Task dedup cache for Components API responses across parallel entries (standalone mode)                    |
 | `Output/SVGColorReplacer.swift`           | Hex color replacement in SVG content (fill, stroke, stop-color)                                                 |
 
 ### MCP Server Architecture

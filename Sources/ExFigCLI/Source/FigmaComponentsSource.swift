@@ -11,6 +11,7 @@ struct FigmaComponentsSource: ComponentsSource {
     let logger: Logger
     let filter: String?
     let variablesCache: VariablesCache?
+    let componentsCache: ComponentsCache?
 
     func loadIcons(from input: IconsSourceInput) async throws -> IconsLoadOutput {
         let config = IconsLoaderConfig(
@@ -32,6 +33,7 @@ struct FigmaComponentsSource: ComponentsSource {
             logger: logger,
             config: config
         )
+        loader.componentsCache = componentsCache
 
         let result = try await loader.load(filter: filter)
 
@@ -95,6 +97,7 @@ struct FigmaComponentsSource: ComponentsSource {
             logger: logger,
             config: config
         )
+        loader.componentsCache = componentsCache
 
         let result = try await loader.load(filter: filter)
 
