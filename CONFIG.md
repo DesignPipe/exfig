@@ -205,10 +205,8 @@ colors = new Common.Colors {
   nameValidateRegexp = "^([a-zA-Z_]+)$"
   // [optional] Replacement pattern using captured groups ($n).
   nameReplaceRegexp = "color_$1"
-  // [optional] Extract light/dark from a single file. Default: false
-  useSingleFile = false
-  // [optional] Suffix for dark mode. Default: "_dark"
-  darkModeSuffix = "_dark"
+  // [optional] Extract light/dark from a single file using name suffix splitting
+  // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   // [optional] Suffix for light high contrast. Default: "_lightHC"
   // lightHCModeSuffix = "_lightHC"
   // [optional] Suffix for dark high contrast. Default: "_darkHC"
@@ -216,14 +214,13 @@ colors = new Common.Colors {
 }
 ```
 
-| Field                | Type       | Description                                 |
-| -------------------- | ---------- | ------------------------------------------- |
-| `nameValidateRegexp` | `String?`  | RegExp for validating/capturing color names |
-| `nameReplaceRegexp`  | `String?`  | Replacement pattern with captured groups    |
-| `useSingleFile`      | `Boolean?` | Extract all modes from lightFileId          |
-| `darkModeSuffix`     | `String?`  | Dark mode name suffix (default: `_dark`)    |
-| `lightHCModeSuffix`  | `String?`  | Light HC suffix (default: `_lightHC`)       |
-| `darkHCModeSuffix`   | `String?`  | Dark HC suffix (default: `_darkHC`)         |
+| Field                | Type              | Description                                 |
+| -------------------- | ----------------- | ------------------------------------------- |
+| `nameValidateRegexp` | `String?`         | RegExp for validating/capturing color names |
+| `nameReplaceRegexp`  | `String?`         | Replacement pattern with captured groups    |
+| `suffixDarkMode`     | `SuffixDarkMode?` | Dark mode via name suffix splitting         |
+| `lightHCModeSuffix`  | `String?`         | Light HC suffix (default: `_lightHC`)       |
+| `darkHCModeSuffix`   | `String?`         | Dark HC suffix (default: `_darkHC`)         |
 
 ### VariablesColors (Variables API)
 
@@ -276,10 +273,8 @@ icons = new Common.Icons {
   nameValidateRegexp = "^(ic)_(\\d\\d)_([a-z0-9_]+)$"
   // [optional] Replacement pattern
   nameReplaceRegexp = "icon_$2_$1"
-  // [optional] Extract light/dark from a single file. Default: false
-  useSingleFile = false
-  // [optional] Suffix for dark mode icons. Default: "_dark"
-  darkModeSuffix = "_dark"
+  // [optional] Extract light/dark from a single file using name suffix splitting
+  // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   // [optional] Exit with error when pathData exceeds 32,767 bytes (AAPT limit). Default: false
   // strictPathValidation = true
 }
@@ -297,10 +292,8 @@ images = new Common.Images {
   nameValidateRegexp = "^(img)_([a-z0-9_]+)$"
   // [optional] Replacement pattern
   nameReplaceRegexp = "image_$2"
-  // [optional] Extract light/dark from a single file. Default: false
-  useSingleFile = false
-  // [optional] Suffix for dark mode images. Default: "_dark"
-  darkModeSuffix = "_dark"
+  // [optional] Extract light/dark from a single file using name suffix splitting
+  // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
 }
 ```
 
@@ -319,18 +312,17 @@ typography = new Common.Typography {
 
 All Icons and Images entries across platforms extend `Common.FrameSource`, which provides:
 
-| Field                         | Type      | Default | Description                                                   |
-| ----------------------------- | --------- | ------- | ------------------------------------------------------------- |
-| `figmaFrameName`              | `String?` | —       | Override Figma frame name for this entry                      |
-| `figmaPageName`               | `String?` | —       | Filter by Figma page name for this entry                      |
-| `figmaFileId`                 | `String?` | —       | Override Figma file ID for this entry                         |
-| `rtlProperty`                 | `String?` | `"RTL"` | Figma component property name for RTL variant detection       |
-| `variablesCollectionName`     | `String?` | —       | Variables collection name for dark mode via Figma Variables   |
-| `variablesLightModeName`      | `String?` | —       | Light mode name in the variables collection (e.g. "Light")    |
-| `variablesDarkModeName`       | `String?` | —       | Dark mode name in the variables collection (e.g. "Dark")      |
-| `variablesPrimitivesModeName` | `String?` | —       | Primitives mode for resolving variable aliases (e.g. "Value") |
-| `nameValidateRegexp`          | `String?` | —       | Regex pattern for name validation                             |
-| `nameReplaceRegexp`           | `String?` | —       | Replacement pattern using captured groups                     |
+| Field                | Type                 | Default | Description                                             |
+| -------------------- | -------------------- | ------- | ------------------------------------------------------- |
+| `figmaFrameName`     | `String?`            | —       | Override Figma frame name for this entry                |
+| `figmaPageName`      | `String?`            | —       | Filter by Figma page name for this entry                |
+| `figmaFileId`        | `String?`            | —       | Override Figma file ID for this entry                   |
+| `rtlProperty`        | `String?`            | `"RTL"` | Figma component property name for RTL variant detection |
+| `variablesDarkMode`  | `VariablesDarkMode?` | —       | Dark mode via Figma Variable bindings (see below)       |
+| `nameValidateRegexp` | `String?`            | —       | Regex pattern for name validation                       |
+| `nameReplaceRegexp`  | `String?`            | —       | Replacement pattern using captured groups               |
+
+**VariablesDarkMode** fields: `collectionName` (required), `lightModeName` (required), `darkModeName` (required), `primitivesModeName` (optional).
 
 **RTL Detection:** When `rtlProperty` is set (default `"RTL"`), ExFig detects RTL support via Figma
 COMPONENT_SET variant properties. Components with `RTL=On` variant are automatically skipped (iOS/Android

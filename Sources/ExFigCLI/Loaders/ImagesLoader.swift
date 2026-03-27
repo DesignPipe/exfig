@@ -222,7 +222,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
         filter: String? = nil,
         onBatchProgress: @escaping BatchProgressCallback = { _, _ in }
     ) async throws -> ImagesLoaderOutput {
-        if let useSingleFile = params.common?.images?.useSingleFile, useSingleFile {
+        if params.common?.images?.suffixDarkMode != nil {
             try await loadFromSingleFile(filter: filter, onBatchProgress: onBatchProgress)
         } else {
             try await loadFromLightAndDarkFile(filter: filter, onBatchProgress: onBatchProgress)
@@ -242,7 +242,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
         filter: String? = nil,
         onBatchProgress: @escaping BatchProgressCallback = { _, _ in }
     ) async throws -> ImagesLoaderResultWithHashes {
-        if let useSingleFile = params.common?.images?.useSingleFile, useSingleFile {
+        if params.common?.images?.suffixDarkMode != nil {
             try await loadFromSingleFileWithGranularCache(
                 filter: filter, onBatchProgress: onBatchProgress
             )
@@ -259,7 +259,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
         filter: String? = nil,
         onBatchProgress: @escaping BatchProgressCallback
     ) async throws -> ImagesLoaderOutput {
-        let darkSuffix = params.common?.images?.darkModeSuffix ?? "_dark"
+        let darkSuffix = params.common?.images?.suffixDarkMode?.suffix ?? "_dark"
         let fileId = try requireLightFileId(entryFileId: config.entryFileId)
 
         if isRasterFormat, !useSVGSource {
@@ -409,7 +409,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
         onBatchProgress: @escaping BatchProgressCallback
     ) async throws -> ImagesLoaderResultWithHashes {
         let fileId = try requireLightFileId(entryFileId: config.entryFileId)
-        let darkSuffix = params.common?.images?.darkModeSuffix ?? "_dark"
+        let darkSuffix = params.common?.images?.suffixDarkMode?.suffix ?? "_dark"
 
         if isRasterFormat, !useSVGSource {
             // PNG source: Raster images (PNG/WebP) with granular cache

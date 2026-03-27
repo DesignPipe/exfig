@@ -260,8 +260,7 @@ import ".exfig/schemas/Common.pkl"
 
 common = new Common.CommonConfig {
   icons = new Common.Icons {
-    useSingleFile = true
-    darkModeSuffix = "_dark"
+    suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
 }
 ```

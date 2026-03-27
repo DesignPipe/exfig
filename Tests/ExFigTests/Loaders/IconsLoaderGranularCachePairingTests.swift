@@ -48,7 +48,7 @@ final class IconsLoaderGranularCachePairingTests: XCTestCase {
         let granularManager = GranularCacheManager(client: mockClient, cache: cache)
         let params = PKLConfig.make(
             lightFileId: "file123", iconsFrameName: "Icons",
-            useSingleFileIcons: true, iconsDarkModeSuffix: "-dark"
+            iconsSuffixDarkMode: "-dark"
         )
         let loader = IconsLoader(client: mockClient, params: params, platform: .ios, logger: logger)
         loader.granularCacheManager = granularManager
@@ -111,7 +111,7 @@ final class IconsLoaderGranularCachePairingTests: XCTestCase {
         let granularManager = GranularCacheManager(client: mockClient, cache: cache)
         let params = PKLConfig.make(
             lightFileId: "file123", iconsFrameName: "Icons",
-            useSingleFileIcons: true, iconsDarkModeSuffix: "-dark"
+            iconsSuffixDarkMode: "-dark"
         )
         let loader = IconsLoader(client: mockClient, params: params, platform: .ios, logger: logger)
         loader.granularCacheManager = granularManager
@@ -159,7 +159,7 @@ final class IconsLoaderGranularCachePairingTests: XCTestCase {
         let granularManager = GranularCacheManager(client: mockClient, cache: cache)
         let params = PKLConfig.make(
             lightFileId: "file123", iconsFrameName: "Icons",
-            useSingleFileIcons: true, iconsDarkModeSuffix: "-dark"
+            iconsSuffixDarkMode: "-dark"
         )
         let loader = IconsLoader(client: mockClient, params: params, platform: .ios, logger: logger)
         loader.granularCacheManager = granularManager
@@ -207,7 +207,7 @@ final class IconsLoaderGranularCachePairingTests: XCTestCase {
         let granularManager = GranularCacheManager(client: mockClient, cache: cache)
         let params = PKLConfig.make(
             lightFileId: "file123", iconsFrameName: "Icons",
-            useSingleFileIcons: true, iconsDarkModeSuffix: "-dark"
+            iconsSuffixDarkMode: "-dark"
         )
         let loader = IconsLoader(client: mockClient, params: params, platform: .ios, logger: logger)
         loader.granularCacheManager = granularManager

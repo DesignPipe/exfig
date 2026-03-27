@@ -235,12 +235,12 @@ When relocating a type (e.g., `Android.WebpOptions` → `Common.WebpOptions`), u
 
 Three dark mode approaches for icons (mutually exclusive):
 
-1. `darkFileId` — separate Figma file for dark icons
-2. `useSingleFile` + `darkModeSuffix` — dark icons in same file, split by name suffix
-3. `variablesCollectionName` + mode names — resolve Figma Variable bindings to generate dark SVGs
+1. `darkFileId` — separate Figma file for dark icons (global `figma` section)
+2. `suffixDarkMode` — `Common.SuffixDarkMode` on `Common.Icons`/`Images`/`Colors`, splits by name suffix
+3. `variablesDarkMode` — `Common.VariablesDarkMode` on `FrameSource` (per-entry), resolves Figma Variable bindings
 
-Approach 3 is configured via `FrameSource` fields: `variablesCollectionName`, `variablesLightModeName`,
-`variablesDarkModeName`, `variablesPrimitivesModeName`. Integration point: `FigmaComponentsSource.loadIcons()`.
+Approach 3 is configured via nested `variablesDarkMode: VariablesDarkMode?` on `FrameSource`.
+Integration point: `FigmaComponentsSource.loadIcons()`.
 
 **Algorithm:** fetch `VariablesMeta` → fetch icon nodes → walk children tree to find `Paint.boundVariables["color"]`
 → resolve dark value via alias chain (depth limit 10, same pattern as `ColorsVariablesLoader.handleColorMode()`)

@@ -483,16 +483,14 @@ common = new Common.CommonConfig {
   // Shared icons settings
   icons = new Common.Icons {
     figmaFrameName = "Icons/24"
-    useSingleFile = false
-    darkModeSuffix = "-dark"
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "-dark" }
     strictPathValidation = true
   }
 
   // Shared images settings
   images = new Common.Images {
     figmaFrameName = "Illustrations"
-    useSingleFile = false
-    darkModeSuffix = "-dark"
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "-dark" }
   }
 
   // Name processing (applies to all)

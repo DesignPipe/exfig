@@ -76,11 +76,7 @@ common = new Common.CommonConfig {
     // Regex replacement for color names
     nameReplaceRegexp = "$1"
 
-    // Extract light and dark mode colors from a single file
-    useSingleFile = false
-
-    // Suffix for dark mode variants (when useSingleFile is true)
-    darkModeSuffix = "_dark"
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
 }
 ```
@@ -213,11 +209,7 @@ common = new Common.CommonConfig {
     // Regex replacement for icon names
     nameReplaceRegexp = "ic_$1"
 
-    // Use single file for light/dark (default: false)
-    useSingleFile = false
-
-    // Suffix for dark mode variants (when useSingleFile is true)
-    darkModeSuffix = "_dark"
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
 }
 ```
@@ -238,11 +230,7 @@ common = new Common.CommonConfig {
     // Regex replacement for image names
     nameReplaceRegexp = "$1"
 
-    // Use single file for light/dark (default: false)
-    useSingleFile = false
-
-    // Suffix for dark mode variants (when useSingleFile is true)
-    darkModeSuffix = "_dark"
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
 }
 ```

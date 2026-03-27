@@ -151,7 +151,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
         filter: String? = nil,
         onBatchProgress: @escaping BatchProgressCallback = { _, _ in }
     ) async throws -> IconsLoaderOutput {
-        if let useSingleFile = params.common?.icons?.useSingleFile, useSingleFile {
+        if params.common?.icons?.suffixDarkMode != nil {
             try await loadFromSingleFile(filter: filter, onBatchProgress: onBatchProgress)
         } else {
             try await loadFromLightAndDarkFile(filter: filter, onBatchProgress: onBatchProgress)
@@ -167,7 +167,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
         filter: String? = nil,
         onBatchProgress: @escaping BatchProgressCallback = { _, _ in }
     ) async throws -> IconsLoaderResultWithHashes {
-        if let useSingleFile = params.common?.icons?.useSingleFile, useSingleFile {
+        if params.common?.icons?.suffixDarkMode != nil {
             try await loadFromSingleFileWithGranularCache(
                 filter: filter, onBatchProgress: onBatchProgress
             )
@@ -197,7 +197,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
             onBatchProgress: onBatchProgress
         )
 
-        let darkSuffix = params.common?.icons?.darkModeSuffix ?? "_dark"
+        let darkSuffix = params.common?.icons?.suffixDarkMode?.suffix ?? "_dark"
         let (lightIcons, darkIcons) = splitByDarkMode(icons, darkSuffix: darkSuffix)
 
         return (
@@ -298,7 +298,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
     ) async throws -> IconsLoaderResultWithHashes {
         let formatParams = makeFormatParams()
         let fileId = try requireLightFileId(entryFileId: config.entryFileId)
-        let darkSuffix = params.common?.icons?.darkModeSuffix ?? "_dark"
+        let darkSuffix = params.common?.icons?.suffixDarkMode?.suffix ?? "_dark"
 
         // Use pairing-aware method to ensure light/dark pairs are exported together
         let result = try await loadVectorImagesWithGranularCacheAndPairing(

@@ -33,17 +33,13 @@ extension PKLConfig.Figma {
 extension PKLConfig.Common.Colors {
     /// Creates a PKLConfig.Common.Colors for testing.
     static func make(
-        useSingleFile: Bool? = nil,
-        darkModeSuffix: String? = nil,
+        suffixDarkMode: String? = nil,
         lightHCModeSuffix: String? = nil,
         darkHCModeSuffix: String? = nil
     ) -> PKLConfig.Common.Colors {
         var components: [String] = []
-        if let useSingleFile {
-            components.append("\"useSingleFile\": \(useSingleFile)")
-        }
-        if let darkModeSuffix {
-            components.append("\"darkModeSuffix\": \"\(darkModeSuffix)\"")
+        if let suffixDarkMode {
+            components.append("\"suffixDarkMode\": { \"suffix\": \"\(suffixDarkMode)\" }")
         }
         if let lightHCModeSuffix {
             components.append("\"lightHCModeSuffix\": \"\(lightHCModeSuffix)\"")
@@ -191,13 +187,12 @@ extension PKLConfig {
         iconsPageName: String? = nil,
         imagesFrameName: String? = nil,
         imagesPageName: String? = nil,
-        useSingleFileIcons: Bool? = nil,
-        useSingleFileImages: Bool? = nil,
-        iconsDarkModeSuffix: String? = nil
+        iconsSuffixDarkMode: String? = nil,
+        imagesSuffixDarkMode: String? = nil
     ) -> PKLConfig {
         var commonComponents: [String] = []
 
-        if iconsFrameName != nil || iconsPageName != nil || useSingleFileIcons != nil || iconsDarkModeSuffix != nil {
+        if iconsFrameName != nil || iconsPageName != nil || iconsSuffixDarkMode != nil {
             var iconParts: [String] = []
             if let frameName = iconsFrameName {
                 iconParts.append("\"figmaFrameName\": \"\(frameName)\"")
@@ -205,16 +200,13 @@ extension PKLConfig {
             if let pageName = iconsPageName {
                 iconParts.append("\"figmaPageName\": \"\(pageName)\"")
             }
-            if let useSingle = useSingleFileIcons {
-                iconParts.append("\"useSingleFile\": \(useSingle)")
-            }
-            if let darkSuffix = iconsDarkModeSuffix {
-                iconParts.append("\"darkModeSuffix\": \"\(darkSuffix)\"")
+            if let suffix = iconsSuffixDarkMode {
+                iconParts.append("\"suffixDarkMode\": { \"suffix\": \"\(suffix)\" }")
             }
             commonComponents.append("\"icons\": { \(iconParts.joined(separator: ", ")) }")
         }
 
-        if imagesFrameName != nil || imagesPageName != nil || useSingleFileImages != nil {
+        if imagesFrameName != nil || imagesPageName != nil || imagesSuffixDarkMode != nil {
             var imageParts: [String] = []
             if let frameName = imagesFrameName {
                 imageParts.append("\"figmaFrameName\": \"\(frameName)\"")
@@ -222,8 +214,8 @@ extension PKLConfig {
             if let pageName = imagesPageName {
                 imageParts.append("\"figmaPageName\": \"\(pageName)\"")
             }
-            if let useSingle = useSingleFileImages {
-                imageParts.append("\"useSingleFile\": \(useSingle)")
+            if let suffix = imagesSuffixDarkMode {
+                imageParts.append("\"suffixDarkMode\": { \"suffix\": \"\(suffix)\" }")
             }
             commonComponents.append("\"images\": { \(imageParts.joined(separator: ", ")) }")
         }

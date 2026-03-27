@@ -28,10 +28,8 @@ common = new Common.CommonConfig {
     nameValidateRegexp = "^([a-zA-Z_]+)$"
     // [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp = "color_$1"
-    // [optional] Extract light and dark mode colors from the lightFileId. Defaults to false
-    useSingleFile = false
-    // [optional] If useSingleFile is true, customize the suffix for dark mode. Defaults to '_dark'
-    darkModeSuffix = "_dark"
+    // [optional] Extract light and dark mode from the lightFileId using name suffix splitting
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
   // [optional] Use variablesColors to export colors from Figma Variables.
   // variablesColors = new Common.VariablesColors {
@@ -61,10 +59,8 @@ common = new Common.CommonConfig {
     nameValidateRegexp = "^(ic)_(\\d\\d)_([a-z0-9_]+)$"
     // [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp = "icon_$2_$1"
-    // [optional] Extract light and dark mode icons from the lightFileId. Defaults to false
-    useSingleFile = false
-    // [optional] If useSingleFile is true, customize the suffix for dark mode. Defaults to '_dark'
-    darkModeSuffix = "_dark"
+    // [optional] Extract light and dark mode icons from the lightFileId using name suffix splitting
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
   // [optional]
   images = new Common.Images {
@@ -77,10 +73,8 @@ common = new Common.CommonConfig {
     nameValidateRegexp = "^(img)_([a-z0-9_]+)$"
     // [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp = "image_$2"
-    // [optional] Extract light and dark mode images from the lightFileId. Defaults to false
-    useSingleFile = false
-    // [optional] If useSingleFile is true, customize the suffix for dark mode. Defaults to '_dark'
-    darkModeSuffix = "_dark"
+    // [optional] Extract light and dark mode images from the lightFileId using name suffix splitting
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
 }
 

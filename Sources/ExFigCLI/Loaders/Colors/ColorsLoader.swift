@@ -30,7 +30,7 @@ final class ColorsLoader: Sendable {
                     "Use common.variablesColors or multi-entry colors format instead."
             )
         }
-        guard let useSingleFile = colorParams?.useSingleFile, useSingleFile else {
+        guard colorParams?.suffixDarkMode != nil else {
             return try await loadColorsFromLightAndDarkFile()
         }
         return try await loadColorsFromSingleFile()
@@ -87,7 +87,7 @@ final class ColorsLoader: Sendable {
         // swiftlint:disable:next force_unwrapping
         let colors = try await loadColors(fileId: figmaParams.lightFileId!)
 
-        let darkSuffix = colorParams?.darkModeSuffix ?? "_dark"
+        let darkSuffix = colorParams?.suffixDarkMode?.suffix ?? "_dark"
         let lightHCSuffix = colorParams?.lightHCModeSuffix ?? "_lightHC"
         let darkHCSuffix = colorParams?.darkHCModeSuffix ?? "_darkHC"
 

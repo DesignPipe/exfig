@@ -31,10 +31,8 @@ common = new Common.CommonConfig {
     nameValidateRegexp = "^([a-zA-Z_]+)$" // RegExp pattern for: background, background_primary, widget_primary_background
     // [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp = "color_$1"
-    // [optional] Extract light and dark mode colors from the lightFileId specified in the figma config. Defaults to false
-    useSingleFile = false
-    // [optional] If useSingleFile is true, customize the suffix to denote a dark mode color. Defaults to '_dark'
-    darkModeSuffix = "_dark"
+    // [optional] Extract light and dark mode from the lightFileId using name suffix splitting
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
     // [optional] If useSingleFile is true, customize the suffix to denote a light high contrast color. Defaults to '_lightHC'
     // lightHCModeSuffix = "_lightHC"
     // [optional] If useSingleFile is true, customize the suffix to denote a dark high contrast color. Defaults to '_darkHC'
@@ -72,10 +70,8 @@ common = new Common.CommonConfig {
     nameValidateRegexp = "^(ic)_(\\d\\d)_([a-z0-9_]+)$" // RegExp pattern for: ic_24_icon_name, ic_24_icon
     // [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp = "icon_$2_$1"
-    // [optional] Extract light and dark mode icons from the lightFileId specified in the figma config. Defaults to false
-    useSingleFile = false
-    // [optional] If useSingleFile is true, customize the suffix to denote a dark mode icons. Defaults to '_dark'
-    darkModeSuffix = "_dark"
+    // [optional] Extract light and dark mode icons from the lightFileId using name suffix splitting
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
   // [optional]
   images = new Common.Images {
@@ -88,10 +84,8 @@ common = new Common.CommonConfig {
     nameValidateRegexp = "^(img)_([a-z0-9_]+)$" // RegExp pattern for: img_image_name
     // [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp = "image_$2"
-    // [optional] Extract light and dark mode images from the lightFileId specified in the figma config. Defaults to false
-    useSingleFile = false
-    // [optional] If useSingleFile is true, customize the suffix to denote a dark mode images. Defaults to '_dark'
-    darkModeSuffix = "_dark"
+    // [optional] Extract light and dark mode images from the lightFileId using name suffix splitting
+    // suffixDarkMode = new Common.SuffixDarkMode { suffix = "_dark" }
   }
   // [optional]
   typography = new Common.Typography {

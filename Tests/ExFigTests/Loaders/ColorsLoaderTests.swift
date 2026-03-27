@@ -98,7 +98,7 @@ final class ColorsLoaderTests: XCTestCase {
         mockClient.setResponse(styles, for: StylesEndpoint.self)
         mockClient.setResponse(nodes, for: NodesEndpoint.self)
 
-        let colorParams = PKLConfig.Common.Colors.make(useSingleFile: true)
+        let colorParams = PKLConfig.Common.Colors.make(suffixDarkMode: "_dark")
         let loader = ColorsLoader(
             client: mockClient,
             figmaParams: .make(lightFileId: "single-file"),
@@ -134,7 +134,7 @@ final class ColorsLoaderTests: XCTestCase {
         mockClient.setResponse(styles, for: StylesEndpoint.self)
         mockClient.setResponse(nodes, for: NodesEndpoint.self)
 
-        let colorParams = PKLConfig.Common.Colors.make(useSingleFile: true, darkModeSuffix: "-night")
+        let colorParams = PKLConfig.Common.Colors.make(suffixDarkMode: "-night")
         let loader = ColorsLoader(
             client: mockClient,
             figmaParams: .make(lightFileId: "single-file"),

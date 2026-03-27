@@ -55,9 +55,11 @@ ios = new iOS.iOSConfig {
       format = "svg"
       assetsFolder = "DoubleColorIcons"
       nameStyle = "camelCase"
-      variablesCollectionName = "DesignTokens"
-      variablesLightModeName = "Light"
-      variablesDarkModeName = "Dark"
+      variablesDarkMode = new Common.VariablesDarkMode {
+        collectionName = "DesignTokens"
+        lightModeName = "Light"
+        darkModeName = "Dark"
+      }
     }
   }
 }
