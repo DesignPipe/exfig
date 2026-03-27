@@ -250,7 +250,7 @@ Key files: `VariableModeDarkGenerator.swift`, `SVGColorReplacer.swift`, `FigmaCo
 
 **Logging requirements:** Every `guard ... else { continue }` in the generation loop must log a warning — silent skips cause invisible data loss. `resolveDarkColor` must check `deletedButReferenced != true` (same as all other variable loaders). `SVGColorReplacer` uses separate regex replacement templates per pattern (attribute patterns have 3 capture groups, CSS patterns have 2 — never share a single template).
 
-**PKL registration:** `Common.VariablesDarkMode` and `Common.SuffixDarkMode` must be listed in `registerPklTypes()` in `PKLEvaluator.swift`. Omitting a `PklRegisteredType` struct causes pkl-swift to silently return `nil` for that field — the PKL config appears correct but the feature never activates.
+**pkl-swift decoding:** pkl-swift uses **keyed** decoding (by property name, not positional). TypeRegistry is only for `PklAny` polymorphic types and performance — concrete `Decodable` structs (like `VariablesDarkMode`) decode via synthesized `init(from:)` regardless of `registerPklTypes`. New types should still be added to `registerPklTypes()` for completeness, but missing entries do NOT cause silent nil for concrete typed fields.
 
 **Granular cache path:** `IconsExportContextImpl.loadIconsWithGranularCache()` creates its own `IconsLoader` and bypasses `FigmaComponentsSource` entirely. Variable-mode dark generation must be applied explicitly at the end of that method via `applyVariableModeDark(to:source:)`.
 
@@ -481,7 +481,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | SPM `from:` too loose | When code uses APIs from version X, set `from: "X"` not older — SPM may resolve an incompatible earlier version |
 | Granular cache "Access denied" | `GranularCacheManager.filterChangedComponents` degrades gracefully — returns all components on node fetch error instead of failing config |
 | Empty `fileId` in variable dark | `FigmaComponentsSource` must guard `fileId` not empty before calling `VariableModeDarkGenerator` — `?? ""` causes cryptic Figma API 404 |
-| PKL field always `nil` | New `PklRegisteredType` structs (e.g. `Common.VariablesDarkMode`) MUST be added to `registerPklTypes()` in `PKLEvaluator.swift` — pkl-swift silently returns `nil` without registration, no error thrown |
+| PKL field always `nil` | `registerPklTypes()` is a performance optimization, NOT a correctness requirement for concrete typed fields. For optional nested PKL objects returning `nil`, check: (1) `pkl eval --format json` confirms field present, (2) unit test with `PKLEvaluator.evaluate()` decodes correctly, (3) trace values at bridge layer (`iconsSourceInput()`) with diagnostic log |
 | Granular cache skips dark gen | `loadIconsWithGranularCache()` in `IconsExportContextImpl` bypasses `FigmaComponentsSource` — must call `VariableModeDarkGenerator` explicitly via `applyVariableModeDark()` helper |
 
 ## Additional Rules

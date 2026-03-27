@@ -52,6 +52,29 @@ struct PKLEvaluatorTests {
         }
     }
 
+    @Test("Evaluates variablesDarkMode nested object")
+    func evaluatesVariablesDarkMode() async throws {
+        let configPath = Self.fixturesPath.appendingPathComponent("valid-config.pkl")
+
+        let module = try await PKLEvaluator.evaluate(configPath: configPath)
+
+        let icons = module.ios?.icons
+        #expect(icons?.count == 1)
+
+        let entry = try #require(icons?.first)
+        #expect(entry.figmaFrameName == "TestIcons")
+
+        // This is the critical assertion: variablesDarkMode must NOT be nil
+        let darkMode = try #require(
+            entry.variablesDarkMode,
+            "variablesDarkMode is nil — pkl-swift failed to deserialize nested object"
+        )
+        #expect(darkMode.collectionName == "TestCollection")
+        #expect(darkMode.lightModeName == "Light")
+        #expect(darkMode.darkModeName == "Dark")
+        #expect(darkMode.primitivesModeName == nil)
+    }
+
     @Test("All generated PKL types are registered")
     func allGeneratedPklTypesRegistered() {
         // Every registeredIdentifier in Generated/*.pkl.swift must be listed here AND

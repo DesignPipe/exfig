@@ -26,4 +26,17 @@ ios = new iOS.iOSConfig {
       nameStyle = "camelCase"
     }
   }
+
+  icons = new Listing {
+    new iOS.IconsEntry {
+      figmaFrameName = "TestIcons"
+      format = "svg"
+      assetsFolder = "Icons"
+      variablesDarkMode = new Common.VariablesDarkMode {
+        collectionName = "TestCollection"
+        lightModeName = "Light"
+        darkModeName = "Dark"
+      }
+    }
+  }
 }
