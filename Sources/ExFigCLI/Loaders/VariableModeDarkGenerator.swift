@@ -173,7 +173,7 @@ struct VariableModeDarkGenerator {
 
     private func buildDarkPack(
         for pack: ImagePack,
-        colorMap: [String: String],
+        colorMap: [String: ColorReplacement],
         tempDir: URL
     ) throws -> ImagePack? {
         guard let svgImage = pack.images.first else {
@@ -284,8 +284,8 @@ struct VariableModeDarkGenerator {
         node: Node,
         ctx: ResolutionContext,
         iconName: String
-    ) -> [String: String] {
-        var colorMap: [String: String] = [:]
+    ) -> [String: ColorReplacement] {
+        var colorMap: [String: ColorReplacement] = [:]
         collectBoundColors(from: node.document, ctx: ctx, colorMap: &colorMap, iconName: iconName)
         return colorMap
     }
@@ -293,7 +293,7 @@ struct VariableModeDarkGenerator {
     private func collectBoundColors(
         from document: Document,
         ctx: ResolutionContext,
-        colorMap: inout [String: String],
+        colorMap: inout [String: ColorReplacement],
         iconName: String
     ) {
         for paint in document.fills {
@@ -314,7 +314,7 @@ struct VariableModeDarkGenerator {
     private func collectFromPaint(
         _ paint: Paint,
         ctx: ResolutionContext,
-        colorMap: inout [String: String],
+        colorMap: inout [String: ColorReplacement],
         iconName: String
     ) {
         guard let boundVars = paint.boundVariables,
@@ -329,7 +329,7 @@ struct VariableModeDarkGenerator {
         )
 
         // Try local resolution first (same file)
-        var darkHex = resolveDarkColor(
+        var darkColor = resolveDarkColor(
             variableId: colorAlias.id,
             modeId: ctx.modes.darkModeId,
             variablesMeta: ctx.variablesMeta,
@@ -337,9 +337,9 @@ struct VariableModeDarkGenerator {
         )
 
         // Cross-file fallback: find variable by name in library, resolve there
-        if darkHex == nil, let libMeta = ctx.libMeta, let libNameIndex = ctx.libNameIndex {
+        if darkColor == nil, let libMeta = ctx.libMeta, let libNameIndex = ctx.libNameIndex {
             if let localVar = ctx.variablesMeta.variables[colorAlias.id] {
-                darkHex = resolveViaLibrary(
+                darkColor = resolveViaLibrary(
                     variableName: localVar.name,
                     libMeta: libMeta,
                     libNameIndex: libNameIndex,
@@ -348,13 +348,12 @@ struct VariableModeDarkGenerator {
             }
         }
 
-        if let darkHex, lightHex != darkHex {
-            if let existing = colorMap[lightHex], existing != darkHex {
-                logger.warning(
-                    "Icon '\(iconName)': #\(lightHex) maps to multiple dark values (#\(existing) and #\(darkHex))"
-                )
+        if let darkColor, lightHex != darkColor.hex || darkColor.changesOpacity {
+            if let existing = colorMap[lightHex], existing.hex != darkColor.hex {
+                let msg = "#\(lightHex) → multiple dark: #\(existing.hex), #\(darkColor.hex)"
+                logger.warning("Icon '\(iconName)': \(msg)")
             }
-            colorMap[lightHex] = darkHex
+            colorMap[lightHex] = darkColor
         }
     }
 
@@ -364,7 +363,7 @@ struct VariableModeDarkGenerator {
         libMeta: VariablesMeta,
         libNameIndex: [String: VariableValue],
         darkModeName: String
-    ) -> String? {
+    ) -> ColorReplacement? {
         guard let libVar = libNameIndex[variableName] else {
             logger.debug("Variable-mode dark: library fallback miss — '\(variableName)' not found in library")
             return nil
@@ -388,8 +387,9 @@ struct VariableModeDarkGenerator {
             variablesMeta: libMeta,
             primitivesModeId: nil
         )
-        if result != nil {
-            logger.debug("Variable-mode dark: resolved '\(variableName)' via library → #\(result!)")
+        if let result {
+            logger
+                .debug("Variable-mode dark: resolved '\(variableName)' via library → #\(result.hex) a=\(result.alpha)")
         }
         return result
     }
@@ -401,7 +401,7 @@ struct VariableModeDarkGenerator {
         variablesMeta: VariablesMeta,
         primitivesModeId: String?,
         depth: Int = 0
-    ) -> String? {
+    ) -> ColorReplacement? {
         guard depth < 10 else {
             logger.warning("Variable alias chain exceeded depth limit (variableId: \(variableId))")
             return nil
@@ -420,7 +420,10 @@ struct VariableModeDarkGenerator {
 
         switch value {
         case let .color(color):
-            return SVGColorReplacer.normalizeColor(r: color.r, g: color.g, b: color.b)
+            return ColorReplacement(
+                hex: SVGColorReplacer.normalizeColor(r: color.r, g: color.g, b: color.b),
+                alpha: color.a
+            )
 
         case let .variableAlias(alias):
             // Resolve alias — use primitives mode if available, else use the same mode
