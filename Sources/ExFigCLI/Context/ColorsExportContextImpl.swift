@@ -82,9 +82,13 @@ struct ColorsExportContextImpl: ColorsExportContext {
             darkHC: colors.darkHC.isEmpty ? nil : colors.darkHC
         )
 
+        if let warning = result.warning {
+            let formatted = WarningFormatter().format(warning, compact: isBatchMode)
+            ExFigCommand.logger.debug("\(formatted)")
+        }
+
         return try ColorsProcessResult(
-            colorPairs: result.get(),
-            warning: result.warning.map { WarningFormatter().format($0, compact: isBatchMode) }
+            colorPairs: result.get()
         )
     }
 }

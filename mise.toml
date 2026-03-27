@@ -36,21 +36,21 @@ git config core.hooksPath .githooks 2>/dev/null || true
 # --- Swift Development ---
 swiftformat = "0.60.1" # Swift code formatting
 swiftlint = "0.63.2"   # Swift linting
-xcsift = "1.1.6"      # xcodebuild output filtering
+xcsift = "1.2.0"      # xcodebuild output filtering
 
 # --- Documentation & Formatting ---
-dprint = "0.50.2" # MD/JSON/YAML formatting (Rust, fast)
+dprint = "0.53.1" # MD/JSON/YAML formatting (Rust, fast)
 
 # --- Git & CI ---
-hk = "1.36.0"        # Git hooks manager
-actionlint = "1.7.9" # GitHub Actions linting
-git-cliff = "2.10.1" # Changelog generation
+hk = "1.39.0"        # Git hooks manager
+actionlint = "1.7.11" # GitHub Actions linting
+git-cliff = "2.12.0" # Changelog generation
 
 # --- Configuration ---
-pkl = "0.31.0" # Configuration language (for hk.pkl)
+pkl = "0.31.1" # Configuration language (for hk.pkl)
 
 # --- CLI Spec ---
-usage = "3.0.0" # CLI spec → shell completions, docs, man pages
+usage = "3.2.0" # CLI spec → shell completions, docs, man pages
 
 
 # =============================================================================

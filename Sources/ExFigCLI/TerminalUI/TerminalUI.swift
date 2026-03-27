@@ -77,16 +77,6 @@ final class TerminalUI: Sendable {
         }
     }
 
-    /// Print a formatted AssetsValidatorWarning
-    func warning(_ warning: AssetsValidatorWarning) {
-        let formatter = WarningFormatter()
-        let formattedMessage = formatter.format(warning)
-
-        guard !formattedMessage.isEmpty else { return }
-
-        self.warning(formattedMessage)
-    }
-
     /// Print a formatted ExFigWarning
     func warning(_ warning: ExFigWarning) {
         let formatter = ExFigWarningFormatter()

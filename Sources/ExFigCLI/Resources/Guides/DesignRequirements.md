@@ -177,6 +177,40 @@ Icons frame
 └── ic/24/close_dark
 ```
 
+**Variable Modes (per-entry, recommended for Figma Variables):**
+
+When icons use Figma Variable bindings for colors (e.g., fill bound to a `DesignTokens` collection
+with Light/Dark modes), ExFig can auto-generate dark SVGs by resolving variable values:
+
+```pkl
+import ".exfig/schemas/Common.pkl"
+
+// Single-file mode: all variables in the same file as icons
+new iOS.IconsEntry {
+  figmaFrameName = "Icons"
+  variablesDarkMode = new Common.VariablesDarkMode {
+    collectionName = "DesignTokens"  // exact collection name (case-sensitive)
+    lightModeName = "Light"          // exact mode name
+    darkModeName = "Dark"            // exact mode name
+  }
+}
+
+// Cross-file mode: icon variables reference an external library
+new iOS.IconsEntry {
+  figmaFrameName = "Icons"
+  variablesDarkMode = new Common.VariablesDarkMode {
+    collectionName = "DesignTokens"
+    lightModeName = "Light"
+    darkModeName = "Dark"
+    variablesFileId = "LIB_FILE_ID"    // library containing primitive values
+    primitivesModeName = "Value"       // mode in primitives collection (optional)
+  }
+}
+```
+
+No naming conventions required — ExFig reads variable bindings directly from Figma nodes.
+Supports alpha/opacity in color replacements.
+
 ### Images
 
 #### Component Structure

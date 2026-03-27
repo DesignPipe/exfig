@@ -107,9 +107,13 @@ struct ImagesExportContextImpl: ImagesExportContextWithGranularCache {
             dark: images.dark.isEmpty ? nil : images.dark
         )
 
+        if let warning = result.warning {
+            let formatted = WarningFormatter().format(warning, compact: isBatchMode)
+            ExFigCommand.logger.debug("\(formatted)")
+        }
+
         return try ImagesProcessResult(
-            imagePairs: result.get(),
-            warning: result.warning.map { WarningFormatter().format($0, compact: isBatchMode) }
+            imagePairs: result.get()
         )
     }
 

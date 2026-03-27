@@ -97,6 +97,10 @@
             - Figma file ID(s) for my design files
             - Output paths matching my project structure
             - Entry configurations for colors, icons, and/or images
+            - Dark mode approach for icons (if applicable):
+              * `darkFileId` — separate Figma file for dark icons
+              * `suffixDarkMode` — name suffix splitting (e.g., "_dark")
+              * `variablesDarkMode` — Figma Variable Modes (recommended when icons use variable bindings)
 
             First, validate the config with exfig_validate after creating it.
             """

@@ -248,7 +248,7 @@ struct VariableModeDarkGenerator {
         var index: [String: VariableValue] = [:]
         for (name, vars) in grouped {
             if vars.count > 1 {
-                logger.warning("Library file has \(vars.count) variables named '\(name)', using first match")
+                logger.debug("Library file has \(vars.count) variables named '\(name)', using first match")
             }
             index[name] = vars[0]
         }

@@ -108,9 +108,13 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
             dark: icons.dark.isEmpty ? nil : icons.dark
         )
 
+        if let warning = result.warning {
+            let formatted = WarningFormatter().format(warning, compact: isBatchMode)
+            ExFigCommand.logger.debug("\(formatted)")
+        }
+
         return try IconsProcessResult(
-            iconPairs: result.get(),
-            warning: result.warning.map { WarningFormatter().format($0, compact: isBatchMode) }
+            iconPairs: result.get()
         )
     }
 

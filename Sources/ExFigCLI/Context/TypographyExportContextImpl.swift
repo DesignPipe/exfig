@@ -77,9 +77,13 @@ struct TypographyExportContextImpl: TypographyExportContext {
 
         let result = processor.process(assets: textStyles.textStyles)
 
+        if let warning = result.warning {
+            let formatted = WarningFormatter().format(warning, compact: isBatchMode)
+            ExFigCommand.logger.debug("\(formatted)")
+        }
+
         return try TypographyProcessResult(
-            textStyles: result.get(),
-            warning: result.warning.map { WarningFormatter().format($0, compact: isBatchMode) }
+            textStyles: result.get()
         )
     }
 }

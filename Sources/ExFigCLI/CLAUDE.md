@@ -198,6 +198,9 @@ reserved for MCP JSON-RPC protocol.
 
 **Guide resources:** `exfig://guides/` serves markdown files from `Resources/Guides/` (copied from DocC articles).
 DocC `.docc` articles are NOT accessible via `Bundle.module` at runtime — must be separately copied to `Resources/Guides/`.
+**Guide sync:** `Resources/Guides/DesignRequirements.md` is served via MCP `exfig://guides/` resource. Must be updated alongside DocC articles when adding dark mode approaches or other user-facing features.
+
+**MCP validate dark_mode field:** `ValidateSummary.darkMode` reports active dark mode approaches (`darkFileId`, `suffixDarkMode`, `variablesDarkMode`). `buildDarkModeSummary()` checks `config.figma?.darkFileId`, `config.common?.icons?.suffixDarkMode`, and `Common_FrameSource.variablesDarkMode` across all platform icon entries.
 
 **Tool handler order:** Validate input parameters BEFORE expensive operations (PKL eval, API client creation).
 

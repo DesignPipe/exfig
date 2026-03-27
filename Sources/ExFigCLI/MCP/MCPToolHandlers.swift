@@ -54,12 +54,14 @@
 
             let platforms = buildPlatformSummary(config: config)
             let fileIDs = Array(config.getFileIds()).sorted()
+            let darkModes = buildDarkModeSummary(config: config)
 
             let summary = ValidateSummary(
                 configPath: configPath,
                 valid: true,
                 platforms: platforms.isEmpty ? nil : platforms,
-                figmaFileIds: fileIDs.isEmpty ? nil : fileIDs
+                figmaFileIds: fileIDs.isEmpty ? nil : fileIDs,
+                darkMode: darkModes.isEmpty ? nil : darkModes
             )
 
             return try .init(content: [.text(text: encodeJSON(summary), annotations: nil, _meta: nil)])
@@ -94,6 +96,36 @@
             }
 
             return platforms
+        }
+
+        private static func buildDarkModeSummary(config: PKLConfig) -> [String] {
+            var approaches: Set<String> = []
+
+            if config.figma?.darkFileId != nil {
+                approaches.insert("darkFileId")
+            }
+
+            if config.common?.icons?.suffixDarkMode != nil {
+                approaches.insert("suffixDarkMode (icons)")
+            }
+            if config.common?.images?.suffixDarkMode != nil {
+                approaches.insert("suffixDarkMode (images)")
+            }
+
+            func checkIconEntries(_ entries: [any Common_FrameSource]?) {
+                guard let entries else { return }
+                for entry in entries where entry.variablesDarkMode != nil {
+                    approaches.insert("variablesDarkMode")
+                    return
+                }
+            }
+
+            checkIconEntries(config.ios?.icons)
+            checkIconEntries(config.android?.icons)
+            checkIconEntries(config.flutter?.icons)
+            checkIconEntries(config.web?.icons)
+
+            return approaches.sorted()
         }
 
         // MARK: - Tokens Info
@@ -748,12 +780,14 @@
         let valid: Bool
         var platforms: [String: EntrySummary]?
         var figmaFileIds: [String]?
+        var darkMode: [String]?
 
         enum CodingKeys: String, CodingKey {
             case configPath = "config_path"
             case valid
             case platforms
             case figmaFileIds = "figma_file_ids"
+            case darkMode = "dark_mode"
         }
     }
 

@@ -122,6 +122,7 @@ Twelve modules in `Sources/`:
 **MCP data flow:** `exfig mcp` → StdioTransport (JSON-RPC on stdin/stdout) → tool handlers → PKLEvaluator / TokensFileSource / FigmaAPI
 **MCP stdout safety:** `OutputMode.mcp` + `TerminalOutputManager.setStderrMode(true)` — all CLI output goes to stderr
 **Claude Code plugins:** [exfig-plugins](https://github.com/DesignPipe/exfig-plugins) marketplace — MCP integration, setup wizard, export commands, config review, troubleshooting
+**Plugin sync checklist:** When adding features visible to end users (new dark mode approach, new CLI flag, new MCP tool), update DesignPipe/exfig-plugins skills: `exfig-mcp-usage`, `exfig-config-review` (common-issues.md), `exfig-troubleshooting` (error-catalog.md), `exfig-setup`. Clone to `/tmp/exfig-plugins`, branch, commit, PR.
 
 **Variable-mode dark icons:** `FigmaComponentsSource.loadIcons()` → `VariableModeDarkGenerator` — fetches Variables API, resolves alias chains, replaces hex colors in SVG via `SVGColorReplacer`. Third dark mode approach alongside `darkFileId` and `suffixDarkMode`.
 
