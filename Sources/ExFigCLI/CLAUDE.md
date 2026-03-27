@@ -129,6 +129,8 @@ Granular cache flow: pre-fetch nodes → compute hashes → compare with cached 
 - `warning()` / `error()` — NEVER suppressed; queued to `BatchProgressView.queueLogMessage()` for coordinated rendering
 - `TerminalOutputManager` singleton prevents race conditions between animations and log output via `hasActiveAnimation` flag
 - `withParallelEntries()` creates parent spinner suppressing all inner output (except warnings/errors)
+- `OutputMode.useAnimations` is `true` only for `.normal` — `.verbose` and `.quiet` are non-animated
+- `Spinner`/`ProgressBar` non-animated mode: `start()` emits NO output; only `stop()` prints the final `✓`/`✗` line. Do NOT call `startAnimation()` or `writeDirect()` in non-animated mode — causes duplicated output
 
 ### Image Conversion Pipeline
 

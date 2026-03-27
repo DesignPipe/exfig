@@ -75,6 +75,8 @@ Uses `static let _typeRegistration` for thread-safe dispatch_once semantics.
 When adding new PKL types to schemas, regenerate with `codegen:pkl` and add the new type to the registration list in `PKLEvaluator.swift`.
 `registerPklTypes` has a hard `precondition(_shared == nil)` — must be called before any `TypeRegistry.get()`.
 
+**Silent failure:** If a `PklRegisteredType` struct is missing from the list, pkl-swift silently returns `nil` for that field — no error is thrown and no warning logged. The PKL config evaluates successfully but the feature simply never activates. This is especially hard to debug for optional nested types like `variablesDarkMode`. After adding a new class to the PKL schema, ALWAYS check that the generated Swift struct is added to `registerPklTypes()` in `PKLEvaluator.swift`.
+
 ## Codegen Gotchas
 
 - PKL `"kebab-case"` raw values become `.kebabCase` in Swift (not `.kebab_case`)

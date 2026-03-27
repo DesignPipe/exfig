@@ -74,10 +74,8 @@ final class Spinner: @unchecked Sendable {
                 self.timer = timer
                 timer.resume()
             }
-        } else {
-            // Non-animated mode: just print the message once with newline
-            TerminalOutputManager.shared.print("\(coloredFrame) \(initialMessage)")
         }
+        // Non-animated mode: no start output — stop() prints the final result
     }
 
     /// Update the spinner message

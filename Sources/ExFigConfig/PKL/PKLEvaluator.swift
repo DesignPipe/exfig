@@ -46,6 +46,8 @@ public enum PKLEvaluator {
             Common.TokensFile.self,
             Common.PenpotSource.self,
             Common.WebpOptions.self,
+            Common.VariablesDarkMode.self,
+            Common.SuffixDarkMode.self,
             Common.Cache.self,
             Common.Colors.self,
             Common.Icons.self,
