@@ -10,6 +10,7 @@ struct FigmaComponentsSource: ComponentsSource {
     let platform: Platform
     let logger: Logger
     let filter: String?
+    let variablesCache: VariablesCache?
 
     func loadIcons(from input: IconsSourceInput) async throws -> IconsLoadOutput {
         let config = IconsLoaderConfig(
@@ -46,7 +47,7 @@ struct FigmaComponentsSource: ComponentsSource {
                 logger.warning("Variable-mode dark generation requires a Figma file ID, skipping")
                 return IconsLoadOutput(light: result.light, dark: [])
             }
-            let generator = VariableModeDarkGenerator(client: client, logger: logger)
+            let generator = VariableModeDarkGenerator(client: client, logger: logger, variablesCache: variablesCache)
             let darkPacks = try await generator.generateDarkVariants(
                 lightPacks: result.light,
                 config: .init(

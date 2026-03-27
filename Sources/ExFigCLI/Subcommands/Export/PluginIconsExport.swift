@@ -45,6 +45,7 @@ extension ExFigCommand.ExportIcons {
         guard let sourceKind = entries.first?.resolvedSourceKind else {
             throw ExFigError.configurationError("No entries provided for icons export")
         }
+        let variablesCache = VariablesCache()
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
@@ -52,7 +53,8 @@ extension ExFigCommand.ExportIcons {
             platform: .ios,
             logger: ExFigCommand.logger,
             filter: filter,
-            ui: ui
+            ui: ui,
+            variablesCache: variablesCache
         )
 
         let context = IconsExportContextImpl(
@@ -64,7 +66,8 @@ extension ExFigCommand.ExportIcons {
             isBatchMode: batchMode,
             fileDownloader: fileDownloader,
             granularCacheManager: granularCacheManager,
-            platform: .ios
+            platform: .ios,
+            variablesCache: variablesCache
         )
 
         // Export via plugin (returns IconsExportResult with hashes)
@@ -130,6 +133,7 @@ extension ExFigCommand.ExportIcons {
         guard let sourceKind = entries.first?.resolvedSourceKind else {
             throw ExFigError.configurationError("No entries provided for icons export")
         }
+        let variablesCache = VariablesCache()
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
@@ -137,7 +141,8 @@ extension ExFigCommand.ExportIcons {
             platform: .android,
             logger: ExFigCommand.logger,
             filter: filter,
-            ui: ui
+            ui: ui,
+            variablesCache: variablesCache
         )
 
         let context = IconsExportContextImpl(
@@ -149,7 +154,8 @@ extension ExFigCommand.ExportIcons {
             isBatchMode: batchMode,
             fileDownloader: fileDownloader,
             granularCacheManager: granularCacheManager,
-            platform: .android
+            platform: .android,
+            variablesCache: variablesCache
         )
 
         let exporter = AndroidIconsExporter()
@@ -189,6 +195,7 @@ extension ExFigCommand.ExportIcons {
         guard let sourceKind = entries.first?.resolvedSourceKind else {
             throw ExFigError.configurationError("No entries provided for icons export")
         }
+        let variablesCache = VariablesCache()
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
@@ -196,7 +203,8 @@ extension ExFigCommand.ExportIcons {
             platform: .flutter,
             logger: ExFigCommand.logger,
             filter: filter,
-            ui: ui
+            ui: ui,
+            variablesCache: variablesCache
         )
 
         let context = IconsExportContextImpl(
@@ -208,7 +216,8 @@ extension ExFigCommand.ExportIcons {
             isBatchMode: batchMode,
             fileDownloader: fileDownloader,
             granularCacheManager: granularCacheManager,
-            platform: .flutter
+            platform: .flutter,
+            variablesCache: variablesCache
         )
 
         let exporter = FlutterIconsExporter()
@@ -248,6 +257,7 @@ extension ExFigCommand.ExportIcons {
         guard let sourceKind = entries.first?.resolvedSourceKind else {
             throw ExFigError.configurationError("No entries provided for icons export")
         }
+        let variablesCache = VariablesCache()
         let componentsSource = try SourceFactory.createComponentsSource(
             for: sourceKind,
             client: client,
@@ -255,7 +265,8 @@ extension ExFigCommand.ExportIcons {
             platform: .web,
             logger: ExFigCommand.logger,
             filter: filter,
-            ui: ui
+            ui: ui,
+            variablesCache: variablesCache
         )
 
         let context = IconsExportContextImpl(
@@ -267,7 +278,8 @@ extension ExFigCommand.ExportIcons {
             isBatchMode: batchMode,
             fileDownloader: fileDownloader,
             granularCacheManager: granularCacheManager,
-            platform: .web
+            platform: .web,
+            variablesCache: variablesCache
         )
 
         let exporter = WebIconsExporter()

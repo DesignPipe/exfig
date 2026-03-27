@@ -37,10 +37,12 @@ struct VariableModeDarkGenerator {
 
     private let client: Client
     private let logger: Logger
+    private let variablesCache: VariablesCache?
 
-    init(client: Client, logger: Logger) {
+    init(client: Client, logger: Logger, variablesCache: VariablesCache? = nil) {
         self.client = client
         self.logger = logger
+        self.variablesCache = variablesCache
     }
 
     /// Generates dark SVG variants by resolving variable bindings and replacing colors.
@@ -215,8 +217,12 @@ struct VariableModeDarkGenerator {
     }
 
     private func loadVariables(fileId: String) async throws -> VariablesMeta {
-        let endpoint = VariablesEndpoint(fileId: fileId)
-        return try await client.request(endpoint)
+        if let cache = variablesCache {
+            return try await cache.get(fileId: fileId) { [client] in
+                try await client.request(VariablesEndpoint(fileId: fileId))
+            }
+        }
+        return try await client.request(VariablesEndpoint(fileId: fileId))
     }
 
     private func findModeIds(in meta: VariablesMeta, config: Config) -> ModeContext? {

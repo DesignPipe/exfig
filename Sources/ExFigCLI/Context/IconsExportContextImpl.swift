@@ -23,6 +23,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
     let configExecutionContext: ConfigExecutionContext?
     let granularCacheManager: GranularCacheManager?
     let platform: Platform
+    let variablesCache: VariablesCache?
 
     init(
         client: Client,
@@ -34,7 +35,8 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
         fileDownloader: FileDownloader = FileDownloader(),
         configExecutionContext: ConfigExecutionContext? = nil,
         granularCacheManager: GranularCacheManager? = nil,
-        platform: Platform
+        platform: Platform,
+        variablesCache: VariablesCache? = nil
     ) {
         self.client = client
         self.componentsSource = componentsSource
@@ -46,6 +48,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
         self.configExecutionContext = configExecutionContext
         self.granularCacheManager = granularCacheManager
         self.platform = platform
+        self.variablesCache = variablesCache
     }
 
     var isGranularCacheEnabled: Bool {
@@ -210,7 +213,7 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
             logger.warning("Variable-mode dark generation requires a Figma file ID, skipping")
             return output
         }
-        let generator = VariableModeDarkGenerator(client: client, logger: logger)
+        let generator = VariableModeDarkGenerator(client: client, logger: logger, variablesCache: variablesCache)
         let darkPacks = try await generator.generateDarkVariants(
             lightPacks: output.light,
             config: .init(

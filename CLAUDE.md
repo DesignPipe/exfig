@@ -254,6 +254,8 @@ Key files: `VariableModeDarkGenerator.swift`, `SVGColorReplacer.swift`, `FigmaCo
 
 **Cross-file variable resolution:** Figma variable IDs are file-scoped — alias targets from the icons file don't exist in library files by ID. When `variablesFileId` is set, variables are loaded from BOTH files: icons file (semantic variables matching node boundVariables) + library file (primitives for alias resolution). Matching is by variable **name** across files and mode **name** across collections (not IDs).
 
+**VariablesCache pattern:** `VariablesCache` (Lock + Task dedup) caches Variables API responses by fileId across parallel entries. Created per platform section in `PluginIconsExport`, injected through `SourceFactory` → `FigmaComponentsSource` → `VariableModeDarkGenerator`. Same pattern applicable to `ColorsVariablesLoader` if needed.
+
 **Granular cache path:** `IconsExportContextImpl.loadIconsWithGranularCache()` creates its own `IconsLoader` and bypasses `FigmaComponentsSource` entirely. Variable-mode dark generation must be applied explicitly at the end of that method via `applyVariableModeDark(to:source:)`.
 
 ### Module Boundaries
@@ -486,6 +488,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | PKL field always `nil` | `registerPklTypes()` is a performance optimization, NOT a correctness requirement for concrete typed fields. For optional nested PKL objects returning `nil`, check: (1) `pkl eval --format json` confirms field present, (2) unit test with `PKLEvaluator.evaluate()` decodes correctly, (3) trace values at bridge layer (`iconsSourceInput()`) with diagnostic log |
 | Granular cache skips dark gen | `loadIconsWithGranularCache()` in `IconsExportContextImpl` bypasses `FigmaComponentsSource` — must call `VariableModeDarkGenerator` explicitly via `applyVariableModeDark()` helper |
 | Variable dark always empty maps | Alias targets are external library variables — set `variablesFileId` in `VariablesDarkMode` PKL config to the library file ID containing primitives |
+| Figma variable IDs file-scoped | Variable IDs differ between files — alias targets from file A can't be found by ID in file B. Use name-based matching (`resolveViaLibrary`) + mode name matching (not modeId) for cross-file resolution |
 
 ## Additional Rules
 
