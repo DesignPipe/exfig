@@ -2,11 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.1.1] - 2026-03-30
 
 ### Bug Fixes
 
 - **ci**: Upgrade deploy-pages to v5 for Node.js 24 compatibility by @alexey1312
+
+- **icons**: Support RTL and fix temp file collision in variable-mode dark generation  by @alexey1312 in [#79](https://github.com/DesignPipe/exfig/pull/79)
 
 
 ## [3.1.0] - 2026-03-27
