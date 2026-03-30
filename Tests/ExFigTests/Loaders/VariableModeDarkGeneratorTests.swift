@@ -633,9 +633,14 @@ final class VariableModeDarkGeneratorRTLTests: XCTestCase {
         try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
         let darkPacks = try generator.processLightPacks([pack], nodeMap: nodeMap, ctx: ctx, tempDir: outDir)
+        XCTAssertEqual(darkPacks.count, 1)
         for image in darkPacks[0].images {
             let content = try String(data: Data(contentsOf: image.url), encoding: .utf8)
             XCTAssertTrue(content?.contains("0000ff") == true, "\(image.isRTL ? "RTL" : "LTR") should have dark color")
+            XCTAssertFalse(
+                content?.contains("ff0000") == true,
+                "\(image.isRTL ? "RTL" : "LTR") should not have light color"
+            )
         }
     }
 
@@ -662,6 +667,116 @@ final class VariableModeDarkGeneratorRTLTests: XCTestCase {
         XCTAssertEqual(darkImage.idiom, "universal")
         XCTAssertEqual(darkImage.format, "svg")
         XCTAssertFalse(darkImage.isRTL)
+    }
+
+    func testDarkRTLImageHasRTLSuffixInFileName() throws {
+        let svg = "<svg><rect fill=\"#ff0000\"/></svg>"
+        let ltrURL = tempDir.appendingPathComponent("ltr.svg")
+        let rtlURL = tempDir.appendingPathComponent("rtl.svg")
+        try Data(svg.utf8).write(to: ltrURL)
+        try Data(svg.utf8).write(to: rtlURL)
+
+        let pack = ImagePack(
+            name: "arrow",
+            images: [
+                Image(name: "arrow", scale: .all, url: ltrURL, format: "svg", isRTL: false),
+                Image(name: "arrow", scale: .all, url: rtlURL, format: "svg", isRTL: true),
+            ],
+            platform: .ios, nodeId: "1:1", fileId: "file1"
+        )
+
+        let (ctx, nodeMap) = makeRedToBlueDarkCtx()
+        let outDir = tempDir.appendingPathComponent("out4")
+        try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
+
+        let darkPacks = try generator.processLightPacks([pack], nodeMap: nodeMap, ctx: ctx, tempDir: outDir)
+        XCTAssertEqual(darkPacks.count, 1)
+        let rtlImage = darkPacks[0].images.first(where: { $0.isRTL })
+        XCTAssertNotNil(rtlImage)
+        XCTAssertTrue(
+            try XCTUnwrap(rtlImage?.url.lastPathComponent.contains("_rtl")),
+            "RTL dark image should have _rtl in filename"
+        )
+    }
+
+    func testMultipleNonRTLImagesGetDistinctFiles() throws {
+        let svg1 = "<svg><rect fill=\"#ff0000\" width=\"10\"/></svg>"
+        let svg2 = "<svg><rect fill=\"#ff0000\" width=\"20\"/></svg>"
+        let url1 = tempDir.appendingPathComponent("icon_1x.svg")
+        let url2 = tempDir.appendingPathComponent("icon_2x.svg")
+        try Data(svg1.utf8).write(to: url1)
+        try Data(svg2.utf8).write(to: url2)
+
+        let pack = ImagePack(
+            name: "star",
+            images: [
+                Image(name: "star", scale: .individual(1.0), url: url1, format: "svg", isRTL: false),
+                Image(name: "star", scale: .individual(2.0), url: url2, format: "svg", isRTL: false),
+            ],
+            platform: .ios, nodeId: "1:1", fileId: "file1"
+        )
+
+        let (ctx, nodeMap) = makeRedToBlueDarkCtx()
+        let outDir = tempDir.appendingPathComponent("out5")
+        try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
+
+        let darkPacks = try generator.processLightPacks([pack], nodeMap: nodeMap, ctx: ctx, tempDir: outDir)
+        XCTAssertEqual(darkPacks.count, 1)
+        XCTAssertEqual(darkPacks[0].images.count, 2)
+
+        let urls = darkPacks[0].images.map(\.url)
+        XCTAssertNotEqual(urls[0], urls[1], "Different scale images must have distinct temp file URLs")
+
+        let content0 = try String(contentsOf: urls[0], encoding: .utf8)
+        let content1 = try String(contentsOf: urls[1], encoding: .utf8)
+        XCTAssertTrue(content0.contains("width=\"10\""), "First image content should be preserved")
+        XCTAssertTrue(content1.contains("width=\"20\""), "Second image content should be preserved")
+    }
+
+    func testPartialFailureStillProducesDarkPack() throws {
+        let svg = "<svg><rect fill=\"#ff0000\"/></svg>"
+        let validURL = tempDir.appendingPathComponent("valid.svg")
+        try Data(svg.utf8).write(to: validURL)
+        let missingURL = tempDir.appendingPathComponent("nonexistent.svg")
+
+        let pack = ImagePack(
+            name: "icon",
+            images: [
+                Image(name: "icon", scale: .all, url: validURL, format: "svg", isRTL: false),
+                Image(name: "icon", scale: .all, url: missingURL, format: "svg", isRTL: true),
+            ],
+            platform: .ios, nodeId: "1:1", fileId: "file1"
+        )
+
+        let (ctx, nodeMap) = makeRedToBlueDarkCtx()
+        let outDir = tempDir.appendingPathComponent("out6")
+        try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
+
+        let darkPacks = try generator.processLightPacks([pack], nodeMap: nodeMap, ctx: ctx, tempDir: outDir)
+        XCTAssertEqual(darkPacks.count, 1, "Should produce dark pack from surviving image")
+        XCTAssertEqual(darkPacks[0].images.count, 1, "Should have only the valid image")
+        XCTAssertFalse(darkPacks[0].images[0].isRTL)
+    }
+
+    func testAllImagesFailReturnsNil() throws {
+        let missingURL1 = tempDir.appendingPathComponent("missing1.svg")
+        let missingURL2 = tempDir.appendingPathComponent("missing2.svg")
+
+        let pack = ImagePack(
+            name: "broken",
+            images: [
+                Image(name: "broken", scale: .all, url: missingURL1, format: "svg", isRTL: false),
+                Image(name: "broken", scale: .all, url: missingURL2, format: "svg", isRTL: true),
+            ],
+            platform: .ios, nodeId: "1:1", fileId: "file1"
+        )
+
+        let (ctx, nodeMap) = makeRedToBlueDarkCtx()
+        let outDir = tempDir.appendingPathComponent("out7")
+        try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
+
+        let darkPacks = try generator.processLightPacks([pack], nodeMap: nodeMap, ctx: ctx, tempDir: outDir)
+        XCTAssertTrue(darkPacks.isEmpty, "Should produce no dark packs when all images fail")
     }
 }
 

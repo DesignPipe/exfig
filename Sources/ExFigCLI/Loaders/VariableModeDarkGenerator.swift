@@ -229,7 +229,7 @@ struct VariableModeDarkGenerator {
             let darkSVG = SVGColorReplacer.replaceColors(in: svgContent, colorMap: colorMap)
 
             let suffix = svgImage.isRTL ? "_rtl" : ""
-            let tempURL = tempDir.appendingPathComponent("\(safeName)\(suffix)_dark.\(svgImage.format)")
+            let tempURL = tempDir.appendingPathComponent("\(safeName)\(suffix)_\(index)_dark.\(svgImage.format)")
             try Data(darkSVG.utf8).write(to: tempURL)
 
             darkImages.append(Image(
@@ -242,7 +242,10 @@ struct VariableModeDarkGenerator {
             ))
         }
 
-        guard !darkImages.isEmpty else { return nil }
+        guard !darkImages.isEmpty else {
+            logger.warning("Icon '\(pack.name)' produced no dark images (all \(pack.images.count) variants failed)")
+            return nil
+        }
 
         return ImagePack(
             name: pack.name,
