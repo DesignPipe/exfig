@@ -86,6 +86,18 @@ struct AliasChainIntegrityRule: LintRule {
         case tooDeep
     }
 
+    /// Cross-file variable IDs have a long hash before the "/" separator,
+    /// e.g., "VariableID:806fcc6a84cf048f0a06837634440ecad91622fe/3556:423".
+    /// Local variable IDs are short like "VariableID:3556:423" or just "3556:423".
+    private func isCrossFileReference(_ id: String) -> Bool {
+        // Strip "VariableID:" prefix if present
+        let raw = id.hasPrefix("VariableID:") ? String(id.dropFirst("VariableID:".count)) : id
+        // Cross-file IDs have a 40-char hex hash before "/"
+        guard let slashIndex = raw.firstIndex(of: "/") else { return false }
+        let prefix = raw[raw.startIndex ..< slashIndex]
+        return prefix.count >= 32 && prefix.allSatisfy(\.isHexDigit)
+    }
+
     private func resolveChain(
         value: ValuesByMode,
         variables: [String: VariableValue],
@@ -106,6 +118,12 @@ struct AliasChainIntegrityRule: LintRule {
         }
 
         guard let target = variables[aliasId] else {
+            // Cross-file alias: variable IDs containing "/" with a long hash prefix
+            // (e.g., "VariableID:806fcc6a.../3556:423") are external library references.
+            // These can't be validated within the local file — treat as resolved.
+            if isCrossFileReference(aliasId) {
+                return .resolved
+            }
             return .broken(targetId: aliasId)
         }
 
