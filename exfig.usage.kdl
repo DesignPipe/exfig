@@ -6,7 +6,7 @@
 
 name "ExFig"
 bin "exfig"
-version "v2.8.0"
+version "v3.2.1"
 about "Exports resources from Figma to iOS, Android, Flutter, and Web projects"
 
 // =============================================================================
