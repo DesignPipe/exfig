@@ -105,7 +105,9 @@ struct LintReporter {
         guard let jsonString = String(data: data, encoding: .utf8) else {
             throw ExFigError.custom(errorString: "Failed to encode lint report as UTF-8")
         }
-        ui.info(jsonString)
+        // Write directly to stdout — ui.info() is suppressed in quiet mode
+        // which is force-enabled for JSON format to keep stdout clean
+        TerminalOutputManager.shared.print(jsonString)
     }
 }
 

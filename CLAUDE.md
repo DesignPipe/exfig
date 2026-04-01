@@ -512,6 +512,7 @@ NooraUI.formatLink("url", useColors: true)  // underlined primary
 | Logger concatenation err | `Logger.Message` (swift-log) requires interpolation `"\(a) \(b)"`, not concatenation `a + b` |
 | Deleted variables in output | Filter `VariableValue.deletedButReferenced != true` in variable loaders AND `CodeSyntaxSyncer` |
 | Jinja trailing `\n` | `{% if false %}...{% endif %}\n` renders `"\n"`, not `""` — strip whitespace-only partial template results |
+| JSON output empty in quiet | `ui.info()` suppressed when `outputMode == .quiet` — machine-readable output (JSON) must use `TerminalOutputManager.shared.print()` directly |
 | `Bundle.module` in tests | SPM test targets without declared resources don't have `Bundle.module` — use `Bundle.main` or temp bundle |
 | SwiftFormat breaks `::` syntax | SwiftFormat 0.60.1+ required for Swift 6.3 module selectors (`FigmaAPI::Client`) |
 | MCP SDK 0.12.0 breaking | `.text` has 3 associated values — pattern match as `.text(text, _, _)`; `GetPrompt.arguments` is `[String: String]?` now |
