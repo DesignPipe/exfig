@@ -24,6 +24,7 @@ public extension Flutter.ImagesEntry {
             useSingleFile: darkFileId == nil,
             darkModeSuffix: "_dark",
             rtlProperty: rtlProperty,
+            rtlActiveValues: rtlActiveValues,
             nameValidateRegexp: nameValidateRegexp,
             nameReplaceRegexp: nameReplaceRegexp,
             penpotBaseURL: resolvedPenpotBaseURL
@@ -55,6 +56,7 @@ public extension Flutter.ImagesEntry {
             useSingleFile: darkFileId == nil,
             darkModeSuffix: "_dark",
             rtlProperty: rtlProperty,
+            rtlActiveValues: rtlActiveValues,
             nameValidateRegexp: nameValidateRegexp,
             nameReplaceRegexp: nameReplaceRegexp,
             penpotBaseURL: resolvedPenpotBaseURL

@@ -446,6 +446,7 @@ private extension AndroidImagesExporter {
                 useSingleFile: true,
                 darkModeSuffix: "_dark",
                 rtlProperty: entry.rtlProperty,
+                rtlActiveValues: entry.rtlActiveValues,
                 nameValidateRegexp: entry.nameValidateRegexp,
                 nameReplaceRegexp: entry.nameReplaceRegexp
             )

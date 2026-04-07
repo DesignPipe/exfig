@@ -120,6 +120,7 @@ final class EnumBridgingTests: XCTestCase {
                 figmaPageName: nil,
                 figmaFileId: nil,
                 rtlProperty: nil,
+                rtlActiveValues: nil,
                 variablesDarkMode: nil,
                 nameValidateRegexp: nil,
                 nameReplaceRegexp: nil
@@ -166,6 +167,7 @@ final class EnumBridgingTests: XCTestCase {
                 figmaPageName: nil,
                 figmaFileId: nil,
                 rtlProperty: nil,
+                rtlActiveValues: nil,
                 variablesDarkMode: nil,
                 nameValidateRegexp: nil,
                 nameReplaceRegexp: nil
@@ -208,6 +210,7 @@ final class EnumBridgingTests: XCTestCase {
                 figmaPageName: nil,
                 figmaFileId: nil,
                 rtlProperty: nil,
+                rtlActiveValues: nil,
                 variablesDarkMode: nil,
                 nameValidateRegexp: nil,
                 nameReplaceRegexp: nil
@@ -238,6 +241,7 @@ final class EnumBridgingTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: nil,
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -274,6 +278,7 @@ final class EnumBridgingTests: XCTestCase {
                 figmaPageName: nil,
                 figmaFileId: nil,
                 rtlProperty: nil,
+                rtlActiveValues: nil,
                 variablesDarkMode: nil,
                 nameValidateRegexp: nil,
                 nameReplaceRegexp: nil
@@ -302,6 +307,7 @@ final class EnumBridgingTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: nil,
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -367,6 +373,7 @@ final class EnumBridgingTests: XCTestCase {
                 figmaPageName: nil,
                 figmaFileId: nil,
                 rtlProperty: nil,
+                rtlActiveValues: nil,
                 variablesDarkMode: nil,
                 nameValidateRegexp: nil,
                 nameReplaceRegexp: nil
@@ -402,6 +409,7 @@ final class EnumBridgingTests: XCTestCase {
                 figmaPageName: nil,
                 figmaFileId: nil,
                 rtlProperty: nil,
+                rtlActiveValues: nil,
                 variablesDarkMode: nil,
                 nameValidateRegexp: nil,
                 nameReplaceRegexp: nil

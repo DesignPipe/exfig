@@ -47,6 +47,9 @@ struct ImagesLoaderConfig {
     /// Figma component property name for RTL variant detection.
     let rtlProperty: String?
 
+    /// Values of the RTL variant property that indicate "active" RTL direction.
+    let rtlActiveValues: [String]?
+
     /// Creates config for a specific iOS images entry.
     static func forIOS(entry: iOSImagesEntry, params: PKLConfig) -> ImagesLoaderConfig {
         ImagesLoaderConfig(
@@ -56,7 +59,8 @@ struct ImagesLoaderConfig {
             scales: entry.scales,
             format: nil, // iOS always uses PNG output
             sourceFormat: convertSourceFormat(entry.sourceFormat),
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -69,7 +73,8 @@ struct ImagesLoaderConfig {
             scales: entry.scales,
             format: convertAndroidFormat(entry.format),
             sourceFormat: convertSourceFormat(entry.sourceFormat),
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -82,7 +87,8 @@ struct ImagesLoaderConfig {
             scales: entry.scales,
             format: entry.format.flatMap { convertFlutterFormat($0) },
             sourceFormat: convertSourceFormat(entry.sourceFormat),
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -95,7 +101,8 @@ struct ImagesLoaderConfig {
             scales: nil,
             format: .svg, // Web uses SVG by default
             sourceFormat: .svg, // Web always uses SVG source
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -108,7 +115,8 @@ struct ImagesLoaderConfig {
             scales: nil,
             format: nil,
             sourceFormat: .png,
-            rtlProperty: Component.defaultRTLProperty
+            rtlProperty: Component.defaultRTLProperty,
+            rtlActiveValues: ["On"]
         )
     }
 
@@ -273,6 +281,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                 filter: filter,
                 scales: scales,
                 rtlProperty: config.rtlProperty,
+                rtlActiveValues: config.rtlActiveValues,
                 onBatchProgress: onBatchProgress
             )
             let (lightImages, darkImages) = splitByDarkMode(images, darkSuffix: darkSuffix)
@@ -287,6 +296,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                 params: SVGParams(),
                 filter: filter,
                 rtlProperty: config.rtlProperty,
+                rtlActiveValues: config.rtlActiveValues,
                 onBatchProgress: onBatchProgress
             )
             let (lightPack, darkPack) = splitByDarkMode(pack, darkSuffix: darkSuffix)
@@ -344,6 +354,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                         filter: filter,
                         scales: scales,
                         rtlProperty: self.config.rtlProperty,
+                        rtlActiveValues: self.config.rtlActiveValues,
                         onBatchProgress: onBatchProgress
                     )
                     return (key, images)
@@ -382,6 +393,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                         params: SVGParams(),
                         filter: filter,
                         rtlProperty: self.config.rtlProperty,
+                        rtlActiveValues: self.config.rtlActiveValues,
                         onBatchProgress: onBatchProgress
                     )
                     return (key, packs)
@@ -422,6 +434,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                 filter: filter,
                 scales: scales,
                 rtlProperty: config.rtlProperty,
+                rtlActiveValues: config.rtlActiveValues,
                 onBatchProgress: onBatchProgress
             )
 
@@ -455,6 +468,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                 params: SVGParams(),
                 filter: filter,
                 rtlProperty: config.rtlProperty,
+                rtlActiveValues: config.rtlActiveValues,
                 onBatchProgress: onBatchProgress
             )
 
@@ -523,6 +537,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                             filter: filter,
                             scales: scales,
                             rtlProperty: self.config.rtlProperty,
+                            rtlActiveValues: self.config.rtlActiveValues,
                             onBatchProgress: onBatchProgress
                         )
                         return FileGranularResult(
@@ -542,6 +557,7 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
                             params: SVGParams(),
                             filter: filter,
                             rtlProperty: self.config.rtlProperty,
+                            rtlActiveValues: self.config.rtlActiveValues,
                             onBatchProgress: onBatchProgress
                         )
                         return FileGranularResult(

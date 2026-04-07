@@ -23,7 +23,8 @@ struct FigmaComponentsSource: ComponentsSource {
             renderModeDefaultSuffix: input.renderModeDefaultSuffix,
             renderModeOriginalSuffix: input.renderModeOriginalSuffix,
             renderModeTemplateSuffix: input.renderModeTemplateSuffix,
-            rtlProperty: input.rtlProperty
+            rtlProperty: input.rtlProperty,
+            rtlActiveValues: input.rtlActiveValues
         )
 
         let loader = IconsLoader(
@@ -87,7 +88,8 @@ struct FigmaComponentsSource: ComponentsSource {
             scales: input.scales,
             format: nil,
             sourceFormat: loaderSourceFormat,
-            rtlProperty: input.rtlProperty
+            rtlProperty: input.rtlProperty,
+            rtlActiveValues: input.rtlActiveValues
         )
 
         let loader = ImagesLoader(

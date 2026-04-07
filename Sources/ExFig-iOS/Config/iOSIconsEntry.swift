@@ -26,6 +26,7 @@ public extension iOS.IconsEntry {
             renderModeOriginalSuffix: renderModeOriginalSuffix,
             renderModeTemplateSuffix: renderModeTemplateSuffix,
             rtlProperty: rtlProperty,
+            rtlActiveValues: rtlActiveValues,
             nameValidateRegexp: nameValidateRegexp,
             nameReplaceRegexp: nameReplaceRegexp,
             penpotBaseURL: resolvedPenpotBaseURL,
