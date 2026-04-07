@@ -48,6 +48,7 @@ ios = new iOS.iOSConfig {
       xcassetsPath = "BrandKit/Assets.xcassets"
       templatesPath = "BrandKit/Templates"
       // rtlProperty = "RTL"  // default; set to null to disable variant-based RTL detection
+      // rtlActiveValues = new { "On" }  // default; add "true" if your Figma uses true/false naming
     }
     // Variable-mode dark: generate dark SVGs from Figma Variable bindings.
     // variablesFileId is required when variables alias to primitives in an external library.

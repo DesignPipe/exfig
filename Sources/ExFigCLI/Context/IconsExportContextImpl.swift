@@ -166,7 +166,8 @@ struct IconsExportContextImpl: IconsExportContextWithGranularCache {
             renderModeDefaultSuffix: source.renderModeDefaultSuffix,
             renderModeOriginalSuffix: source.renderModeOriginalSuffix,
             renderModeTemplateSuffix: source.renderModeTemplateSuffix,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
 
         let loader = IconsLoader(

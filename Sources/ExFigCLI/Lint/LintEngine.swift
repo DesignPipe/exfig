@@ -62,5 +62,6 @@ extension LintEngine {
         DarkModeVariablesRule(),
         DarkModeSuffixRule(),
         PathDataLengthRule(),
+        InvalidRTLVariantValueRule(),
     ])
 }

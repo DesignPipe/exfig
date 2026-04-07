@@ -23,6 +23,8 @@ private func makeIOSIconsConfig(
     frameName: String? = nil,
     pageName: String? = nil,
     nameValidateRegexp: String? = nil,
+    rtlProperty: String? = nil,
+    rtlActiveValues: [String]? = nil,
     suffixDarkMode: String? = nil
 ) -> PKLConfig {
     var entryParts: [String] = [
@@ -33,6 +35,11 @@ private func makeIOSIconsConfig(
     if let frameName { entryParts.append("\"figmaFrameName\": \"\(frameName)\"") }
     if let pageName { entryParts.append("\"figmaPageName\": \"\(pageName)\"") }
     if let regex = nameValidateRegexp { entryParts.append("\"nameValidateRegexp\": \"\(regex)\"") }
+    if let rtlProperty { entryParts.append("\"rtlProperty\": \"\(rtlProperty)\"") }
+    if let rtlActiveValues {
+        let valuesJson = rtlActiveValues.map { "\"\($0)\"" }.joined(separator: ", ")
+        entryParts.append("\"rtlActiveValues\": [\(valuesJson)]")
+    }
 
     var commonParts: [String] = []
     if let suffix = suffixDarkMode {
@@ -630,7 +637,7 @@ struct LintEngineTests {
         #expect(!diagnostics.contains { $0.ruleId == "component-not-frame" })
     }
 
-    @Test("default engine registers all 9 rules")
+    @Test("default engine registers all 10 rules")
     func defaultEngineHasAllRules() {
         let ruleIds = Set(LintEngine.default.rules.map(\.id))
         let expected: Set = [
@@ -643,6 +650,7 @@ struct LintEngineTests {
             "dark-mode-variables",
             "dark-mode-suffix",
             "path-data-length",
+            "invalid-rtl-variant-value",
         ]
         #expect(ruleIds == expected)
     }
@@ -929,6 +937,197 @@ struct PathDataLengthRuleTests {
 
         let diagnostics = rule.validateParsedSVG(svg, name: "ic_simple", nodeId: "1:1")
         #expect(diagnostics.isEmpty)
+    }
+}
+
+// MARK: - InvalidRTLVariantValueRule Tests
+
+struct InvalidRTLVariantValueRuleTests {
+    let rule = InvalidRTLVariantValueRule()
+
+    @Test("passes when RTL variants use valid Off/On values")
+    func passesWithValidValues() async throws {
+        let client = MockClient()
+        client.setResponse([
+            makeVariantComponent(nodeId: "1:1", name: "RTL=Off", frameName: "Icons", componentSetName: "arrow"),
+            makeVariantComponent(nodeId: "1:2", name: "RTL=On", frameName: "Icons", componentSetName: "arrow"),
+        ], for: ComponentsEndpoint.self)
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "RTL")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("error when true/false used instead of Off/On")
+    func errorWhenTrueFalseUsed() async throws {
+        let client = MockClient()
+        client.setResponse([
+            makeVariantComponent(nodeId: "1:1", name: "RTL=false", frameName: "Icons", componentSetName: "car"),
+            makeVariantComponent(nodeId: "1:2", name: "RTL=true", frameName: "Icons", componentSetName: "car"),
+        ], for: ComponentsEndpoint.self)
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "RTL")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 2)
+        #expect(diagnostics.allSatisfy { $0.severity == .error })
+        #expect(diagnostics.allSatisfy { $0.ruleId == "invalid-rtl-variant-value" })
+    }
+
+    @Test("passes for non-variant components (no containingComponentSet)")
+    func passesNonVariantComponents() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "icon_home", frameName: "Icons"),
+        ], for: ComponentsEndpoint.self)
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "RTL")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("passes for variants without RTL property")
+    func passesComponentsWithoutRTLProperty() async throws {
+        let client = MockClient()
+        client.setResponse([
+            makeVariantComponent(nodeId: "1:1", name: "Size=Small", frameName: "Icons", componentSetName: "button"),
+        ], for: ComponentsEndpoint.self)
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "RTL")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("supports custom rtlProperty name")
+    func supportsCustomRTLProperty() async throws {
+        let client = MockClient()
+        client.setResponse([
+            makeVariantComponent(nodeId: "1:1", name: "Direction=yes", frameName: "Icons", componentSetName: "arrow"),
+        ], for: ComponentsEndpoint.self)
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "Direction")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.message.contains("Direction=yes") == true)
+    }
+
+    @Test("skips entries with nil rtlProperty (RTL disabled)")
+    func skipsEntriesWithNilRTLProperty() async throws {
+        let client = MockClient()
+        client.setResponse([
+            makeVariantComponent(nodeId: "1:1", name: "RTL=true", frameName: "Icons", componentSetName: "car"),
+        ], for: ComponentsEndpoint.self)
+
+        // No rtlProperty in config → entry skipped → no diagnostics
+        let config = makeIOSIconsConfig(frameName: "Icons")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("handles empty fileId with diagnostic")
+    func handlesEmptyFileId() async throws {
+        let client = MockClient()
+        let config = makeIOSIconsConfig(lightFileId: "", frameName: "Icons", rtlProperty: "RTL")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.message.contains("No figma.lightFileId") == true)
+    }
+
+    @Test("emits error when components API fails")
+    func emitsErrorWhenComponentsFail() async throws {
+        let client = MockClient()
+        client.setError(
+            NSError(domain: "test", code: -1, userInfo: [NSLocalizedDescriptionKey: "API error"]),
+            for: ComponentsEndpoint.self
+        )
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "RTL")
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.severity == .error)
+        #expect(diagnostics.first?.message.contains("Cannot fetch components") == true)
+    }
+
+    @Test("suggests adding value to rtlActiveValues or renaming in Figma")
+    func suggestsCorrectAction() {
+        let entries = [InvalidRTLVariantValueRule.IconEntry(
+            fileId: "abc", frameName: "Icons", pageName: nil, rtlProperty: "RTL",
+            rtlActiveValues: ["On"]
+        )]
+
+        let components = [
+            makeVariantComponent(nodeId: "1:1", name: "RTL=true", frameName: "Icons", componentSetName: "car"),
+        ]
+
+        let diagnostics = rule.validateRTLValues(components: components, entries: entries)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.suggestion?.contains("rtlActiveValues") == true)
+    }
+
+    @Test("passes when rtlActiveValues includes true/false")
+    func passesWithConfiguredTrueFalse() async throws {
+        let client = MockClient()
+        client.setResponse([
+            makeVariantComponent(nodeId: "1:1", name: "RTL=false", frameName: "Icons", componentSetName: "car"),
+            makeVariantComponent(nodeId: "1:2", name: "RTL=true", frameName: "Icons", componentSetName: "car"),
+        ], for: ComponentsEndpoint.self)
+
+        let config = makeIOSIconsConfig(frameName: "Icons", rtlProperty: "RTL", rtlActiveValues: ["true"])
+        let context = makeLintContext(config: config, client: client)
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("validValues builds correct set from active values")
+    func validValuesBuildCorrectSet() {
+        let valid = InvalidRTLVariantValueRule.validValues(for: ["On"])
+        #expect(valid == ["Off", "On"])
+
+        let valid2 = InvalidRTLVariantValueRule.validValues(for: ["true"])
+        #expect(valid2 == ["false", "true"])
+
+        let valid3 = InvalidRTLVariantValueRule.validValues(for: ["On", "true"])
+        #expect(valid3 == ["Off", "On", "false", "true"])
+
+        // Custom value not in knownPairs — only the value itself, no counterpart
+        let valid4 = InvalidRTLVariantValueRule.validValues(for: ["Active"])
+        #expect(valid4 == ["Active"])
+    }
+
+    @Test("validates mixed valid and invalid components in same set")
+    func mixedValidAndInvalidComponents() {
+        let entries = [InvalidRTLVariantValueRule.IconEntry(
+            fileId: "abc", frameName: "Icons", pageName: nil, rtlProperty: "RTL",
+            rtlActiveValues: ["On"]
+        )]
+
+        let components = [
+            makeVariantComponent(nodeId: "1:1", name: "RTL=Off", frameName: "Icons", componentSetName: "arrow"),
+            makeVariantComponent(nodeId: "1:2", name: "RTL=On", frameName: "Icons", componentSetName: "arrow"),
+            makeVariantComponent(nodeId: "2:1", name: "RTL=true", frameName: "Icons", componentSetName: "car"),
+        ]
+
+        let diagnostics = rule.validateRTLValues(components: components, entries: entries)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.message.contains("RTL=true") == true)
     }
 }
 

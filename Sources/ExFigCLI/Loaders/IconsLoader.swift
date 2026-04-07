@@ -47,6 +47,9 @@ struct IconsLoaderConfig {
     /// Figma component property name for RTL variant detection.
     let rtlProperty: String?
 
+    /// Values of the RTL variant property that indicate "active" RTL direction.
+    let rtlActiveValues: [String]?
+
     /// Creates config for a specific iOS icons entry.
     static func forIOS(entry: iOSIconsEntry, params: PKLConfig) -> IconsLoaderConfig {
         IconsLoaderConfig(
@@ -58,7 +61,8 @@ struct IconsLoaderConfig {
             renderModeDefaultSuffix: entry.renderModeDefaultSuffix,
             renderModeOriginalSuffix: entry.renderModeOriginalSuffix,
             renderModeTemplateSuffix: entry.renderModeTemplateSuffix,
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -73,7 +77,8 @@ struct IconsLoaderConfig {
             renderModeDefaultSuffix: nil,
             renderModeOriginalSuffix: nil,
             renderModeTemplateSuffix: nil,
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -88,7 +93,8 @@ struct IconsLoaderConfig {
             renderModeDefaultSuffix: nil,
             renderModeOriginalSuffix: nil,
             renderModeTemplateSuffix: nil,
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -103,7 +109,8 @@ struct IconsLoaderConfig {
             renderModeDefaultSuffix: nil,
             renderModeOriginalSuffix: nil,
             renderModeTemplateSuffix: nil,
-            rtlProperty: entry.rtlProperty
+            rtlProperty: entry.rtlProperty,
+            rtlActiveValues: entry.rtlActiveValues
         )
     }
 
@@ -118,7 +125,8 @@ struct IconsLoaderConfig {
             renderModeDefaultSuffix: nil,
             renderModeOriginalSuffix: nil,
             renderModeTemplateSuffix: nil,
-            rtlProperty: Component.defaultRTLProperty
+            rtlProperty: Component.defaultRTLProperty,
+            rtlActiveValues: ["On"]
         )
     }
 }
@@ -194,6 +202,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
             params: formatParams,
             filter: filter,
             rtlProperty: config.rtlProperty,
+            rtlActiveValues: config.rtlActiveValues,
             onBatchProgress: onBatchProgress
         )
 
@@ -235,6 +244,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
                         params: formatParams,
                         filter: filter,
                         rtlProperty: self.config.rtlProperty,
+                        rtlActiveValues: self.config.rtlActiveValues,
                         onBatchProgress: onBatchProgress
                     ).map { self.updateRenderMode($0) }
                     return (key, icons)
@@ -309,6 +319,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
             filter: filter,
             darkModeSuffix: darkSuffix,
             rtlProperty: config.rtlProperty,
+            rtlActiveValues: config.rtlActiveValues,
             onBatchProgress: onBatchProgress
         )
 
@@ -373,6 +384,7 @@ final class IconsLoader: ImageLoaderBase, @unchecked Sendable {
                         params: formatParams,
                         filter: filter,
                         rtlProperty: self.config.rtlProperty,
+                        rtlActiveValues: self.config.rtlActiveValues,
                         onBatchProgress: onBatchProgress
                     )
 

@@ -193,6 +193,11 @@ public struct ImagesSourceInput: Sendable {
     /// Default: `"RTL"`. Set to `nil` to disable variant-based RTL detection.
     public let rtlProperty: String?
 
+    /// Values of the RTL variant property that indicate "active" RTL direction.
+    /// Components with these values are skipped during export.
+    /// Default: `["On"]`.
+    public let rtlActiveValues: [String]?
+
     /// Name validation regex.
     public let nameValidateRegexp: String?
 
@@ -213,6 +218,7 @@ public struct ImagesSourceInput: Sendable {
         useSingleFile: Bool = false,
         darkModeSuffix: String = "_dark",
         rtlProperty: String? = "RTL",
+        rtlActiveValues: [String]? = ["On"],
         nameValidateRegexp: String? = nil,
         nameReplaceRegexp: String? = nil,
         penpotBaseURL: String? = nil
@@ -227,6 +233,7 @@ public struct ImagesSourceInput: Sendable {
         self.useSingleFile = useSingleFile
         self.darkModeSuffix = darkModeSuffix
         self.rtlProperty = rtlProperty
+        self.rtlActiveValues = rtlActiveValues
         self.nameValidateRegexp = nameValidateRegexp
         self.nameReplaceRegexp = nameReplaceRegexp
         self.penpotBaseURL = penpotBaseURL

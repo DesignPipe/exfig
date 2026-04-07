@@ -799,6 +799,31 @@ common = new Common.CommonConfig {
 }
 ```
 
+### RTL (Right-to-Left) Configuration
+
+Icons in a COMPONENT_SET can have an RTL variant property (e.g., `RTL=Off` and `RTL=On`).
+The "active" variant is skipped during export — platforms mirror the base icon at runtime.
+
+```pkl
+new iOS.IconsEntry {
+  // Property name in Figma (default: "RTL")
+  rtlProperty = "RTL"
+
+  // Values meaning "active RTL" — these variants are skipped.
+  // Default: new { "On" } (paired with "Off")
+  rtlActiveValues = new { "On" }
+
+  // If your Figma uses true/false instead of On/Off:
+  // rtlActiveValues = new { "true" }
+}
+```
+
+Set `rtlProperty = null` to disable RTL detection entirely.
+
+The `exfig lint` rule `invalid-rtl-variant-value` validates that RTL variant values
+match the configured `rtlActiveValues` and their known counterparts
+(On↔Off, true↔false, True↔False, Yes↔No, 0↔1).
+
 ### Images
 
 ```pkl

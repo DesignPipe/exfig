@@ -222,7 +222,8 @@ final class IconsLoaderConfigTests: XCTestCase {
             renderModeDefaultSuffix: nil,
             renderModeOriginalSuffix: nil,
             renderModeTemplateSuffix: nil,
-            rtlProperty: nil
+            rtlProperty: nil,
+            rtlActiveValues: nil
         )
 
         XCTAssertEqual(config.format, .svg)
@@ -238,7 +239,8 @@ final class IconsLoaderConfigTests: XCTestCase {
             renderModeDefaultSuffix: nil,
             renderModeOriginalSuffix: nil,
             renderModeTemplateSuffix: nil,
-            rtlProperty: nil
+            rtlProperty: nil,
+            rtlActiveValues: nil
         )
 
         XCTAssertEqual(config.format, .pdf)
@@ -263,7 +265,8 @@ final class IconsLoaderConfigTests: XCTestCase {
             renderModeDefaultSuffix: source.renderModeDefaultSuffix,
             renderModeOriginalSuffix: source.renderModeOriginalSuffix,
             renderModeTemplateSuffix: source.renderModeTemplateSuffix,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
         XCTAssertEqual(config.format, .svg, "SVG format must survive source → config conversion")
     }
@@ -283,7 +286,8 @@ final class IconsLoaderConfigTests: XCTestCase {
             renderModeDefaultSuffix: source.renderModeDefaultSuffix,
             renderModeOriginalSuffix: source.renderModeOriginalSuffix,
             renderModeTemplateSuffix: source.renderModeTemplateSuffix,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
         XCTAssertEqual(config.format, .pdf)
     }
@@ -307,9 +311,15 @@ final class IconsLoaderConfigTests: XCTestCase {
             renderModeDefaultSuffix: source.renderModeDefaultSuffix,
             renderModeOriginalSuffix: source.renderModeOriginalSuffix,
             renderModeTemplateSuffix: source.renderModeTemplateSuffix,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
         XCTAssertEqual(config.rtlProperty, "RTL", "rtlProperty must survive source → config conversion")
+        XCTAssertEqual(
+            config.rtlActiveValues,
+            source.rtlActiveValues,
+            "rtlActiveValues must survive source → config conversion"
+        )
     }
 
     func testRTLPropertyNilPreservedThroughEntryToSource() throws {
@@ -395,7 +405,8 @@ final class IconsLoaderConfigTests: XCTestCase {
             renderModeDefaultSuffix: source.renderModeDefaultSuffix,
             renderModeOriginalSuffix: source.renderModeOriginalSuffix,
             renderModeTemplateSuffix: source.renderModeTemplateSuffix,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
         XCTAssertEqual(config.pageName, "Outlined", "pageName must survive source → config conversion")
     }

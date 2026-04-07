@@ -94,6 +94,11 @@ public struct IconsSourceInput: Sendable {
     /// Default: `"RTL"`. Set to `nil` to disable variant-based RTL detection.
     public let rtlProperty: String?
 
+    /// Values of the RTL variant property that indicate "active" RTL direction.
+    /// Components with these values are skipped during export.
+    /// Default: `["On"]`.
+    public let rtlActiveValues: [String]?
+
     /// Name validation regex.
     public let nameValidateRegexp: String?
 
@@ -132,6 +137,7 @@ public struct IconsSourceInput: Sendable {
         renderModeOriginalSuffix: String? = nil,
         renderModeTemplateSuffix: String? = nil,
         rtlProperty: String? = "RTL",
+        rtlActiveValues: [String]? = ["On"],
         nameValidateRegexp: String? = nil,
         nameReplaceRegexp: String? = nil,
         penpotBaseURL: String? = nil,
@@ -154,6 +160,7 @@ public struct IconsSourceInput: Sendable {
         self.renderModeOriginalSuffix = renderModeOriginalSuffix
         self.renderModeTemplateSuffix = renderModeTemplateSuffix
         self.rtlProperty = rtlProperty
+        self.rtlActiveValues = rtlActiveValues
         self.nameValidateRegexp = nameValidateRegexp
         self.nameReplaceRegexp = nameReplaceRegexp
         self.penpotBaseURL = penpotBaseURL

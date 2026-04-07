@@ -23,6 +23,7 @@ public extension Android.IconsEntry {
             useSingleFile: darkFileId == nil && variablesDarkMode == nil,
             darkModeSuffix: "_dark",
             rtlProperty: rtlProperty,
+            rtlActiveValues: rtlActiveValues,
             nameValidateRegexp: nameValidateRegexp,
             nameReplaceRegexp: nameReplaceRegexp,
             penpotBaseURL: resolvedPenpotBaseURL,

@@ -28,6 +28,7 @@ Do NOT inject `colorsSource` at context construction time — it breaks multi-so
 - `Component.iconName`: uses `containingComponentSet.name` for variants, own `name` otherwise
 - `Component.codeConnectNodeId`: uses `containingComponentSet.nodeId` for variants, own `nodeId` otherwise (Figma Code Connect rejects variant node IDs)
 - `Component.defaultRTLProperty = "RTL"`: shared constant in ExFigCLI for the magic string
+- `rtlActiveValues: Listing<String>? = new { "On" }`: configurable per-entry list of variant values that mean "active RTL" (skipped during export). `shouldSkipAsRTLVariant(propertyName:activeValues:)` checks against this list. Known pairs (case-sensitive): Off↔On, off↔on, false↔true, False↔True, No↔Yes, no↔yes, 0↔1
 - PNG images intentionally do NOT carry `isRTL` — raster images skip mirroring by design
 - `buildPairedComponents` must use `iconName` (not `name`) — variant `name` is `"RTL=Off"`, not the icon name
 

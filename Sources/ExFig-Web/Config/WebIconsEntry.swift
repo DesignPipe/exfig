@@ -19,6 +19,7 @@ public extension Web.IconsEntry {
             useSingleFile: darkFileId == nil && variablesDarkMode == nil,
             darkModeSuffix: "_dark",
             rtlProperty: rtlProperty,
+            rtlActiveValues: rtlActiveValues,
             nameValidateRegexp: nameValidateRegexp,
             nameReplaceRegexp: nameReplaceRegexp,
             penpotBaseURL: resolvedPenpotBaseURL,

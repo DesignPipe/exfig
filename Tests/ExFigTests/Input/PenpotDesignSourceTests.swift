@@ -28,6 +28,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: "figma-file-id",
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -58,6 +59,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: nil,
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -88,6 +90,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: "figma-file-id",
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -118,6 +121,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: "figma-file-id",
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -146,6 +150,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: "figma-file-id",
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -176,6 +181,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: nil,
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil
@@ -204,6 +210,7 @@ final class FrameSourceResolvedSourceKindTests: XCTestCase {
             figmaPageName: nil,
             figmaFileId: nil,
             rtlProperty: nil,
+            rtlActiveValues: nil,
             variablesDarkMode: nil,
             nameValidateRegexp: nil,
             nameReplaceRegexp: nil

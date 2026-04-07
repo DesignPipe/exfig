@@ -265,7 +265,8 @@ final class ImagesLoaderConfigTests: XCTestCase {
             scales: source.scales,
             format: nil,
             sourceFormat: .png,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
         XCTAssertEqual(config.rtlProperty, "RTL", "rtlProperty must survive source → config conversion")
     }
@@ -342,7 +343,8 @@ final class ImagesLoaderConfigTests: XCTestCase {
             scales: source.scales,
             format: nil,
             sourceFormat: .png,
-            rtlProperty: source.rtlProperty
+            rtlProperty: source.rtlProperty,
+            rtlActiveValues: source.rtlActiveValues
         )
         XCTAssertEqual(config.pageName, "Marketing", "pageName must survive source → config conversion")
     }

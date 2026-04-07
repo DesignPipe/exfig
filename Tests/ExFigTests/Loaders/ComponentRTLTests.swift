@@ -100,6 +100,41 @@ final class ComponentRTLTests: XCTestCase {
         XCTAssertTrue(component.shouldSkipAsRTLVariant(propertyName: "RTL"))
     }
 
+    func testShouldSkip_customActiveValues_true() {
+        let component = makeComponent(name: "RTL=true")
+        XCTAssertTrue(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: ["true"]))
+    }
+
+    func testShouldNotSkip_customActiveValues_false() {
+        let component = makeComponent(name: "RTL=false")
+        XCTAssertFalse(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: ["true"]))
+    }
+
+    func testShouldSkip_customActiveValues_Yes() {
+        let component = makeComponent(name: "RTL=Yes")
+        XCTAssertTrue(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: ["Yes"]))
+    }
+
+    func testShouldNotSkip_customActiveValues_mismatch() {
+        let component = makeComponent(name: "RTL=On")
+        XCTAssertFalse(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: ["true"]))
+    }
+
+    func testShouldSkip_multipleActiveValues() {
+        let component = makeComponent(name: "RTL=true")
+        XCTAssertTrue(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: ["On", "true"]))
+    }
+
+    func testShouldSkip_nilActiveValues_defaultsToOn() {
+        let component = makeComponent(name: "RTL=On")
+        XCTAssertTrue(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: nil))
+    }
+
+    func testShouldNotSkip_nilActiveValues_trueNotSkipped() {
+        let component = makeComponent(name: "RTL=true")
+        XCTAssertFalse(component.shouldSkipAsRTLVariant(propertyName: "RTL", activeValues: nil))
+    }
+
     // MARK: - useRTL
 
     func testUseRTL_variantPropertyPresent_returnsTrue() {
