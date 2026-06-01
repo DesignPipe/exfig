@@ -63,5 +63,6 @@ extension LintEngine {
         DarkModeSuffixRule(),
         PathDataLengthRule(),
         InvalidRTLVariantValueRule(),
+        IconColorVariablesLintRule(),
     ])
 }

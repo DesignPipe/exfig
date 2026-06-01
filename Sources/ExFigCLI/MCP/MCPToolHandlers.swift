@@ -150,7 +150,8 @@
             let client = try await state.getClient()
             let cache = LintDataCache()
             let ui = TerminalUI(outputMode: .quiet)
-            let context = LintContext(config: config, client: client, cache: cache, ui: ui)
+            let lintConfig = try await LintConfigLoader.load(explicitPath: nil, mainConfigPath: configPath)
+            let context = LintContext(config: config, lintConfig: lintConfig, client: client, cache: cache, ui: ui)
 
             let engine = LintEngine.default
             let diagnostics = try await engine.run(

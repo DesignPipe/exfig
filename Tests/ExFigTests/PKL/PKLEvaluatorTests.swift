@@ -76,6 +76,20 @@ struct PKLEvaluatorTests {
         #expect(darkMode.variablesFileId == "lib-file-123")
     }
 
+    @Test("Evaluates lint-only PKL config")
+    func evaluatesLintOnlyConfig() async throws {
+        let configPath = Self.fixturesPath.appendingPathComponent("valid-lint-config.pkl")
+
+        let module = try await PKLEvaluator.evaluateLintConfig(configPath: configPath)
+
+        let policies = try #require(module.iconColorVariables)
+        #expect(policies.count == 2)
+        #expect(policies[0].selector.figmaPageName == "Outlined")
+        #expect(policies[0].paints == ["textandicon/Primary"])
+        #expect(policies[1].fills == ["doublecolor/Bg"])
+        #expect(policies[1].strokes == ["doublecolor/Outline"])
+    }
+
     @Test("All generated PKL types are registered")
     func allGeneratedPklTypesRegistered() {
         // Every registeredIdentifier in Generated/*.pkl.swift must be listed here AND
@@ -105,6 +119,10 @@ struct PKLEvaluatorTests {
             // Batch
             Batch.Module.registeredIdentifier,
             Batch.BatchConfig.registeredIdentifier,
+            // Lint
+            Lint.ModuleImpl.registeredIdentifier,
+            Lint.IconColorVariablesRule.registeredIdentifier,
+            Lint.IconSelector.registeredIdentifier,
             // iOS
             iOS.Module.registeredIdentifier,
             iOS.HeicOptions.registeredIdentifier,
@@ -137,7 +155,7 @@ struct PKLEvaluatorTests {
         ]
 
         #expect(
-            expectedIdentifiers.count == 43,
+            expectedIdentifiers.count == 46,
             """
             Generated PKL type count changed! After running codegen:pkl:
             1. Update registerPklTypes(_:) in PKLEvaluator.swift with new types

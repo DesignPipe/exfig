@@ -11,15 +11,17 @@ import Testing
 
 private func makeLintContext(
     config: PKLConfig,
-    client: MockClient
+    client: MockClient,
+    lintConfig: ExFigConfig.Lint.ModuleImpl? = nil
 ) -> LintContext {
     let ui = TerminalUI(outputMode: .quiet)
-    return LintContext(config: config, client: client, cache: LintDataCache(), ui: ui)
+    return LintContext(config: config, lintConfig: lintConfig, client: client, cache: LintDataCache(), ui: ui)
 }
 
 /// Creates a PKLConfig with iOS icons entries for lint testing.
 private func makeIOSIconsConfig(
     lightFileId: String = "abc123",
+    commonVariablesFileId: String? = nil,
     frameName: String? = nil,
     pageName: String? = nil,
     nameValidateRegexp: String? = nil,
@@ -42,6 +44,16 @@ private func makeIOSIconsConfig(
     }
 
     var commonParts: [String] = []
+    if let commonVariablesFileId {
+        commonParts.append("""
+        "variablesColors": {
+            "tokensFileId": "\(commonVariablesFileId)",
+            "tokensCollectionName": "Oymyakon",
+            "lightModeName": "Light",
+            "darkModeName": "Dark"
+        }
+        """)
+    }
     if let suffix = suffixDarkMode {
         commonParts.append("\"icons\": { \"suffixDarkMode\": { \"suffix\": \"\(suffix)\" } }")
     }
@@ -604,6 +616,117 @@ private func makeVariantComponent(
     return try! JSONCodec.decode(Component.self, from: Data(json.utf8))
 }
 
+private func makeLintConfig(
+    pageName: String? = nil,
+    frameName: String? = nil,
+    variablesFileId: String? = nil,
+    requireBound: Bool = false,
+    paints: [String]? = nil,
+    fills: [String]? = nil,
+    strokes: [String]? = nil
+) -> ExFigConfig.Lint.ModuleImpl {
+    var selectorParts: [String] = []
+    if let pageName { selectorParts.append("\"figmaPageName\": \"\(pageName)\"") }
+    if let frameName { selectorParts.append("\"figmaFrameName\": \"\(frameName)\"") }
+
+    var ruleParts = [
+        "\"selector\": { \(selectorParts.joined(separator: ", ")) }",
+        "\"requireBound\": \(requireBound)",
+    ]
+    if let variablesFileId {
+        ruleParts.append("\"variablesFileId\": \"\(variablesFileId)\"")
+    }
+    if let paints {
+        ruleParts.append("\"paints\": [\(paints.map { "\"\($0)\"" }.joined(separator: ", "))]")
+    }
+    if let fills {
+        ruleParts.append("\"fills\": [\(fills.map { "\"\($0)\"" }.joined(separator: ", "))]")
+    }
+    if let strokes {
+        ruleParts.append("\"strokes\": [\(strokes.map { "\"\($0)\"" }.joined(separator: ", "))]")
+    }
+
+    let json = """
+    {
+        "iconColorVariables": [
+            { \(ruleParts.joined(separator: ", ")) }
+        ]
+    }
+    """
+    // swiftlint:disable:next force_try
+    return try! JSONCodec.decode(ExFigConfig.Lint.ModuleImpl.self, from: Data(json.utf8))
+}
+
+private func makeIconNode(
+    rootFills: [String] = [],
+    childFills: [String] = [],
+    childStrokes: [String] = []
+) -> Node {
+    let rootFillsJson = rootFills.joined(separator: ", ")
+    let childFillsJson = childFills.joined(separator: ", ")
+    let childStrokesJson = childStrokes.joined(separator: ", ")
+    let json = """
+    {
+        "document": {
+            "id": "root",
+            "name": "icon",
+            "fills": [\(rootFillsJson)],
+            "children": [
+                {
+                    "id": "shape",
+                    "name": "shape",
+                    "fills": [\(childFillsJson)],
+                    "strokes": [\(childStrokesJson)]
+                }
+            ]
+        }
+    }
+    """
+    // swiftlint:disable:next force_try
+    return try! JSONCodec.decode(Node.self, from: Data(json.utf8))
+}
+
+private func boundPaint(variableId: String) -> String {
+    """
+    {
+        "type": "SOLID",
+        "color": { "r": 0.0, "g": 0.0, "b": 0.0, "a": 1.0 },
+        "boundVariables": {
+            "color": { "id": "\(variableId)", "type": "VARIABLE_ALIAS" }
+        }
+    }
+    """
+}
+
+private func unboundPaint() -> String {
+    """
+    {
+        "type": "SOLID",
+        "color": { "r": 0.0, "g": 0.0, "b": 0.0, "a": 1.0 }
+    }
+    """
+}
+
+private func invisiblePaint() -> String {
+    """
+    {
+        "type": "SOLID",
+        "opacity": 0,
+        "color": { "r": 0.0, "g": 0.0, "b": 0.0, "a": 1.0 }
+    }
+    """
+}
+
+private func imagePaint() -> String {
+    """
+    {
+        "type": "IMAGE",
+        "scaleMode": "FILL",
+        "imageRef": "image-ref"
+    }
+    """
+}
+
 // MARK: - LintEngine Tests
 
 struct LintEngineTests {
@@ -637,7 +760,7 @@ struct LintEngineTests {
         #expect(!diagnostics.contains { $0.ruleId == "component-not-frame" })
     }
 
-    @Test("default engine registers all 10 rules")
+    @Test("default engine registers all 11 rules")
     func defaultEngineHasAllRules() {
         let ruleIds = Set(LintEngine.default.rules.map(\.id))
         let expected: Set = [
@@ -651,6 +774,7 @@ struct LintEngineTests {
             "dark-mode-suffix",
             "path-data-length",
             "invalid-rtl-variant-value",
+            "icon-color-variables",
         ]
         #expect(ruleIds == expected)
     }
@@ -687,6 +811,298 @@ struct LintEngineTests {
         #expect(!diagnostics.contains { $0.ruleId == "dark-mode-suffix" })
         #expect(!diagnostics.contains { $0.ruleId == "deleted-variables" })
         #expect(!diagnostics.contains { $0.ruleId == "alias-chain-integrity" })
+    }
+}
+
+// MARK: - IconColorVariablesLintRule Tests
+
+struct IconColorVariablesLintRuleTests {
+    let rule = IconColorVariablesLintRule()
+
+    @Test("skips when lint config is absent")
+    func skipsWhenLintConfigAbsent() async throws {
+        let client = MockClient()
+        let config = makeIOSIconsConfig(frameName: "Icons")
+        let context = makeLintContext(config: config, client: client)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("paints allowlist applies to fills and strokes")
+    func paintsAllowlistAppliesToFillsAndStrokes() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_car", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(
+                childFills: [boundPaint(variableId: "VariableID:text")],
+                childStrokes: [boundPaint(variableId: "VariableID:text")]
+            ),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "text", name: "textandicon/Primary", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", paints: ["textandicon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("external library variable IDs resolve to local variable names")
+    func externalLibraryVariableIdsResolveToLocalVariableNames() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_car", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(
+                childFills: [boundPaint(variableId: "VariableID:library-key/2092:51")]
+            ),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "2092:51", name: "TextAndIcon/Primary", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", paints: ["TextAndIcon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("fills and strokes are checked separately")
+    func fillsAndStrokesAreCheckedSeparately() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_wallet", frameName: "Finance", pageName: "Double color"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(
+                childFills: [boundPaint(variableId: "VariableID:bg")],
+                childStrokes: [boundPaint(variableId: "VariableID:outline")]
+            ),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "bg", name: "doublecolor/Bg", valuesByMode: [:]),
+                (id: "outline", name: "doublecolor/Outline", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Double color"
+        )
+        let lintConfig = makeLintConfig(
+            pageName: "Double color",
+            fills: ["doublecolor/Bg"],
+            strokes: ["doublecolor/Outline"]
+        )
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("wrong variable emits diagnostic")
+    func wrongVariableEmitsDiagnostic() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_home", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(childFills: [boundPaint(variableId: "VariableID:wrong")]),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "expected", name: "textandicon/Primary", valuesByMode: [:]),
+                (id: "wrong", name: "doublecolor/Bg", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", paints: ["textandicon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.ruleId == "icon-color-variables")
+        #expect(diagnostics.first?.message.contains("doublecolor/Bg") == true)
+        #expect(diagnostics.first?.message.contains("textandicon/Primary") == true)
+    }
+
+    @Test("unbound paint is ignored by default")
+    func unboundPaintIsIgnoredByDefault() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_home", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(childFills: [unboundPaint()]),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "expected", name: "textandicon/Primary", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", paints: ["textandicon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("requireBound emits diagnostic for unbound paint")
+    func requireBoundEmitsDiagnosticForUnboundPaint() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_home", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(childFills: [unboundPaint()]),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "expected", name: "textandicon/Primary", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", requireBound: true, paints: ["textandicon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.message.contains("not bound") == true)
+    }
+
+    @Test("no variable source found emits configuration diagnostic")
+    func noVariableSourceFoundEmitsDiagnostic() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_home", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "other", name: "other/Variable", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", paints: ["textandicon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.count == 1)
+        #expect(diagnostics.first?.message.contains("Cannot resolve variable source") == true)
+    }
+
+    @Test("multiple matching variable sources are allowed")
+    func multipleMatchingVariableSourcesAreAllowed() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_home", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(childFills: [boundPaint(variableId: "VariableID:text")]),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "text", name: "textandicon/Primary", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(
+            pageName: "Outlined",
+            variablesFileId: "other-variables-file",
+            paints: ["textandicon/Primary"]
+        )
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
+    }
+
+    @Test("ignores root background invisible and image paints")
+    func ignoresRootBackgroundInvisibleAndImagePaints() async throws {
+        let client = MockClient()
+        client.setResponse([
+            Component.make(nodeId: "1:1", name: "ic_home", frameName: "Actions", pageName: "Outlined"),
+        ], for: ComponentsEndpoint.self)
+        client.setResponse([
+            "1:1": makeIconNode(
+                rootFills: [unboundPaint()],
+                childFills: [invisiblePaint(), imagePaint(), boundPaint(variableId: "VariableID:text")]
+            ),
+        ], for: NodesEndpoint.self)
+        client.setResponse(VariablesMeta.make(
+            variables: [
+                (id: "text", name: "textandicon/Primary", valuesByMode: [:]),
+            ]
+        ), for: VariablesEndpoint.self)
+
+        let config = makeIOSIconsConfig(
+            lightFileId: "icons-file",
+            commonVariablesFileId: "variables-file",
+            pageName: "Outlined"
+        )
+        let lintConfig = makeLintConfig(pageName: "Outlined", paints: ["textandicon/Primary"])
+        let context = makeLintContext(config: config, client: client, lintConfig: lintConfig)
+
+        let diagnostics = try await rule.check(context: context)
+
+        #expect(diagnostics.isEmpty)
     }
 }
 

@@ -298,6 +298,9 @@ Validate your Figma file structure against your PKL config before exporting:
 # Lint with default rules
 exfig lint -i exfig.pkl
 
+# Add lint-only policies from a separate config
+exfig lint -i exfig.pkl --lint-config lint.pkl
+
 # Only check specific rules
 exfig lint -i exfig.pkl --rules naming-convention,deleted-variables
 
@@ -307,17 +310,18 @@ exfig lint -i exfig.pkl --format json --severity error
 
 ### Available Rules
 
-| Rule                       | Severity | Description                                            |
-| -------------------------- | -------- | ------------------------------------------------------ |
-| `frame-page-match`         | error    | Frame/page names in config exist in Figma file         |
-| `naming-convention`        | error    | Component names match `nameValidateRegexp` patterns    |
-| `component-not-frame`      | error    | Configured frames contain published components         |
-| `duplicate-component-names`| error    | No duplicate component names in configured frames      |
-| `deleted-variables`        | warning  | No `deletedButReferenced` variables in collections     |
-| `alias-chain-integrity`    | warning  | Variable alias chains resolve without broken refs      |
-| `dark-mode-variables`      | error    | With `variablesDarkMode`, fills bound to Variables     |
-| `dark-mode-suffix`         | warning  | With `suffixDarkMode`, light components have dark pair |
-| `path-data-length`         | error    | Icon SVG pathData within 32,767-byte AAPT limit        |
+| Rule                        | Severity | Description                                            |
+| --------------------------- | -------- | ------------------------------------------------------ |
+| `frame-page-match`          | error    | Frame/page names in config exist in Figma file         |
+| `naming-convention`         | error    | Component names match `nameValidateRegexp` patterns    |
+| `component-not-frame`       | error    | Configured frames contain published components         |
+| `duplicate-component-names` | error    | No duplicate component names in configured frames      |
+| `deleted-variables`         | warning  | No `deletedButReferenced` variables in collections     |
+| `alias-chain-integrity`     | warning  | Variable alias chains resolve without broken refs      |
+| `dark-mode-variables`       | error    | With `variablesDarkMode`, fills bound to Variables     |
+| `dark-mode-suffix`          | warning  | With `suffixDarkMode`, light components have dark pair |
+| `path-data-length`          | error    | Icon SVG pathData within 32,767-byte AAPT limit        |
+| `icon-color-variables`      | error    | Icon paints use configured Figma Variables             |
 
 ## Help and Version
 

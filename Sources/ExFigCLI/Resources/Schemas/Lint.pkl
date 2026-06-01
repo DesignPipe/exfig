@@ -1,0 +1,45 @@
+/// Lint-only configuration schema.
+///
+/// This module is intentionally separate from ExFig export configuration.
+/// It describes additional design policies for `exfig lint` without changing
+/// what ExFig exports.
+open module Lint
+
+/// Selects icon entries from the main ExFig config.
+class IconSelector {
+  /// Figma file ID to match.
+  figmaFileId: String?
+
+  /// Figma page name to match.
+  figmaPageName: String?
+
+  /// Figma frame name to match.
+  figmaFrameName: String?
+
+  /// Export assets folder to match.
+  assetsFolder: String?
+}
+
+/// Expected Figma Variables for icon paints.
+class IconColorVariablesRule {
+  /// Selects existing icon entries from the main ExFig config.
+  selector: IconSelector = new IconSelector {}
+
+  /// Optional variable file override. Normally inferred from the main config.
+  variablesFileId: String?
+
+  /// Whether matching paints must be bound to a Figma Variable.
+  requireBound: Boolean = false
+
+  /// Allowed variable names for both fills and strokes.
+  paints: Listing<String>?
+
+  /// Allowed variable names for fills.
+  fills: Listing<String>?
+
+  /// Allowed variable names for strokes.
+  strokes: Listing<String>?
+}
+
+/// Icon color variable lint policies.
+iconColorVariables: Listing<IconColorVariablesRule>?

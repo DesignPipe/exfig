@@ -1,0 +1,19 @@
+/// Test fixture: valid lint-only ExFig configuration.
+amends "../../../../Sources/ExFigCLI/Resources/Schemas/Lint.pkl"
+
+iconColorVariables = new Listing {
+  new IconColorVariablesRule {
+    selector = new IconSelector {
+      figmaPageName = "Outlined"
+    }
+    paints = new { "textandicon/Primary" }
+  }
+
+  new IconColorVariablesRule {
+    selector = new IconSelector {
+      figmaPageName = "Double color"
+    }
+    fills = new { "doublecolor/Bg" }
+    strokes = new { "doublecolor/Outline" }
+  }
+}
