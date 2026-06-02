@@ -6,6 +6,9 @@
 open module Lint
 
 /// Selects icon entries from the main ExFig config.
+///
+/// All fields are optional and combined with AND. An empty selector (the default,
+/// `new IconSelector {}`) matches every icon entry.
 class IconSelector {
   /// Figma file ID to match.
   figmaFileId: String?
@@ -23,21 +26,24 @@ class IconSelector {
 /// Expected Figma Variables for icon paints.
 class IconColorVariablesRule {
   /// Selects existing icon entries from the main ExFig config.
+  /// The default empty selector matches all icon entries.
   selector: IconSelector = new IconSelector {}
 
   /// Optional variable file override. Normally inferred from the main config.
   variablesFileId: String?
 
   /// Whether matching paints must be bound to a Figma Variable.
+  /// Only enforced for a role (fill/stroke) that has at least one allowed variable name configured.
   requireBound: Boolean = false
 
-  /// Allowed variable names for both fills and strokes.
+  /// Allowed variable names applied to both fills and strokes.
+  /// Merged with the role-specific `fills`/`strokes` lists (not mutually exclusive with them).
   paints: Listing<String>?
 
-  /// Allowed variable names for fills.
+  /// Allowed variable names for fills (in addition to `paints`).
   fills: Listing<String>?
 
-  /// Allowed variable names for strokes.
+  /// Allowed variable names for strokes (in addition to `paints`).
   strokes: Listing<String>?
 }
 
