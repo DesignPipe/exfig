@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.0] - 2026-06-02
+
+### Features
+
+- **lint**: Add icon color variable policies  by @alexey1312 in [#83](https://github.com/DesignPipe/exfig/pull/83)
+
+
 ## [3.4.0] - 2026-05-09
 
 ### Documentation
