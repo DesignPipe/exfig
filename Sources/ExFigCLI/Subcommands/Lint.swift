@@ -15,6 +15,7 @@ extension ExFigCommand {
 
             Examples:
               exfig lint -i exfig.pkl                              # Lint one config
+              exfig lint -i exfig.pkl --lint-config lint.pkl        # Add lint-only policies
               exfig lint -i exfig.pkl --rules naming-convention    # Filter rules
               exfig lint -i exfig.pkl --format json                # JSON output for CI
               exfig lint -i exfig.pkl --severity error             # Only errors
@@ -38,6 +39,12 @@ extension ExFigCommand {
 
         @Option(name: .long, help: "Minimum severity: error, warning, or info")
         var severity: LintSeverity = .info
+
+        @Option(
+            name: .long,
+            help: "Path to optional lint-only PKL config. Defaults to lint.pkl next to the input config."
+        )
+        var lintConfig: String?
 
         func run() async throws {
             // JSON mode: force quiet to keep stdout clean for machine parsing
@@ -65,7 +72,17 @@ extension ExFigCommand {
             )
 
             let cache = LintDataCache()
-            let context = LintContext(config: options.params, client: client, cache: cache, ui: ui)
+            let overlayConfig = try await LintConfigLoader.load(
+                explicitPath: lintConfig,
+                mainConfigPath: options.input
+            )
+            let context = LintContext(
+                config: options.params,
+                lintConfig: overlayConfig,
+                client: client,
+                cache: cache,
+                ui: ui
+            )
             let engine = LintEngine.default
 
             let diagnostics = try await ui.withSpinnerMessage(

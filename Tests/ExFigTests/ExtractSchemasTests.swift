@@ -98,6 +98,7 @@ final class ExtractSchemasTests: XCTestCase {
             "Android.pkl",
             "Flutter.pkl",
             "Web.pkl",
+            "Lint.pkl",
             "PklProject",
         ]
         XCTAssertEqual(SchemaExtractor.schemaFiles.sorted(), expected.sorted())

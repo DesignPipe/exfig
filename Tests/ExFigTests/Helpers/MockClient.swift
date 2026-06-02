@@ -17,20 +17,63 @@ public final class MockClient: Client, @unchecked Sendable {
 
     public init() {}
 
+    // MARK: - Keys
+
+    /// Per-endpoint-type key (file-agnostic). Used as the fallback when no file-specific
+    /// response is configured.
+    private func key(forType endpointType: Any.Type) -> String {
+        String(describing: endpointType)
+    }
+
+    /// File-specific key. Lets a single mock return different responses for different file IDs
+    /// (e.g. cross-file variable resolution), which the type-only key cannot express.
+    private func key(forType endpointType: Any.Type, fileId: String) -> String {
+        "\(endpointType)#\(fileId)"
+    }
+
+    /// Extracts the `{fileId}` path segment from a Figma `…/v1/files/{fileId}/…` request URL.
+    private func fileId(from request: URLRequest) -> String? {
+        guard let segments = request.url?.pathComponents,
+              let filesIndex = segments.firstIndex(of: "files"),
+              segments.index(after: filesIndex) < segments.endIndex
+        else { return nil }
+        return segments[segments.index(after: filesIndex)]
+    }
+
     // MARK: - Configuration
 
-    /// Sets a successful response for a specific endpoint type.
+    /// Sets a successful response for a specific endpoint type (any file ID).
     public func setResponse<T: Endpoint>(_ response: T.Content, for endpointType: T.Type) {
-        let key = String(describing: endpointType)
+        let key = key(forType: endpointType)
         queue.sync {
             self._responses[key] = response
             self._errors.removeValue(forKey: key)
         }
     }
 
-    /// Sets an error to throw for a specific endpoint type.
+    /// Sets a successful response for a specific endpoint type scoped to a single file ID.
+    /// Takes precedence over the file-agnostic response when the request targets `fileId`.
+    public func setResponse<T: Endpoint>(_ response: T.Content, for endpointType: T.Type, fileId: String) {
+        let key = key(forType: endpointType, fileId: fileId)
+        queue.sync {
+            self._responses[key] = response
+            self._errors.removeValue(forKey: key)
+        }
+    }
+
+    /// Sets an error to throw for a specific endpoint type (any file ID).
     public func setError(_ error: any Error, for endpointType: (some Endpoint).Type) {
-        let key = String(describing: endpointType)
+        let key = key(forType: endpointType)
+        queue.sync {
+            self._errors[key] = error
+            self._responses.removeValue(forKey: key)
+        }
+    }
+
+    /// Sets an error to throw for a specific endpoint type scoped to a single file ID.
+    /// Takes precedence over the file-agnostic configuration when the request targets `fileId`.
+    public func setError(_ error: any Error, for endpointType: (some Endpoint).Type, fileId: String) {
+        let key = key(forType: endpointType, fileId: fileId)
         queue.sync {
             self._errors[key] = error
             self._responses.removeValue(forKey: key)
@@ -56,9 +99,11 @@ public final class MockClient: Client, @unchecked Sendable {
     // MARK: - Client Protocol
 
     public func request<T: Endpoint>(_ endpoint: T) async throws -> T.Content {
-        let key = String(describing: type(of: endpoint))
+        let typeKey = key(forType: type(of: endpoint))
         let baseURL = FigmaClient.baseURL
         let request = try endpoint.makeRequest(baseURL: baseURL)
+        // File-specific configuration (if any) takes precedence over the file-agnostic one.
+        let fileKey = fileId(from: request).map { key(forType: type(of: endpoint), fileId: $0) }
 
         // Record timestamp and get delay (thread-safe)
         let delay = queue.sync { () -> TimeInterval in
@@ -73,14 +118,12 @@ public final class MockClient: Client, @unchecked Sendable {
         }
 
         return try queue.sync {
-            if let error = self._errors[key] {
-                throw error
+            // Resolve in precedence order: file-specific, then file-agnostic.
+            for candidate in [fileKey, typeKey].compactMap({ $0 }) {
+                if let error = self._errors[candidate] { throw error }
+                if let response = self._responses[candidate] as? T.Content { return response }
             }
-
-            guard let response = self._responses[key] as? T.Content else {
-                throw MockClientError.noResponseConfigured(endpoint: key)
-            }
-            return response
+            throw MockClientError.noResponseConfigured(endpoint: typeKey)
         }
     }
 

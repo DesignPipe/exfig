@@ -15,6 +15,14 @@ If `PklProject.deps.json` is missing, run: `cd Sources/ExFigCLI/Resources/Schema
 Schemas: `Sources/ExFigCLI/Resources/Schemas/{ExFig,Common,Figma,iOS,Android,Flutter,Web}.pkl`
 Output: `Sources/ExFigConfig/Generated/*.pkl.swift` (committed to repo)
 
+## Codegen Side Effects
+
+`codegen:pkl` rewrites ALL 9 `Generated/*.pkl.swift` even when one schema changed, and the
+generator omits the trailing newline. This (a) breaks the `hk` `newlines` (end-of-file-fixer)
+hook and (b) leaves 8 unrelated files with a 1-line newline-only diff.
+Fix: `git checkout --` the files whose schema you didn't touch, then
+`./bin/mise exec -- hk util end-of-file-fixer --fix Sources/ExFigConfig/Generated/<Changed>.pkl.swift`.
+
 ## Type Mapping
 
 | PKL | Swift Generated |

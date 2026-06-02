@@ -7,7 +7,7 @@ import Foundation
 enum SchemaExtractor {
     static let schemaFiles = [
         "ExFig.pkl", "Figma.pkl", "Common.pkl",
-        "iOS.pkl", "Android.pkl", "Flutter.pkl", "Web.pkl",
+        "iOS.pkl", "Android.pkl", "Flutter.pkl", "Web.pkl", "Lint.pkl",
         "PklProject",
     ]
 

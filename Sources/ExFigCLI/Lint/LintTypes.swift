@@ -64,6 +64,8 @@ actor LintDataCache {
 struct LintContext {
     /// The resolved PKL configuration.
     let config: ExFig.ModuleImpl
+    /// Optional lint-only overlay configuration.
+    let lintConfig: ExFigConfig.Lint.ModuleImpl?
     /// Figma API client.
     let client: any FigmaAPI.Client
     /// Shared cache for Figma API responses across rules.

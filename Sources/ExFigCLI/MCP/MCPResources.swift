@@ -14,6 +14,7 @@
             "Android.pkl",
             "Flutter.pkl",
             "Web.pkl",
+            "Lint.pkl",
         ]
 
         // MARK: - Template entries

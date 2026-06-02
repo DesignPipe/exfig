@@ -61,6 +61,10 @@ public enum PKLEvaluator {
             // Batch
             Batch.Module.self,
             Batch.BatchConfig.self,
+            // Lint
+            Lint.ModuleImpl.self,
+            Lint.IconColorVariablesRule.self,
+            Lint.IconSelector.self,
             // iOS
             iOS.Module.self,
             iOS.HeicOptions.self,
@@ -117,6 +121,30 @@ public enum PKLEvaluator {
             try await evaluator.evaluateModule(
                 source: .path(configPath.path),
                 as: ExFig.ModuleImpl.self
+            )
+        }
+    }
+
+    /// Evaluates a lint-only PKL configuration file.
+    /// - Parameter configPath: Path to the lint .pkl configuration file
+    /// - Returns: Evaluated lint module
+    /// - Throws: `PKLError.configNotFound` if file doesn't exist,
+    ///           or PklSwift evaluation errors on syntax/type issues
+    public static func evaluateLintConfig(configPath: URL) async throws -> Lint.ModuleImpl {
+        guard FileManager.default.fileExists(atPath: configPath.path) else {
+            throw PKLError.configNotFound(path: configPath.path)
+        }
+
+        _ = _typeRegistration
+
+        var options = EvaluatorOptions.preconfigured
+        options.allowedModules = allowedModules
+        options.allowedResources = allowedResources
+
+        return try await PklSwift.withEvaluator(options: options) { evaluator in
+            try await evaluator.evaluateModule(
+                source: .path(configPath.path),
+                as: Lint.ModuleImpl.self
             )
         }
     }

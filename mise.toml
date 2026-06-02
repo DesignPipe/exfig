@@ -199,6 +199,7 @@ pkl run \
   "$SCHEMAS_DIR/Android.pkl" \
   "$SCHEMAS_DIR/Flutter.pkl" \
   "$SCHEMAS_DIR/Web.pkl" \
+  "$SCHEMAS_DIR/Lint.pkl" \
   -o "$TEMP_DIR/"
 
 # Only replace files on success
