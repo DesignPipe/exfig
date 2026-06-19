@@ -23,7 +23,6 @@ url = "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_
 [tools.actionlint."platforms.macos-arm64"]
 checksum = "sha256:a21ba7366d8329e7223faee0ed69eb13da27fe8acabb356bb7eb0b7f1e1cb6d8"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_1.7.11_darwin_arm64.tar.gz"
-provenance = "github-attestations"
 
 [tools.actionlint."platforms.macos-x64"]
 checksum = "sha256:17ffc17fed8f0258ef6ad4aed932d3272464c7ef7d64e1cb0d65aa97c9752107"
@@ -69,19 +68,33 @@ url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-x86_64-p
 version = "2.12.0"
 backend = "aqua:orhun/git-cliff"
 
-[[tools."github:alexey1312/swift-index"]]
-version = "0.3.0"
-backend = "github:alexey1312/swift-index"
+[tools.git-cliff."platforms.linux-arm64"]
+checksum = "sha256:a2d262b389aed349e0564aaaa38a44015c98a951048923b086d6cf732f6dbbaf"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-aarch64-unknown-linux-musl.tar.gz"
 
-[tools."github:alexey1312/swift-index"."platforms.macos-arm64"]
-checksum = "sha256:67dd926c16b1447d8314d0106332a3dd3bb66d05e897de9800e69cfa2597f081"
-url = "https://github.com/alexey1312/swift-index/releases/download/v0.3.0/swiftindex-macos.zip"
-url_api = "https://api.github.com/repos/alexey1312/swift-index/releases/assets/349689493"
+[tools.git-cliff."platforms.linux-arm64-musl"]
+checksum = "sha256:a2d262b389aed349e0564aaaa38a44015c98a951048923b086d6cf732f6dbbaf"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-aarch64-unknown-linux-musl.tar.gz"
 
-[tools."github:alexey1312/swift-index"."platforms.macos-x64"]
-checksum = "sha256:67dd926c16b1447d8314d0106332a3dd3bb66d05e897de9800e69cfa2597f081"
-url = "https://github.com/alexey1312/swift-index/releases/download/v0.3.0/swiftindex-macos.zip"
-url_api = "https://api.github.com/repos/alexey1312/swift-index/releases/assets/349689493"
+[tools.git-cliff."platforms.linux-x64"]
+checksum = "sha256:c89a7bc55f3c51f391938aa3fa560125109695c1930d927879daea68dd786420"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-x86_64-unknown-linux-musl.tar.gz"
+
+[tools.git-cliff."platforms.linux-x64-musl"]
+checksum = "sha256:c89a7bc55f3c51f391938aa3fa560125109695c1930d927879daea68dd786420"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-x86_64-unknown-linux-musl.tar.gz"
+
+[tools.git-cliff."platforms.macos-arm64"]
+checksum = "sha256:2ae72a0061bee98d0e375f2ea8e0f4b23b4915ac2e37fa45a705066de49b43a0"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-aarch64-apple-darwin.tar.gz"
+
+[tools.git-cliff."platforms.macos-x64"]
+checksum = "sha256:fd4bce35ea8a6f3af6ac4891073781ca24c654c36c83c865bc30bab332c05a14"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-x86_64-apple-darwin.tar.gz"
+
+[tools.git-cliff."platforms.windows-x64"]
+checksum = "sha256:f2b8c692d9488c3313d7786e2099976151c10fd8f76580b12d045bb9683a8379"
+url = "https://github.com/orhun/git-cliff/releases/download/v2.12.0/git-cliff-2.12.0-x86_64-pc-windows-msvc.zip"
 
 [[tools.hk]]
 version = "1.39.0"
@@ -110,10 +123,6 @@ url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-aarch64-apple-darw
 [tools.hk."platforms.windows-x64"]
 checksum = "sha256:4fdbc4dfe17191fdc2157e2ddb9cf32d0e9fb4c6c0cddae2f8f2ea4b0b351fca"
 url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-x86_64-pc-windows-msvc.zip"
-
-[[tools."npm:@mixedbread/mgrep"]]
-version = "0.1.8"
-backend = "npm:@mixedbread/mgrep"
 
 [[tools.pkl]]
 version = "0.31.1"
@@ -147,10 +156,6 @@ url = "https://github.com/apple/pkl/releases/download/0.31.1/pkl-macos-amd64"
 checksum = "sha256:a8834481667325b44c539dbb758d7365a16389070f343c04b639bbe525ede013"
 url = "https://github.com/apple/pkl/releases/download/0.31.1/pkl-windows-amd64.exe"
 
-[[tools.swift]]
-version = "6.2.3"
-backend = "core:swift"
-
 [[tools.swiftformat]]
 version = "0.60.1"
 backend = "asdf:swiftformat"
@@ -163,7 +168,15 @@ backend = "aqua:realm/SwiftLint"
 checksum = "sha256:104dedff762157f5cff7752f1cc2a289b60f3ea677e72d651c6f3a3287fdd948"
 url = "https://github.com/realm/SwiftLint/releases/download/0.63.2/swiftlint_linux_arm64.zip"
 
+[tools.swiftlint."platforms.linux-arm64-musl"]
+checksum = "sha256:104dedff762157f5cff7752f1cc2a289b60f3ea677e72d651c6f3a3287fdd948"
+url = "https://github.com/realm/SwiftLint/releases/download/0.63.2/swiftlint_linux_arm64.zip"
+
 [tools.swiftlint."platforms.linux-x64"]
+checksum = "sha256:dd1017cfd20a1457f264590bcb5875a6ee06cd75b9a9d4f77cd43a552499143b"
+url = "https://github.com/realm/SwiftLint/releases/download/0.63.2/swiftlint_linux_amd64.zip"
+
+[tools.swiftlint."platforms.linux-x64-musl"]
 checksum = "sha256:dd1017cfd20a1457f264590bcb5875a6ee06cd75b9a9d4f77cd43a552499143b"
 url = "https://github.com/realm/SwiftLint/releases/download/0.63.2/swiftlint_linux_amd64.zip"
 
