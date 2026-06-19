@@ -95,6 +95,37 @@ final class iOSEntryOverrideResolutionTests: XCTestCase {
         let json = "{ \(fields.joined(separator: ", ")) }"
         return try JSONDecoder().decode(iOSImagesEntry.self, from: Data(json.utf8))
     }
+
+    // MARK: - SVG→WebP support
+
+    func testImagesEntry_webpOutputFormat_bridgesToCoreWebp() throws {
+        let json = """
+        { "nameStyle": "camelCase", "assetsFolder": "Images", \
+        "sourceFormat": "svg", "outputFormat": "webp" }
+        """
+        let entry = try JSONDecoder().decode(iOSImagesEntry.self, from: Data(json.utf8))
+
+        XCTAssertEqual(entry.effectiveSourceFormat, .svg)
+        XCTAssertEqual(entry.effectiveOutputFormat, .webp)
+    }
+
+    func testImagesEntry_webpOptions_bridgeToConverterOptions() throws {
+        let json = """
+        { "nameStyle": "camelCase", "assetsFolder": "Images", \
+        "outputFormat": "webp", \
+        "webpOptions": { "encoding": "lossless", "quality": 80 } }
+        """
+        let entry = try JSONDecoder().decode(iOSImagesEntry.self, from: Data(json.utf8))
+
+        let opts = entry.webpConverterOptions
+        XCTAssertEqual(opts?.lossless, true)
+        XCTAssertEqual(opts?.quality, 80)
+    }
+
+    func testImagesEntry_noWebpOptions_returnsNilConverterOptions() throws {
+        let entry = try makeIOSImagesEntry()
+        XCTAssertNil(entry.webpConverterOptions)
+    }
 }
 
 // MARK: - Android Entry Override Resolution

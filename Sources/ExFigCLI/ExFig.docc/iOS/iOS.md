@@ -14,7 +14,7 @@ ExFig exports design resources from Figma to iOS projects:
 
 - **Colors**: Color Sets in Assets.xcassets with UIColor/Color extensions
 - **Icons**: PDF or SVG icons in Image Sets with UIImage/Image extensions
-- **Images**: Multi-scale PNG or HEIC images with UIImage/Image extensions
+- **Images**: Multi-scale PNG, HEIC, or WebP images with UIImage/Image extensions
 - **Typography**: UIFont/Font extensions with text style configurations
 
 ## Quick Start

@@ -1,6 +1,6 @@
 # iOS Images Export
 
-Export raster images from Figma to Xcode Image Sets as PNG or HEIC files with multiple scales.
+Export raster images from Figma to Xcode Image Sets as PNG, HEIC, or WebP files with multiple scales.
 
 @Metadata {
     @PageImage(purpose: icon, source: "images-icon", alt: "iOS images export")
@@ -14,6 +14,7 @@ ExFig exports images as:
 
 - **PNG files** at multiple scales (@1x, @2x, @3x) - default
 - **HEIC files** for ~40-50% smaller file sizes (macOS only)
+- **WebP files** for compact illustrations from SVG source (iOS 14+)
 - **Multi-idiom support** (iPhone, iPad, Mac)
 - **Dark Mode variants**
 - **Swift extensions** for UIImage (UIKit) and Image (SwiftUI)
@@ -224,6 +225,42 @@ ios = new iOS.iOSConfig {
   }
 }
 ```
+
+## WebP Output Format
+
+WebP offers strong compression for illustrations and is the same output format used on
+Android. On iOS it is the natural pairing for vector illustrations fetched as SVG: the SVG
+is rasterized locally and encoded as WebP.
+
+### Configuration
+
+```pkl
+ios = new iOS.iOSConfig {
+  images = new iOS.ImagesEntry {
+    sourceFormat = "svg"    // Fetch SVG, rasterize locally
+    outputFormat = "webp"   // Encode as WebP
+    webpOptions = new Common.WebpOptions {
+      encoding = "lossy"    // or "lossless"
+      quality = 80          // 0-100, lossy only
+    }
+  }
+}
+```
+
+### Encoding Options
+
+| Encoding   | Quality | File Size | Use Case                       |
+| ---------- | ------- | --------- | ------------------------------ |
+| `lossy`    | 80      | Smallest  | Illustrations, complex artwork |
+| `lossy`    | 100     | Small     | High-quality artwork           |
+| `lossless` | N/A     | Medium    | Pixel-perfect output           |
+
+### Platform Availability
+
+WebP image assets in asset catalogs require iOS 14 / macOS 11 or later at runtime. Set a
+deployment target of iOS 14+ before switching illustrations to WebP. PNG source is also
+supported (`sourceFormat = "png"` + `outputFormat = "webp"`), but SVG source is the
+intended pairing for illustrations.
 
 ## Image Scales
 

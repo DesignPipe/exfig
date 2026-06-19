@@ -303,6 +303,7 @@ public struct iOSImagesExporter: ImagesExporter {
         let rasterFiles = try await context.rasterizeSVGs(
             downloadedSVGs, scales: scales, to: outputFormat,
             heicOptions: outputFormat == .heic ? entry.heicConverterOptions : nil,
+            webpOptions: outputFormat == .webp ? entry.webpConverterOptions : nil,
             progressTitle: "Rasterizing SVGs to \(outputFormat.rawValue.uppercased())"
         )
 

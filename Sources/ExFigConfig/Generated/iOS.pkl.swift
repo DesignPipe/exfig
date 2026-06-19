@@ -20,9 +20,11 @@ extension iOS {
     /// Output format for iOS images in asset catalogs.
     /// - `png`: Standard PNG format (default, maximum compatibility)
     /// - `heic`: HEIC format (~40-50% smaller, iOS 12+, macOS only for encoding)
+    /// - `webp`: WebP format (iOS 14+); pairs with `sourceFormat = "svg"` to rasterize SVG illustrations to WebP
     public enum ImageOutputFormat: String, CaseIterable, CodingKeyRepresentable, Decodable, Hashable, Sendable {
         case png = "png"
         case heic = "heic"
+        case webp = "webp"
     }
 
     /// iOS platform configuration for ExFig.
@@ -353,6 +355,9 @@ extension iOS {
         /// HEIC encoding options. Only used when outputFormat is heic.
         public var heicOptions: HeicOptions?
 
+        /// WebP encoding options. Only used when outputFormat is webp.
+        public var webpOptions: Common.WebpOptions?
+
         /// Override path to .xcassets folder for this entry.
         /// When set, overrides `iOSConfig.xcassetsPath`.
         public var xcassetsPath: String?
@@ -429,6 +434,7 @@ extension iOS {
             sourceFormat: Common.SourceFormat?,
             outputFormat: ImageOutputFormat?,
             heicOptions: HeicOptions?,
+            webpOptions: Common.WebpOptions?,
             xcassetsPath: String?,
             templatesPath: String?,
             renderMode: XcodeRenderMode?,
@@ -455,6 +461,7 @@ extension iOS {
             self.sourceFormat = sourceFormat
             self.outputFormat = outputFormat
             self.heicOptions = heicOptions
+            self.webpOptions = webpOptions
             self.xcassetsPath = xcassetsPath
             self.templatesPath = templatesPath
             self.renderMode = renderMode

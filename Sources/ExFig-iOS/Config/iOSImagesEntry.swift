@@ -106,6 +106,12 @@ public extension iOS.ImagesEntry {
         return HeicConverterOptions(encoding: encoding, quality: opts.quality)
     }
 
+    /// Converts entry's WebP options to protocol-level WebpConverterOptions.
+    var webpConverterOptions: WebpConverterOptions? {
+        guard let opts = webpOptions else { return nil }
+        return WebpConverterOptions(lossless: opts.encoding == .lossless, quality: opts.quality)
+    }
+
     // MARK: - Entry-Level Override Resolution
 
     /// Resolved xcassets path: entry override or platform config fallback.

@@ -469,6 +469,11 @@ images = new iOS.ImagesEntry {
   //   encoding = "lossy"
   //   quality = 90
   // }
+  // outputFormat = "webp"           // requires iOS 14+; pairs with sourceFormat = "svg"
+  // webpOptions = new Common.WebpOptions {
+  //   encoding = "lossy"
+  //   quality = 80
+  // }
   // renderMode = "original"
   // renderModeDefaultSuffix = "_default"
   // renderModeOriginalSuffix = "_original"
@@ -476,21 +481,22 @@ images = new iOS.ImagesEntry {
 }
 ```
 
-| Field                      | Type                 | Required | Description                                                      |
-| -------------------------- | -------------------- | -------- | ---------------------------------------------------------------- |
-| `assetsFolder`             | `String`             | Yes      | Folder inside Assets.xcassets for `.imageset` files              |
-| `nameStyle`                | `NameStyle`          | Yes      | Name style for generated names                                   |
-| `scales`                   | `Listing<Number>?`   | No       | Scale factors (default: `[1, 2, 3]`)                             |
-| `imageSwift`               | `String?`            | No       | Path to generate UIImage extension file                          |
-| `swiftUIImageSwift`        | `String?`            | No       | Path to generate SwiftUI Image extension file                    |
-| `codeConnectSwift`         | `String?`            | No       | Path to generate Figma Code Connect file                         |
-| `sourceFormat`             | `SourceFormat?`      | No       | Source from Figma: `"png"` (default) or `"svg"` (higher quality) |
-| `outputFormat`             | `ImageOutputFormat?` | No       | Output format: `"png"` (default) or `"heic"` (smaller files)     |
-| `heicOptions`              | `HeicOptions?`       | No       | HEIC encoding options (when `outputFormat = "heic"`)             |
-| `renderMode`               | `XcodeRenderMode?`   | No       | Default render mode for image assets                             |
-| `renderModeDefaultSuffix`  | `String?`            | No       | Suffix for default render mode                                   |
-| `renderModeOriginalSuffix` | `String?`            | No       | Suffix for original render mode                                  |
-| `renderModeTemplateSuffix` | `String?`            | No       | Suffix for template render mode                                  |
+| Field                      | Type                 | Required | Description                                                                         |
+| -------------------------- | -------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `assetsFolder`             | `String`             | Yes      | Folder inside Assets.xcassets for `.imageset` files                                 |
+| `nameStyle`                | `NameStyle`          | Yes      | Name style for generated names                                                      |
+| `scales`                   | `Listing<Number>?`   | No       | Scale factors (default: `[1, 2, 3]`)                                                |
+| `imageSwift`               | `String?`            | No       | Path to generate UIImage extension file                                             |
+| `swiftUIImageSwift`        | `String?`            | No       | Path to generate SwiftUI Image extension file                                       |
+| `codeConnectSwift`         | `String?`            | No       | Path to generate Figma Code Connect file                                            |
+| `sourceFormat`             | `SourceFormat?`      | No       | Source from Figma: `"png"` (default) or `"svg"` (higher quality)                    |
+| `outputFormat`             | `ImageOutputFormat?` | No       | Output format: `"png"` (default), `"heic"` (smaller, iOS 12+) or `"webp"` (iOS 14+) |
+| `heicOptions`              | `HeicOptions?`       | No       | HEIC encoding options (when `outputFormat = "heic"`)                                |
+| `webpOptions`              | `WebpOptions?`       | No       | WebP encoding options (when `outputFormat = "webp"`)                                |
+| `renderMode`               | `XcodeRenderMode?`   | No       | Default render mode for image assets                                                |
+| `renderModeDefaultSuffix`  | `String?`            | No       | Suffix for default render mode                                                      |
+| `renderModeOriginalSuffix` | `String?`            | No       | Suffix for original render mode                                                     |
+| `renderModeTemplateSuffix` | `String?`            | No       | Suffix for template render mode                                                     |
 
 **Inherited from `FrameSource`:** `figmaFrameName`, `figmaPageName`, `figmaFileId`, `rtlProperty`, `nameValidateRegexp`, `nameReplaceRegexp`.
 

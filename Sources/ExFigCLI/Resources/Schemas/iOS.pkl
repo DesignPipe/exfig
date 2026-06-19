@@ -9,7 +9,8 @@ typealias XcodeRenderMode = "default"|"original"|"template"
 /// Output format for iOS images in asset catalogs.
 /// - `png`: Standard PNG format (default, maximum compatibility)
 /// - `heic`: HEIC format (~40-50% smaller, iOS 12+, macOS only for encoding)
-typealias ImageOutputFormat = "png"|"heic"
+/// - `webp`: WebP format (iOS 14+); pairs with `sourceFormat = "svg"` to rasterize SVG illustrations to WebP
+typealias ImageOutputFormat = "png"|"heic"|"webp"
 
 /// HEIC encoding mode.
 typealias HeicEncoding = "lossy"|"lossless"
@@ -144,6 +145,9 @@ class ImagesEntry extends Common.FrameSource {
 
   /// HEIC encoding options. Only used when outputFormat is heic.
   heicOptions: HeicOptions?
+
+  /// WebP encoding options. Only used when outputFormat is webp.
+  webpOptions: Common.WebpOptions?
 
   /// Override path to .xcassets folder for this entry.
   /// When set, overrides `iOSConfig.xcassetsPath`.
