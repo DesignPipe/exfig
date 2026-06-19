@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Bug Fixes
+
+- **ci**: Regenerate mise.lock with git-cliff platform URLs by @alexey1312
+
+
+## [3.6.0] - 2026-06-19
+
+### Features
+
+- **ios**: Support SVG to WebP output for images by @alexey1312
+
+
 ## [3.5.0] - 2026-06-02
 
 ### Features
