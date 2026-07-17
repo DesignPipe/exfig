@@ -20,7 +20,8 @@ struct ExFigWarningFormatter {
              .themeAttributesMarkerNotFound, .themeAttributesNameCollision,
              .heicUnavailableFallingBackToPng, .deletedVariableAlias,
              .unresolvedNumberAlias, .depthExceededNumberAlias,
-             .circularColorAlias, .downloadTokensSectionSkipped,
+             .circularColorAlias, .duplicateColorCollection,
+             .downloadTokensSectionSkipped,
              .batchSettingsPreloadFailed, .ignoredPerTargetBatchBlock,
              .ignoredPerTargetFigmaRateLimiting, .invalidConfigValue,
              .excessiveDownloadSlots:
@@ -43,7 +44,7 @@ struct ExFigWarningFormatter {
 
     // MARK: - Compact Formatters
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func formatCompact(_ warning: ExFigWarning) -> String {
         switch warning {
         case let .configMissing(platform, assetType):
@@ -128,6 +129,9 @@ struct ExFigWarningFormatter {
                 "parallel=\(parallel), product=\(concurrentDownloads * parallel), capped=\(capped). " +
                 "Reduce --concurrent-downloads or --parallel to avoid CDN throttling / EMFILE."
 
+        case let .duplicateColorCollection(name, selectedCount, otherCounts):
+            formatDuplicateColorCollection(name: name, selectedCount: selectedCount, otherCounts: otherCounts)
+
         // Multiline cases handled in main format() method
         case .noAssetsFound, .invalidConfigsSkipped, .webIconsMissingSVGData, .webIconsConversionFailed:
             fatalError("Multiline warnings should not reach formatCompact")
@@ -155,6 +159,12 @@ struct ExFigWarningFormatter {
         Invalid configs skipped:
           count: \(count) \(noun)
         """
+    }
+
+    private func formatDuplicateColorCollection(name: String, selectedCount: Int, otherCounts: [Int]) -> String {
+        "Multiple variable collections named '\(name)' found; " +
+            "selected the one with \(selectedCount) variables, ignored \(otherCounts). " +
+            "Remove the duplicate collection in Figma to make export deterministic."
     }
 
     private func formatWebIconsMissingSVGData(count: Int, names: [String]) -> String {

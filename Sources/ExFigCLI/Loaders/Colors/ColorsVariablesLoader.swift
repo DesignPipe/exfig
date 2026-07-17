@@ -37,15 +37,14 @@ final class ColorsVariablesLoader: Sendable {
 
         let meta = try await loadVariables(fileId: tokensFileId)
 
-        guard let tokenCollection = meta.variableCollections.first(where: { $0.value.name == tokensCollectionName })
-        else { throw ExFigError.custom(errorString: "tokensCollectionName not found") }
-
-        let modeIds = extractModeIds(from: tokenCollection.value)
+        var warnings: [ExFigWarning] = []
+        let collection = try selectCollection(named: tokensCollectionName, from: meta, warnings: &warnings)
+        let modeIds = extractModeIds(from: collection)
 
         var descriptions: [String: String] = [:]
         var tokenMetadata: [String: ColorTokenMetadata] = [:]
 
-        let variables: [Variable] = tokenCollection.value.variableIds.compactMap { tokenId in
+        let variables: [Variable] = collection.variableIds.compactMap { tokenId in
             guard let variableMeta = meta.variables[tokenId] else { return nil }
             guard variableMeta.deletedButReferenced != true else { return nil }
 
@@ -62,7 +61,6 @@ final class ColorsVariablesLoader: Sendable {
             return mapVariableMetaToVariable(variableMeta: variableMeta, modeIds: modeIds)
         }
 
-        var warnings: [ExFigWarning] = []
         var aliases: ColorAliases = [:]
         let output = mapVariablesToColorOutput(
             variables: variables,
@@ -83,6 +81,63 @@ final class ColorsVariablesLoader: Sendable {
     private func loadVariables(fileId: String) async throws -> VariablesEndpoint.Content {
         let endpoint = VariablesEndpoint(fileId: fileId)
         return try await client.request(endpoint)
+    }
+
+    /// Picks the variable collection matching `name`.
+    ///
+    /// A Figma file can expose several collections with the same name (stale or remote
+    /// duplicates the editor UI hides). `Dictionary.first(where:)` would pick one at random —
+    /// non-deterministic across runs, which silently dropped colors. We deterministically pick
+    /// the collection with the most *usable* variables (matching what the designer sees in the
+    /// UI) and warn about the duplicates.
+    ///
+    /// "Usable" means the same subset that `load()` actually exports — present in `meta.variables`
+    /// and not `deletedButReferenced`. Ranking by raw `variableIds.count` would let a stale
+    /// collection padded with deleted/dangling ids win over the real one; it also keeps the
+    /// warning's counts consistent with the number of colors the user actually gets.
+    private func selectCollection(
+        named name: String,
+        from meta: VariablesEndpoint.Content,
+        warnings: inout [ExFigWarning]
+    ) throws -> Dictionary<String, VariableCollectionValue>.Values.Element {
+        let candidates = meta.variableCollections.values
+            .filter { $0.name == name }
+            // Stable order: most usable variables first; ties broken by id so it never depends
+            // on dictionary iteration order.
+            .sorted { lhs, rhs in
+                let lhsCount = usableVariableCount(of: lhs, in: meta)
+                let rhsCount = usableVariableCount(of: rhs, in: meta)
+                if lhsCount != rhsCount {
+                    return lhsCount > rhsCount
+                }
+                return lhs.id < rhs.id
+            }
+
+        guard let selected = candidates.first else {
+            throw ExFigError.custom(errorString: "tokensCollectionName not found")
+        }
+
+        if candidates.count > 1 {
+            warnings.append(.duplicateColorCollection(
+                name: name,
+                selectedCount: usableVariableCount(of: selected, in: meta),
+                otherCounts: candidates.dropFirst().map { usableVariableCount(of: $0, in: meta) }
+            ))
+        }
+
+        return selected
+    }
+
+    /// Counts the variables in `collection` that `load()` would actually export:
+    /// present in `meta.variables` and not deleted-but-referenced.
+    private func usableVariableCount(
+        of collection: VariableCollectionValue,
+        in meta: VariablesEndpoint.Content
+    ) -> Int {
+        collection.variableIds.count(where: { id in
+            guard let variable = meta.variables[id] else { return false }
+            return variable.deletedButReferenced != true
+        })
     }
 
     private func extractModeIds(

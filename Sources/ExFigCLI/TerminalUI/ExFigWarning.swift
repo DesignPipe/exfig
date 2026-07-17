@@ -103,6 +103,10 @@ enum ExFigWarning: Equatable {
     /// A color variable alias chain exceeded maximum depth (likely circular).
     case circularColorAlias(tokenName: String)
 
+    /// Multiple variable collections share the requested name; the one with the most
+    /// variables was selected. Extra collections are usually stale/remote duplicates.
+    case duplicateColorCollection(name: String, selectedCount: Int, otherCounts: [Int])
+
     /// A `download tokens` section was skipped because config is missing.
     case downloadTokensSectionSkipped(section: String)
 

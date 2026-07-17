@@ -657,4 +657,114 @@ final class ColorsVariablesLoaderTests: XCTestCase {
         // (all modes come in single response, no parallelization needed)
         XCTAssertEqual(mockClient.requestCount, 1)
     }
+
+    // MARK: - Duplicate Collection Names
+
+    /// Regression: a Figma file can expose several collections with the same name (a stale/remote
+    /// duplicate the editor UI hides). Picking via `Dictionary.first(where:)` was non-deterministic
+    /// and silently dropped almost all colors — the folder was then wiped and only the survivors
+    /// re-written. The loader must deterministically pick the fullest collection and warn.
+    func testPicksFullestCollectionWhenNamesCollide() async throws {
+        // Given: two collections named "Base palette" — a full one (2 usable vars) and a stale dupe.
+        // The stale collection's variableIds point at a variable that isn't in the response, so it
+        // has 0 usable variables and must lose to the 2-var main collection.
+        let variablesMeta = VariablesMeta.makeWithAliases(
+            collectionName: "Base palette", // main collection (VariableCollectionId:1:1)
+            variables: [
+                (
+                    id: "1:2", name: "backgroundPrimary", collectionId: nil,
+                    valuesByMode: ["1:0": .color(r: 1.0, g: 1.0, b: 1.0, a: 1.0)]
+                ),
+                (
+                    id: "1:3", name: "textPrimary", collectionId: nil,
+                    valuesByMode: ["1:0": .color(r: 0.0, g: 0.0, b: 0.0, a: 1.0)]
+                ),
+            ],
+            primitiveCollections: [
+                (
+                    id: "VariableCollectionId:stale", name: "Base palette",
+                    defaultModeId: "9:0", modes: [("9:0", "Light")], variableIds: ["dupe:1"]
+                ),
+            ]
+        )
+
+        mockClient.setResponse(variablesMeta, for: VariablesEndpoint.self)
+
+        let loader = ColorsVariablesLoader(
+            client: mockClient,
+            variableParams: PKLConfig.Common.VariablesColors.make(
+                tokensFileId: "test-file", tokensCollectionName: "Base palette", lightModeName: "Light"
+            ),
+            filter: nil
+        )
+
+        // When: loading colors
+        let result = try await loader.load()
+
+        // Then: the full collection (2 vars) is used, not the stale dupe; and a warning surfaces it.
+        // otherCounts is [0] — the stale dupe's one variableId resolves to no usable variable.
+        XCTAssertEqual(Set(result.output.light.map(\.name)), ["backgroundPrimary", "textPrimary"])
+        XCTAssertEqual(
+            result.warnings,
+            [.duplicateColorCollection(name: "Base palette", selectedCount: 2, otherCounts: [0])]
+        )
+    }
+
+    /// Regression for the *determinism* half of the fix: when two same-name collections have an
+    /// equal usable-variable count, the count comparison gives no signal, so selection falls to the
+    /// id tie-break. Without a stable tie-break the pick would depend on dictionary iteration order —
+    /// exactly the non-determinism this fix removes. The lower id must always win.
+    ///
+    /// The dupe is given id "VariableCollectionId:0:0" (sorts *below* the main "VariableCollectionId:1:1"),
+    /// so a no-op id comparator would pick the main collection and fail this test — the assertion is
+    /// only satisfiable if the id tie-break is actually consulted.
+    func testTieBreaksByLowerIdWhenUsableCountsAreEqual() async throws {
+        let variablesMeta = VariablesMeta.makeWithAliases(
+            collectionName: "Base palette", // main collection id = VariableCollectionId:1:1, 2 usable vars
+            variables: [
+                (
+                    id: "main:1", name: "mainOnly1", collectionId: nil,
+                    valuesByMode: ["1:0": .color(r: 1.0, g: 1.0, b: 1.0, a: 1.0)]
+                ),
+                (
+                    id: "main:2", name: "mainOnly2", collectionId: nil,
+                    valuesByMode: ["1:0": .color(r: 1.0, g: 1.0, b: 1.0, a: 1.0)]
+                ),
+                // Two real variables belonging to the lower-id dupe collection (also 2 usable).
+                (
+                    id: "low:1", name: "lowWins1", collectionId: "VariableCollectionId:0:0",
+                    valuesByMode: ["1:0": .color(r: 0.0, g: 0.0, b: 0.0, a: 1.0)]
+                ),
+                (
+                    id: "low:2", name: "lowWins2", collectionId: "VariableCollectionId:0:0",
+                    valuesByMode: ["1:0": .color(r: 0.0, g: 0.0, b: 0.0, a: 1.0)]
+                ),
+            ],
+            primitiveCollections: [
+                (
+                    id: "VariableCollectionId:0:0", name: "Base palette",
+                    defaultModeId: "1:0", modes: [("1:0", "Light")], variableIds: ["low:1", "low:2"]
+                ),
+            ]
+        )
+
+        mockClient.setResponse(variablesMeta, for: VariablesEndpoint.self)
+
+        let loader = ColorsVariablesLoader(
+            client: mockClient,
+            variableParams: PKLConfig.Common.VariablesColors.make(
+                tokensFileId: "test-file", tokensCollectionName: "Base palette", lightModeName: "Light"
+            ),
+            filter: nil
+        )
+
+        let result = try await loader.load()
+
+        // The lower-id collection (VariableCollectionId:0:0) wins the tie, regardless of dict order.
+        XCTAssertEqual(Set(result.output.light.map(\.name)), ["lowWins1", "lowWins2"])
+        XCTAssertEqual(
+            result.warnings,
+            [.duplicateColorCollection(name: "Base palette", selectedCount: 2, otherCounts: [2])]
+        )
+    }
 }
