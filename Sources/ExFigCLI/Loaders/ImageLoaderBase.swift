@@ -866,10 +866,13 @@ class ImageLoaderBase: @unchecked Sendable {
                 let iconName = component?.iconName ?? ""
                 let variantName = component?.name ?? ""
                 let displayName = iconName == variantName ? iconName : "\(iconName) (\(variantName))"
-                let errorMsg =
-                    "Unable to get image for node with id = \(nodeId). "
-                        + "Please check that component \(displayName) in the Figma file is not empty. Skipping..."
-                logger.error("\(errorMsg)")
+                // Figma returns no image URL when a component has no renderable content (e.g. an
+                // empty dark-variant placeholder). That's not fatal — the node is skipped and its
+                // pack-siblings (e.g. the light variant) still export — so warn instead of erroring.
+                let warnMsg =
+                    "No image for node id=\(nodeId) (component '\(displayName)') — "
+                        + "it may be empty or failed to render in Figma. Skipping."
+                logger.warning("\(warnMsg)")
                 return nil
             }
         }
