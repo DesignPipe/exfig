@@ -2,11 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.6.1] - 2026-07-17
 
 ### Bug Fixes
 
 - **ci**: Regenerate mise.lock with git-cliff platform URLs by @alexey1312
+
+- **colors**: Deterministically pick fullest variable collection on name collision by @alexey1312
+
+- **icons**: Warn (not error) when a component renders empty by @alexey1312
 
 
 ## [3.6.0] - 2026-06-19
