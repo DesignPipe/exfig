@@ -35,7 +35,7 @@ git config core.hooksPath .githooks 2>/dev/null || true
 [tools]
 # --- Swift Development ---
 swiftformat = "0.60.1" # Swift code formatting
-swiftlint = "0.63.2"   # Swift linting
+swiftlint = "0.63.3"   # Swift linting
 xcsift = "1.2.0"      # xcodebuild output filtering
 
 # --- Documentation & Formatting ---
