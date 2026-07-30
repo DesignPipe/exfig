@@ -20,7 +20,7 @@ jobs:
     name: Lint
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           lfs: true
 
@@ -46,7 +46,7 @@ jobs:
       DEVELOPER_DIR: "/Applications/Xcode_26.2.app/Contents/Developer"
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           lfs: true
 
@@ -96,7 +96,7 @@ jobs:
           apt-get install -y git-lfs curl
           git lfs install
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           lfs: true
 
@@ -137,7 +137,7 @@ jobs:
     runs-on: windows-latest
     needs: lint
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install Swift
         uses: compnerd/gha-setup-swift@v0.3.0
