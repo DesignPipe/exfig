@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.6.2] - 2026-07-30
+
+### Bug Fixes
+
+- **images**: Export light/dark pairs together with granular cache  by @alexey1312 in [#84](https://github.com/DesignPipe/exfig/pull/84)
+
+
+### Other
+
+- **deps**: Update project tools 2026-07  by @alexey1312 in [#85](https://github.com/DesignPipe/exfig/pull/85)
+
+
 ## [3.6.1] - 2026-07-17
 
 ### Bug Fixes
