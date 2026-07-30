@@ -53,8 +53,8 @@ jobs:
         if: matrix.platform == 'windows-x64'
         uses: compnerd/gha-setup-swift@v0.4.0
         with:
-          branch: swift-6.3-release
-          tag: 6.3-RELEASE
+          swift-version: swift-6.3-release
+          swift-build: 6.3-RELEASE
 
       - name: Install Swift 6.3 toolchain (macOS)
         if: matrix.platform == 'macos'
