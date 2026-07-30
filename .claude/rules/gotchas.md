@@ -202,6 +202,31 @@ final class Collector: Sendable {
 }
 ```
 
+## ParsableArguments: never construct with bare `init()` and then read it
+
+`ParsableArguments.init()` satisfies the protocol but leaves every `@Option`/`@Flag` **undecoded**.
+Assigning is fine; the first *read* traps and kills the whole test process:
+
+```
+Can't read a value from a parsable argument definition.
+```
+
+Under `swift test --parallel` this shows up as a suite that logs `started` with no `passed` and a
+non-zero exit — no `XCTAssert` failure line, so it is easy to mistake for a green run.
+
+```swift
+// BAD — traps on the first read of .rateLimit
+cmd.faultToleranceOptions = FaultToleranceOptions()
+_ = cmd.faultToleranceOptions.effectiveRateLimit(configValue: nil)
+
+// GOOD — "no CLI flag given", all defaults decoded
+cmd.faultToleranceOptions = try FaultToleranceOptions.parse([])
+```
+
+Applies to `filter`, `strictPathValidation`, and every `@OptionGroup` on manually built subcommands
+(the `BatchConfigRunner.make*` pattern). Production is safe — `BatchConfigRunner` receives
+already-parsed option groups; only hand-rolled test instances hit this.
+
 ## Test Helpers for Codable Types
 
 ```swift

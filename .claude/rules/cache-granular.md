@@ -74,6 +74,30 @@ This pattern ensures:
 - Multiple configs referencing the same Figma file all benefit from granular cache tracking
 - Single atomic save at the end contains both file versions AND nodeHashes
 
+## Light/Dark Pairing (mandatory in single-file mode)
+
+In `useSingleFile` + `suffixDarkMode` mode, filtering to changed nodes alone breaks
+`ImagesProcessor.process(light:dark:)` — it requires matching pairs and throws
+`AssetsValidatorError.countMismatch` (`Asset count mismatch: light=0, dark=1`) when only one side changed.
+
+Every single-file granular path MUST use the pairing-aware variant so a changed dark node drags its
+light sibling into the export:
+
+```toon
+paths[3]{caller,method,pairing}:
+  IconsLoader.loadFromSingleFileWithGranularCache,loadVectorImagesWithGranularCacheAndPairing,required
+  ImagesLoader.loadFromSingleFileWithGranularCache (PNG),loadPNGImagesWithGranularCache(darkModeSuffix:),required
+  ImagesLoader.loadFromSingleFileWithGranularCache (SVG),loadVectorImagesWithGranularCacheAndPairing,required
+```
+
+`loadFromLightAndDarkFileWithGranularCache` must NOT pair (`darkModeSuffix: nil`) — light and dark live
+in separate files and are filtered independently.
+
+Pairing matches on `baseName(for: component.iconName, darkModeSuffix:)`, so `darkSuffix` must be the
+same value later passed to `splitByDarkMode` (both default to `"_dark"` when `suffixDarkMode` is unset).
+
+Regression tests: `IconsLoaderGranularCachePairingTests`, `ImagesLoaderGranularCachePairingTests`.
+
 ## Known Limitations
 
 - Config changes (output path, format, scale) are not detected - use `--force` when config changes

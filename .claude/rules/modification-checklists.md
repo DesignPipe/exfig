@@ -22,6 +22,26 @@ When adding fields to `FrameSource` (PKL) / `SourceInput` (ExFigCore), also upda
 8. `DownloadAll.swift` — pass filter value to both `exportIcons` and `exportImages`
 9. Error/warning types with context (`ExFigError`, `ExFigWarning`) — add associated values if needed
 
+## Modifying IconsLoader or ImagesLoader (always both)
+
+`IconsLoader` and `ImagesLoader` are siblings over `ImageLoaderBase` with near-identical
+`loadFromSingleFileWithGranularCache` / `loadFromLightAndDarkFileWithGranularCache` structure.
+A fix applied to one is usually a bug left in the other. Put shared logic in `ImageLoaderBase` and
+check ALL granular call sites:
+
+```toon
+call_sites[4]{loader,mode,branches}:
+  IconsLoader,single-file,vector only
+  IconsLoader,light+dark files,vector only
+  ImagesLoader,single-file,PNG + SVG (two branches!)
+  ImagesLoader,light+dark files,PNG + SVG (two branches!)
+```
+
+`ImagesLoader` has a raster branch that `IconsLoader` does not (`isRasterFormat && !useSVGSource`) —
+any helper added for icons needs a PNG counterpart. Example: `f124526` added light/dark pairing to
+`IconsLoader` only; `ImagesLoader` kept exporting orphan dark assets until `loadPNGImagesWithGranularCache`
+gained `darkModeSuffix:`. See `.claude/rules/cache-granular.md` → Light/Dark Pairing.
+
 ## Adding a New Filter Level (e.g., page filtering)
 
 Filter predicate sites that ALL need updating:
