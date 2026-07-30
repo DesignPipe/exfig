@@ -50,7 +50,7 @@ git-cliff = "2.13.1" # Changelog generation
 pkl = "0.31.1" # Configuration language (for hk.pkl)
 
 # --- CLI Spec ---
-usage = "3.2.0" # CLI spec → shell completions, docs, man pages
+usage = "4.0.0" # CLI spec → shell completions, docs, man pages
 
 
 # =============================================================================
