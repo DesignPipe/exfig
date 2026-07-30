@@ -572,20 +572,32 @@ class ImageLoaderBase: @unchecked Sendable {
     /// 2. Computes content hashes for granular change detection
     /// 3. Filters to only changed components (if cache exists)
     /// 4. Returns computed hashes for cache update after export
+    ///
+    /// Pass `darkModeSuffix` in `useSingleFile` mode so a changed dark node drags its light sibling
+    /// into the export — otherwise `ImagesProcessor` validation fails with a count mismatch.
+    /// Leave it `nil` in light/dark-file mode, where each file is filtered independently.
     func loadPNGImagesWithGranularCache(
         fileId: String,
         frameName: String,
         pageName: String? = nil,
         filter: String? = nil,
         scales: [Double],
+        darkModeSuffix: String? = nil,
         rtlProperty: String? = Component.defaultRTLProperty,
         rtlActiveValues: [String]? = nil,
         onBatchProgress: @escaping BatchProgressCallback = { _, _ in }
     ) async throws -> ImagesWithHashesResult {
-        let filterResult = try await fetchImageComponentsWithGranularCache(
-            fileId: fileId, frameName: frameName, pageName: pageName, filter: filter, rtlProperty: rtlProperty,
-            rtlActiveValues: rtlActiveValues
-        )
+        let filterResult = if let darkModeSuffix {
+            try await fetchImageComponentsWithGranularCacheAndPairing(
+                fileId: fileId, frameName: frameName, pageName: pageName, filter: filter,
+                darkModeSuffix: darkModeSuffix, rtlProperty: rtlProperty, rtlActiveValues: rtlActiveValues
+            )
+        } else {
+            try await fetchImageComponentsWithGranularCache(
+                fileId: fileId, frameName: frameName, pageName: pageName, filter: filter, rtlProperty: rtlProperty,
+                rtlActiveValues: rtlActiveValues
+            )
+        }
 
         if filterResult.allSkipped {
             return ImagesWithHashesResult(

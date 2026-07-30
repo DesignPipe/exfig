@@ -427,12 +427,14 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
             // PNG source: Raster images (PNG/WebP) with granular cache
             let scales = getScales(customScales: configScales)
 
+            // Use pairing-aware method to ensure light/dark pairs are exported together
             let result = try await loadPNGImagesWithGranularCache(
                 fileId: fileId,
                 frameName: frameName,
                 pageName: pageName,
                 filter: filter,
                 scales: scales,
+                darkModeSuffix: darkSuffix,
                 rtlProperty: config.rtlProperty,
                 rtlActiveValues: config.rtlActiveValues,
                 onBatchProgress: onBatchProgress
@@ -461,12 +463,14 @@ final class ImagesLoader: ImageLoaderBase, @unchecked Sendable { // swiftlint:di
             )
         } else {
             // SVG source or vector output: fetch SVG with granular cache
-            let result = try await loadVectorImagesWithGranularCache(
+            // Use pairing-aware method to ensure light/dark pairs are exported together
+            let result = try await loadVectorImagesWithGranularCacheAndPairing(
                 fileId: fileId,
                 frameName: frameName,
                 pageName: pageName,
                 params: SVGParams(),
                 filter: filter,
+                darkModeSuffix: darkSuffix,
                 rtlProperty: config.rtlProperty,
                 rtlActiveValues: config.rtlActiveValues,
                 onBatchProgress: onBatchProgress

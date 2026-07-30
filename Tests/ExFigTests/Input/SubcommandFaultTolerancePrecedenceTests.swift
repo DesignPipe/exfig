@@ -11,6 +11,11 @@ import XCTest
 ///
 /// Without these, a regression that swaps `??` direction or stops passing `figma?.rateLimit`
 /// in any subcommand would slip through unit tests on `FaultToleranceOptions` alone.
+///
+/// "No CLI flag given" MUST be spelled `try FaultToleranceOptions.parse([])`, never the bare
+/// `FaultToleranceOptions()` initializer: `ParsableArguments.init()` leaves every `@Option`
+/// undecoded, so the first read of `.rateLimit` / `.timeout` traps with
+/// "Can't read a value from a parsable argument definition" and kills the test process.
 final class SubcommandFaultTolerancePrecedenceTests: XCTestCase {
     private var tempFiles: [URL] = []
 
@@ -49,7 +54,7 @@ final class SubcommandFaultTolerancePrecedenceTests: XCTestCase {
         cmd.globalOptions = GlobalOptions()
         cmd.options = options
         cmd.cacheOptions = CacheOptions()
-        cmd.faultToleranceOptions = FaultToleranceOptions()
+        cmd.faultToleranceOptions = try FaultToleranceOptions.parse([])
         cmd.filter = nil
 
         let figma = cmd.options.params.figma
@@ -63,7 +68,7 @@ final class SubcommandFaultTolerancePrecedenceTests: XCTestCase {
         cmd.globalOptions = GlobalOptions()
         cmd.options = options
         cmd.cacheOptions = CacheOptions()
-        cmd.faultToleranceOptions = FaultToleranceOptions()
+        cmd.faultToleranceOptions = try FaultToleranceOptions.parse([])
         cmd.filter = nil
 
         let figma = cmd.options.params.figma
@@ -98,7 +103,7 @@ final class SubcommandFaultTolerancePrecedenceTests: XCTestCase {
         cmd.globalOptions = GlobalOptions()
         cmd.options = options
         cmd.cacheOptions = CacheOptions()
-        cmd.faultToleranceOptions = HeavyFaultToleranceOptions()
+        cmd.faultToleranceOptions = try HeavyFaultToleranceOptions.parse([])
         cmd.filter = nil
 
         let figma = cmd.options.params.figma
@@ -114,7 +119,7 @@ final class SubcommandFaultTolerancePrecedenceTests: XCTestCase {
         cmd.globalOptions = GlobalOptions()
         cmd.options = options
         cmd.cacheOptions = CacheOptions()
-        cmd.faultToleranceOptions = HeavyFaultToleranceOptions()
+        cmd.faultToleranceOptions = try HeavyFaultToleranceOptions.parse([])
         cmd.filter = nil
         cmd.strictPathValidation = false
 
@@ -143,7 +148,7 @@ final class SubcommandFaultTolerancePrecedenceTests: XCTestCase {
 
     func testPKLTimeoutUsedWhenCLITimeoutAbsent() throws {
         let options = try makeOptions(figmaBlock: "timeout = 60.0")
-        let cliOpts = FaultToleranceOptions()
+        let cliOpts = try FaultToleranceOptions.parse([])
 
         let configTimeout = options.params.figma?.timeout
         let effective: TimeInterval? = cliOpts.timeout.map { TimeInterval($0) } ?? configTimeout

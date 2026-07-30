@@ -150,6 +150,11 @@ extension ExFigCommand {
                 resolved: resolved,
                 ui: ui
             )
+
+            // A reported failure must fail the process — otherwise CI treats a broken export as green.
+            if result.failureCount > 0 {
+                throw ExitCode.failure
+            }
         }
 
         // MARK: - Run Helpers
@@ -868,6 +873,14 @@ extension ExFigCommand {
             }
 
             NooraUI.shared.table(headers: headers, rows: rows)
+
+            // The table truncates both the config name and the error, which makes CI logs useless
+            // for identifying what failed. Repeat failures in full underneath it.
+            guard !result.failures.isEmpty else { return }
+            ui.info("")
+            for failure in result.failures {
+                ui.error("\(failure.config.name): \(failure.error.localizedDescription)")
+            }
         }
 
         private func displayRateLimitStatus(status: RateLimiterStatus, ui: TerminalUI) {
