@@ -47,7 +47,7 @@ actionlint = "1.7.12" # GitHub Actions linting
 git-cliff = "2.13.1" # Changelog generation
 
 # --- Configuration ---
-pkl = "0.31.1" # Configuration language (for hk.pkl)
+pkl = "0.32.1" # Configuration language (for hk.pkl)
 
 # --- CLI Spec ---
 usage = "4.0.0" # CLI spec → shell completions, docs, man pages
