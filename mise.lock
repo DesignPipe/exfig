@@ -129,32 +129,32 @@ checksum = "sha256:3ae3a5549e85c7ad5b20192ebcfee4371269deca51255f6f2f2e051c6541f
 url = "https://github.com/orhun/git-cliff/releases/download/v2.13.1/git-cliff-2.13.1-x86_64-pc-windows-msvc.zip"
 
 [[tools.hk]]
-version = "1.39.0"
+version = "1.53.0"
 backend = "aqua:jdx/hk"
 
 [tools.hk."platforms.linux-arm64"]
-checksum = "sha256:209b73effe9f36fc5eee5a6ec0e833a501ed67f1041fbb3aeac9923ee252eb53"
-url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:3cf58d268a9114f0923a06c38cf0995b9da43bf2279b09aac3c3c615a615b3e4"
+url = "https://github.com/jdx/hk/releases/download/v1.53.0/hk-aarch64-unknown-linux-gnu.tar.gz"
 
 [tools.hk."platforms.linux-arm64-musl"]
-checksum = "sha256:209b73effe9f36fc5eee5a6ec0e833a501ed67f1041fbb3aeac9923ee252eb53"
-url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:3cf58d268a9114f0923a06c38cf0995b9da43bf2279b09aac3c3c615a615b3e4"
+url = "https://github.com/jdx/hk/releases/download/v1.53.0/hk-aarch64-unknown-linux-gnu.tar.gz"
 
 [tools.hk."platforms.linux-x64"]
-checksum = "sha256:559c72b512f7ec3df48f7a1e0f4d1c1082dd24a26f7d40865805dcc12dbf2a7c"
-url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:960c14b3bcd61e36dcb42c304e3cc23b22ef2e6f28ac6559e3856d27acf6b54a"
+url = "https://github.com/jdx/hk/releases/download/v1.53.0/hk-x86_64-unknown-linux-gnu.tar.gz"
 
 [tools.hk."platforms.linux-x64-musl"]
-checksum = "sha256:559c72b512f7ec3df48f7a1e0f4d1c1082dd24a26f7d40865805dcc12dbf2a7c"
-url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:960c14b3bcd61e36dcb42c304e3cc23b22ef2e6f28ac6559e3856d27acf6b54a"
+url = "https://github.com/jdx/hk/releases/download/v1.53.0/hk-x86_64-unknown-linux-gnu.tar.gz"
 
 [tools.hk."platforms.macos-arm64"]
-checksum = "sha256:0df1d19a8a7b052def3b1048a38681218ce4e04579c1805fa74457f8e634ee82"
-url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:d5c1f9a4c3598cc72c9f15908af6e036b138b9dd97c8891e4d08f699c98a5069"
+url = "https://github.com/jdx/hk/releases/download/v1.53.0/hk-aarch64-apple-darwin.tar.gz"
 
 [tools.hk."platforms.windows-x64"]
-checksum = "sha256:4fdbc4dfe17191fdc2157e2ddb9cf32d0e9fb4c6c0cddae2f8f2ea4b0b351fca"
-url = "https://github.com/jdx/hk/releases/download/v1.39.0/hk-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:a2e5c6131d01cfd6d62204872798f97fc933e7f142d718b3e191434e2d31ef1c"
+url = "https://github.com/jdx/hk/releases/download/v1.53.0/hk-x86_64-pc-windows-msvc.zip"
 
 [[tools.pkl]]
 version = "0.31.1"

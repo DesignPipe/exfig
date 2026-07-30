@@ -42,7 +42,7 @@ xcsift = "1.3.1"      # xcodebuild output filtering
 dprint = "0.55.2" # MD/JSON/YAML formatting (Rust, fast)
 
 # --- Git & CI ---
-hk = "1.39.0"        # Git hooks manager
+hk = "1.53.0"        # Git hooks manager
 actionlint = "1.7.12" # GitHub Actions linting
 git-cliff = "2.13.1" # Changelog generation
 
