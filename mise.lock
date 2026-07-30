@@ -189,7 +189,7 @@ checksum = "sha256:a8834481667325b44c539dbb758d7365a16389070f343c04b639bbe525ede
 url = "https://github.com/apple/pkl/releases/download/0.31.1/pkl-windows-amd64.exe"
 
 [[tools.swiftformat]]
-version = "0.60.1"
+version = "0.62.1"
 backend = "asdf:swiftformat"
 
 [[tools.swiftlint]]
