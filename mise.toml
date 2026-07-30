@@ -39,7 +39,7 @@ swiftlint = "0.63.2"   # Swift linting
 xcsift = "1.2.0"      # xcodebuild output filtering
 
 # --- Documentation & Formatting ---
-dprint = "0.53.1" # MD/JSON/YAML formatting (Rust, fast)
+dprint = "0.55.2" # MD/JSON/YAML formatting (Rust, fast)
 
 # --- Git & CI ---
 hk = "1.39.0"        # Git hooks manager

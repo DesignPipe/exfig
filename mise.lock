@@ -65,36 +65,36 @@ checksum = "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip"
 
 [[tools.dprint]]
-version = "0.53.1"
+version = "0.55.2"
 backend = "aqua:dprint/dprint"
 
 [tools.dprint."platforms.linux-arm64"]
-checksum = "sha256:559cbd7aff707d461627c46f817cd06c28828458ef4a21eb18801f588bc94e89"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-aarch64-unknown-linux-musl.zip"
+checksum = "sha256:f0101217dd0abc94f1ac01b83d306d0288aeee8a501e8614a5e2bbe037500be0"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-aarch64-unknown-linux-musl.zip"
 
 [tools.dprint."platforms.linux-arm64-musl"]
-checksum = "sha256:559cbd7aff707d461627c46f817cd06c28828458ef4a21eb18801f588bc94e89"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-aarch64-unknown-linux-musl.zip"
+checksum = "sha256:f0101217dd0abc94f1ac01b83d306d0288aeee8a501e8614a5e2bbe037500be0"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-aarch64-unknown-linux-musl.zip"
 
 [tools.dprint."platforms.linux-x64"]
-checksum = "sha256:f2815a5c217bb63ff54356c4a6e1e5393a126b29c46116ae57a08ec97c29cb85"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-x86_64-unknown-linux-musl.zip"
+checksum = "sha256:45fc0eef3216af21c4c22c6e7e233aa45c3080fac07b6e94db7008a5c8e5c67a"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-x86_64-unknown-linux-musl.zip"
 
 [tools.dprint."platforms.linux-x64-musl"]
-checksum = "sha256:f2815a5c217bb63ff54356c4a6e1e5393a126b29c46116ae57a08ec97c29cb85"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-x86_64-unknown-linux-musl.zip"
+checksum = "sha256:45fc0eef3216af21c4c22c6e7e233aa45c3080fac07b6e94db7008a5c8e5c67a"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-x86_64-unknown-linux-musl.zip"
 
 [tools.dprint."platforms.macos-arm64"]
-checksum = "sha256:4c822f9d4c692b0f0cd53d14bc82057488e1c4db2df1122b1aceb0a660795ac8"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-aarch64-apple-darwin.zip"
+checksum = "sha256:e9ba8ed7988f3350501a8cf8af92da616cdec8d9d5c831c069293c587311b49d"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-aarch64-apple-darwin.zip"
 
 [tools.dprint."platforms.macos-x64"]
-checksum = "sha256:b35e91afe0f7f2217128b8edcebd63d789b00f9c1b0300e4907a115106d857fd"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-x86_64-apple-darwin.zip"
+checksum = "sha256:b7074cf6c814f995b783b5baa7e516b34e783c42c9baf7af553dbad731adb3a7"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-x86_64-apple-darwin.zip"
 
 [tools.dprint."platforms.windows-x64"]
-checksum = "sha256:db21e2f7a09dc9b3a2fbe2faac34a9f0733a4cc3cb8c78dd13dae6f081e13d4c"
-url = "https://github.com/dprint/dprint/releases/download/0.53.1/dprint-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:12e8c26abc8c436223e70f5a30a2864001c92fa356a859eb93e06b97ab7dbd12"
+url = "https://github.com/dprint/dprint/releases/download/0.55.2/dprint-x86_64-pc-windows-msvc.zip"
 
 [[tools.git-cliff]]
 version = "2.13.1"
