@@ -7,3 +7,6 @@
 --wraparguments before-first
 --wrapcollections before-first
 --exclude .build,Packages,Sources/ExFigConfig/Generated
+# 0.62.0 split the opt-in wrapConditionalBodies rule into wrapIf*/wrapGuard* rules and
+# turned the two wrapIf* halves on by default; keep single-line if bodies as they are.
+--disable wrapIfStatementBodies,wrapIfExpressionBodies

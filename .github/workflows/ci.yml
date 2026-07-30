@@ -20,7 +20,7 @@ jobs:
     name: Lint
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           lfs: true
 
@@ -46,7 +46,7 @@ jobs:
       DEVELOPER_DIR: "/Applications/Xcode_26.2.app/Contents/Developer"
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           lfs: true
 
@@ -58,7 +58,7 @@ jobs:
           echo "TOOLCHAINS=$TOOLCHAINS" >> "$GITHUB_ENV"
 
       - name: Cache SPM dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .build
           key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
@@ -96,12 +96,12 @@ jobs:
           apt-get install -y git-lfs curl
           git lfs install
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           lfs: true
 
       - name: Cache SPM dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .build
           key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
@@ -137,16 +137,16 @@ jobs:
     runs-on: windows-latest
     needs: lint
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install Swift
-        uses: compnerd/gha-setup-swift@v0.3.0
+        uses: compnerd/gha-setup-swift@v0.4.0
         with:
-          branch: swift-6.3-release
-          tag: 6.3-RELEASE
+          swift-version: swift-6.3-release
+          swift-build: 6.3-RELEASE
 
       - name: Cache SPM dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .build
           key: ${{ runner.os }}-swift-6.3-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
