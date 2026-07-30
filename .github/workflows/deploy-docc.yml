@@ -45,7 +45,7 @@ jobs:
               --output-path docs
           echo '<script>window.location.href += "/documentation/exfigcli"</script>' > docs/index.html
 
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs
 
