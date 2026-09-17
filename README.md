@@ -8,6 +8,8 @@
 
 Export colors, typography, icons, and images from Figma and Penpot to Xcode, Android Studio, Flutter, and Web projects — automatically. Runs on macOS, Linux, and Windows.
 
+**Project page:** [blog.kakoulin.com/apps/exfig](https://blog.kakoulin.com/apps/exfig)
+
 ## The Problem
 
 - Figma has no "Export to Xcode" button. You copy hex codes by hand, one by one.
